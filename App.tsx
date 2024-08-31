@@ -1,20 +1,28 @@
+import 'react-native-gesture-handler';
+import { registerRootComponent } from "expo";
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import AuthProvider from './src/contexts/auth';
+import { Routes } from './src/routes';
+import { construtor } from './src/database/conexao';  
+import { useContext, useEffect } from 'react';
+import * as SQLite  from 'expo-sqlite';
+import ConnectedProvider, { ConnectedContext } from './src/contexts/conectedContext';
+import NetInfo from '@react-native-community/netinfo';
+
 
 export default function App() {
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <ConnectedProvider>
+        <AuthProvider>
+          <SQLite.SQLiteProvider databaseName="test.db" onInit={construtor }>
+          <Routes/>
+        </SQLite.SQLiteProvider>
+        </AuthProvider>
+    </ConnectedProvider>
+ 
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+ 

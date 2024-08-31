@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "myapp",
+    "name": "INTERSIG",
     "slug": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,11 +17,20 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
+        "backgroundColor": "#ffffff",
+        "permissions": [
+          "INTERNET"
+        ]
+      },
+      "package": "com.everton421.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9d1e81ee-bfc0-48f7-93d1-e1ad9758fb0d"
+      }
     }
   }
 }

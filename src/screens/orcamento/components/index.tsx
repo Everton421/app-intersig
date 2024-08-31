@@ -151,7 +151,6 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
          observacoes,
           setOrcamento]);
         
-
         //   useEffect(() => {
         //     console.log('');
         //     console.log('Orçamento atualizado:', orcamento);
@@ -359,12 +358,13 @@ const alertaExclusao = (item)=>{
                     </View>
                 </View>
                   
-  
+      {/*//////////////// components produtos  ////////////////////////*/    }  
                 <View style={{ flexDirection: 'row' }}>
                        <ListaProdutos orcamentoEditavel={orcamentoEditavel?.produtos} />
+                 <Cart/>
+
                  </View>
 
-                 <Cart/>
 
                  <View style={{ borderWidth: 0.4, margin: 5 }}></View>
 
@@ -378,6 +378,8 @@ const alertaExclusao = (item)=>{
                     />
                 
                 )}
+      {/*////////////////////////////////////////////////////////////////*/    }  
+
 
                 <View style={{ marginTop: '5%' }}>
                     <View style={{ borderWidth: 0.4, margin: 5 }}></View>

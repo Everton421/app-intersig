@@ -184,8 +184,8 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => setVisibleProdutos(true)} style={{ elevation: 5, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#009de2', padding: 10, margin: 5, borderRadius: 10 }}>
-        <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 17 }}>
+      <TouchableOpacity onPress={() => setVisibleProdutos(true)} style={{   elevation: 5, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#009de2', paddingTop:10, paddingBottom: 10, margin: 5, borderRadius: 10 }}>
+        <Text style={{ marginLeft:5,color: 'white', fontWeight: 'bold', fontSize: 17 }}>
           produtos
         </Text>
         <AntDesign name="caretdown" size={24} color="white" />
@@ -247,7 +247,6 @@ const { connected, setConnected } = useContext(ConnectedContext)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#dcdcdaad'
   },
   item: {
     backgroundColor: '#f9c2ff',

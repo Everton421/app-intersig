@@ -129,7 +129,7 @@ const [ deleteItem, setDeleteItem ] = useState({})
 return(
 
     <View>
-        <TouchableOpacity style={{  width:'18%',margin:10}} onPress={ ()=>setVisible(true)} >
+        <TouchableOpacity style={{    margin:10 }} onPress={ ()=>setVisible(true)} >
             <View style={{backgroundColor:'#009de2', width:20, height:20,borderRadius:10, alignItems:"center", justifyContent:"center", position:'absolute', zIndex: 99, top:-9, right:-1 }} >  
               
                     { orcamento.produtos ?  <Text style={{fontWeight:'bold' }}> {orcamento.produtos.length} </Text> : <Text style={{fontWeight:'bold' }}> 0 </Text>  }

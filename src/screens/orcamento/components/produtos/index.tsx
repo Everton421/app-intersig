@@ -6,6 +6,9 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
 import { ConnectedContext } from '../../../../contexts/conectedContext';
 import { useProducts } from '../../../../database/queryProdutos/queryProdutos';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+
+
 
 export const ListaProdutos = ({ orcamentoEditavel }) => {
   const [pesquisa, setPesquisa] = useState('');
@@ -133,12 +136,18 @@ const { connected, setConnected } = useContext(ConnectedContext)
     return (
       <TouchableOpacity style={[styles.item, { backgroundColor: isSelected ? '#009de2' : '#FFF' }]} onPress={() => toggleSelection(item)}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={[styles.txt, { fontWeight: isSelected ? 'bold' : null }, { color: isSelected ? 'white' : null }]}>
-            Código: {item.codigo}
-          </Text>
-          <Text style={[styles.txt, { color: isSelected ? 'white' : null }]}>
-            R$: {item.preco}
-          </Text>
+            <Text style={[styles.txt, { fontWeight: isSelected ? 'bold' : null }, { color: isSelected ? 'white' : null }]}>
+              Código: {item.codigo}
+            </Text>
+            <Text style={[styles.txt, { color: isSelected ? 'white' : null }]}>
+              R$: {item.preco}
+            </Text>
+            {
+              isSelected ? null : 
+            <AntDesign name="caretdown" size={24} color={ 'black'} />
+
+            }
+
         </View>
         <Text style={[styles.txtDescricao, { color: isSelected ? 'white' : null }]}>
           {item.descricao}
@@ -184,8 +193,10 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={() => setVisibleProdutos(true)} style={{   elevation: 5, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#009de2', paddingTop:10, paddingBottom: 10, margin: 5, borderRadius: 10 }}>
-        <Text style={{ marginLeft:5,color: 'white', fontWeight: 'bold', fontSize: 17 }}>
+      <TouchableOpacity onPress={() => setVisibleProdutos(true)} 
+      style={{margin:5,   elevation: 5, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#009de2', padding:10, borderRadius: 10 }}>
+      <FontAwesome name="search" size={22} color="#FFF" />
+       <Text style={{ marginLeft:5,color: 'white', fontWeight: 'bold', fontSize: 17 }}>
           produtos
         </Text>
         <AntDesign name="caretdown" size={24} color="white" />
@@ -205,7 +216,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
           }}>
             <View style={styles.searchContainer}>
               <TouchableOpacity onPress={() => {setVisibleProdutos(false)  }}
-                style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }} >
+                style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
                 <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                   voltar
                 </Text>

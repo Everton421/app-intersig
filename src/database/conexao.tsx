@@ -9,14 +9,41 @@ export async function construtor(db: SQLiteDatabase) {
    --  DROP TABLE produtos;
    --  DROP TABLE IF EXISTS clientes;
    --  DROP TABLE IF EXISTS forma_pagamento;
-    --  DROP TABLE IF EXISTS pedidos;
-    --   DROP TABLE IF EXISTS produtos_pedido ;
-    --   DROP TABLE IF EXISTS parcelas ;
+      DROP TABLE IF EXISTS pedidos;
+       DROP TABLE IF EXISTS produtos_pedido ;
+       DROP TABLE IF EXISTS servicos_pedido ;
+       DROP TABLE IF EXISTS parcelas ;
+       DROP TABLE IF EXISTS usuarios ;
+       DROP TABLE IF EXISTS servicos ;
 
 
 
+     CREATE TABLE IF NOT EXISTS produtos (
+      codigo INTEGER PRIMARY KEY NOT NULL,
+      estoque REAL DEFAULT 0 ,
+      preco REAL DEFAULT 0,
+      grupo INTEGER DEFAULT 0,
+      origem TEXT,   
+      descricao TEXT NOT NULL,
+      num_fabricante,
+      num_original TEXT,
+      sku TEXT,
+      marca INTEGER DEFAULT 0,
+      ativo TEXT DEFAULT 'S',
+      class_fiscal TEXT ,
+      cst TEXT DEFAULT '00',
+      observacoes1 BLOB,
+      observacoes2 BLOB,
+      observacoes3 BLOB,
+      tipo TEXT);
+      
 
-     CREATE TABLE IF NOT EXISTS produtos (codigo INTEGER PRIMARY KEY NOT NULL, estoque REAL DEFAULT 0 , preco REAL DEFAULT 0, grupo INTEGER DEFAULT 0, origem TEXT,   descricao TEXT NOT NULL,  num_fabricante, num_original TEXT, sku TEXT, marca INTEGER DEFAULT 0, ativo TEXT DEFAULT 'S', class_fiscal TEXT , cst TEXT DEFAULT '00', observacoes1 BLOB, observacoes2 BLOB, observacoes3 BLOB, tipo TEXT);
+      CREATE TABLE IF NOT EXISTS servicos (
+      codigo INTEGER PRIMARY KEY NOT NULL,
+      valor REAL DEFAULT 0,
+      aplicacao TEXT NOT NULL,
+      tipo_serv INTEGER DEFAULT 0 
+       );
     
      -- Create the customers table
     CREATE TABLE IF NOT EXISTS clientes (
@@ -34,15 +61,16 @@ export async function construtor(db: SQLiteDatabase) {
       CREATE TABLE IF NOT EXISTS forma_pagamento (
         codigo INTEGER PRIMARY KEY NOT NULL ,
         descricao TEXT NOT NULL, 
-        desc_maximo INTEGER DEFAULT 0, 
-        parcelas INTEGER DEFAULT 0, 
-        intervalo INTEGER DEFAULT 0, 
+        desc_maximo INTEGER DEFAULT 0,  
+        parcelas INTEGER DEFAULT 0,  
+        intervalo INTEGER DEFAULT 0,  
         recebimento INTEGER DEFAULT 0  
       );
-
-       -- Create the orders table
+  
+       -- Create the orders table 
     CREATE TABLE IF NOT EXISTS pedidos (
-      codigo INTEGER PRIMARY KEY AUTOINCREMENT,  
+      codigo INTEGER PRIMARY KEY AUTOINCREMENT,
+      vendedor INTEGER NOT NULL DEFAULT 0,   
       situacao TEXT NOT NULL DEFAULT 'EA',
       descontos REAL DEFAULT 0.00,
       forma_pagamento INTEGER DEFAULT 0,
@@ -50,10 +78,12 @@ export async function construtor(db: SQLiteDatabase) {
       quantidade_parcelas INTEGER DEFAULT 0,
       total_geral REAL DEFAULT 0.00,
       total_produtos REAL DEFAULT 0.00,
+      total_servicos REAL DEFAULT 0.00,
       cliente INTEGER NOT NULL DEFAULT 0,
-      data_cadastro TEXT NOT NULL 
-    );
-
+      data_cadastro TEXT NOT NULL,
+      tipo INTEGER NOT NULL DEFAULT 1   --1 = Orçamento (gerado no sistema); 2 = Orçamento (gerado fora do sistema); 3 = Ordem de Serviço; 4 = Contrato de Prestação de Serviços; 5 = Devolução
+    ); 
+  
     -- Create the order items table
     CREATE TABLE IF NOT EXISTS produtos_pedido (
       pedido INTEGER NOT NULL,
@@ -64,6 +94,19 @@ export async function construtor(db: SQLiteDatabase) {
       total REAL DEFAULT 0.00,
       FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
     );
+      
+    
+    CREATE TABLE IF NOT EXISTS servicos_pedido (
+      pedido INTEGER NOT NULL,
+      codigo INTEGER NOT NULL,
+      desconto REAL DEFAULT 0.00,
+      quantidade REAL DEFAULT 0.00,
+      valor REAL DEFAULT 0.00,
+      total REAL DEFAULT 0.00,
+      FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
+    );
+
+
 
     CREATE TABLE IF NOT EXISTS parcelas (
       pedido INTEGER NOT NULL,
@@ -73,9 +116,13 @@ export async function construtor(db: SQLiteDatabase) {
        FOREIGN KEY (pedido) REFERENCES pedidos(codigo)
     );
 
+    CREATE TABLE IF NOT EXISTS usuarios (
+      usuario INTEGER PRIMARY KEY NOT NULL,
+      nome TEXT NOT NULL 
+    );
  
-     `);
-
+     `); 
+ 
   console.log('banco carregado com sucesso !');
   
-  }
+  } 

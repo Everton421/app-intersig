@@ -13,12 +13,15 @@ import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Cart } from "./Cart";
+import { Detalhes } from "./detalhes";
+import { AuthContext } from "../../../contexts/auth";
+import { Servico } from "./servico";
 
 export const Orcamento = ({orcamentoEditavel, navigation}) => {
     const [visibleProdutos, setVisibleProdutos] = useState<boolean>(false);
     const [visibleClientes, setVisibleClientes] = useState<boolean>(false);
     const [totalGeral, setTotalGeral] = useState<number | undefined>();
-    const [descontosGeral, setDescontosGeral] = useState<number | undefined>();
+    const [descontosGeral, setDescontosGeral] = useState<number >(0);
     const [totalProdutos, setTotalProdutos] = useState<number>();
     const [quantidade_parcelas, setQuantidade_parcelas] = useState<number | undefined>();
     const [observacoes, setObservacoes] = useState<string>('');
@@ -27,16 +30,30 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
     const [response, setResponse] = useState<string>('');
     const [editavel, setEditavel] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
-
+    const [ dataAtual, setDataAtual ] = useState<any>();
+    const [ tipoOrcamento , setTipoOrcamento ] = useState<number>(1)
 /////
 
   const [selectedItem, setSelectedItem] = useState([]);
 ////
 
+const { usuario } = useContext(AuthContext)
 
     const { orcamento, setOrcamento } = useContext(OrcamentoContext);
     const { connected } = useContext(ConnectedContext)
     const useQuerypedidos = usePedidos();
+
+
+    const getCurrentDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Adiciona zero à esquerda se o mês for menor que 10
+        const day = String(now.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se o dia for menor que 10
+    
+            setDataAtual( `${year}-${month}-${day}` )
+        return `${year}-${month}-${day}`;
+      };
+
 
      useEffect(() => {
         if (status === 200 && response) {
@@ -45,6 +62,8 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
                 cliente: null,
                 produtos: [],
                 parcelas: [],
+                vendedor:0,
+                tipo:tipoOrcamento
             }));
             setTotalGeral(0);
             setDescontosGeral(0);
@@ -52,38 +71,80 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
             Alert.alert(response);
             navigation.navigate('vendas');
         }
+
+        if(status === 500 ){
+            setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                ...prevOrcamento,
+                cliente: null,
+                produtos: [],
+                parcelas: [],
+                vendedor:0,
+                tipo:tipoOrcamento
+            }));
+            setTotalGeral(0);
+            setDescontosGeral(0);
+            
+            Alert.alert(response);
+            navigation.navigate('vendas');
+        }
+
     }, [status, response, navigation, setOrcamento]);
    
   
      useEffect(() => {
-         let novoTotalGeral = 0;
-         let totaDescontos = 0;
+         let novoTotalGeralProdutos = 0;
+         let totaDescontosProdutos = 0;
          let totalValorProdutos = 0;
  
+         let novoTotalGeralServicos = 0;
+         let totaDescontosServicos = 0;
+         let totalValorServicos = 0;
+        
+            let totalGeralOrcamento = 0;
+             
+            ////****  
+            ////**** total de descontos esta considerando somente os 
+            ////**** descontos dos produtos 
+            ////****
+
          if( !orcamento.produtos){
              return
          }
-         if( orcamento.produtos.length > 0 ){
-                 orcamento.produtos.forEach((i: any) => {
-                     novoTotalGeral += i.total;
-                     totaDescontos += i.desconto;
+         if( !orcamento.servicos){
+            return
+        } 
+
+         if( orcamento.produtos.length > 0  ){
+            orcamento.produtos.forEach((i: any) => {
+                     novoTotalGeralProdutos+= i.total;
+                     totaDescontosProdutos += i.desconto;
                      totalValorProdutos += i.preco * i.quantidade;
                  });
- 
              setTotalProdutos(totalValorProdutos);
-             setTotalGeral(novoTotalGeral);
-             setDescontosGeral(totaDescontos);
- 
-             setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                 ...prevOrcamento,
-                 total_produtos: totalValorProdutos,
-                 total_geral: novoTotalGeral,
-                 descontos: totaDescontos,
-                 observacoes: observacoes || '',
-             }));
- 
+             setTotalGeral(novoTotalGeralProdutos);
+             setDescontosGeral(totaDescontosProdutos);
+          
      }
-     }, [orcamento.produtos, orcamento.parcelas, observacoes, setOrcamento    ]);
+
+        if( orcamento.servicos.length > 0  ){
+            orcamento.servicos.forEach((i: any) => {
+                novoTotalGeralServicos+= i.total;
+                totaDescontosServicos += i.desconto;
+                totalValorServicos += i.valor * i.quantidade;
+            });
+        }
+            totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos
+
+        setOrcamento((prevOrcamento: OrcamentoModel) => ({
+            ...prevOrcamento,
+            total_produtos: totalValorProdutos,
+            total_servicos: totalValorServicos, 
+            total_geral: totalGeralOrcamento,
+            descontos: totaDescontosProdutos,
+            observacoes: observacoes || '',
+        }));
+
+     }, [orcamento.produtos, orcamento.parcelas, observacoes, setOrcamento , orcamento.descontos  , orcamento.servicos ]);
     
     /////////////////////////////
     
@@ -92,45 +153,20 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
         console.log('');
         console.log('Orçamento atualizado : ' ,orcamento);
         console.log('');
-      
+        console.log(`Codigo usuario:  `,usuario.codigo);
+
     },[ orcamento ])
     
     /////////////////////////////
     
-    const handleIncrement = (item) => {
-        setOrcamento((prevOrcamento) => {
-            // Crie uma nova lista de produtos atualizada
-            const novosProdutos = prevOrcamento.produtos.map((i) => {
-                if (i.codigo === item.codigo) {
-                    // Atualize a quantidade do produto correspondente
-                    return { ...i, quantidade: i.quantidade + 1 };
-                }
-                return i;
-            });
     
-            // Atualize o estado do orçamento com a nova lista de produtos
-            return {
-                ...prevOrcamento,
-                produtos: novosProdutos,
-            };
-        });
-    };
-    
-      const handleDecrement = (item) => {
-        setSelectedItem((prevSelectedItems) => {
-          return prevSelectedItems.map((i) => {
-            if (i.codigo === item.codigo) {
-              return { ...i, quantidade: Math.max(i.quantidade - 1, 0) };
-            }
-            return i;
-          });
-        });
-      };
-
     useEffect(() => {
+            let data = getCurrentDate();
         if (!orcamentoEditavel || orcamentoEditavel === null) {
+            
             setOrcamento((prevOrcamento: OrcamentoModel) => ({
                 ...prevOrcamento,
+                vendedor: usuario.codigo,
                 total_produtos: 0,
                 total_geral: 0,
                 descontos: 0,
@@ -139,24 +175,19 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
                 quantidade_parcelas:0,
                 cliente: {},
                 parcelas: [],
-                produtos:[]
+                produtos:[],
+                servicos:[],
+                data_cadastro: data
             }));
+
         } else {
           //  setOrcamento(orcamentoEditavel); 
            // console.log(orcamentoEditavel)
             setEditavel(true);
         }
-    }, [
-        orcamentoEditavel,
-         observacoes,
-          setOrcamento]);
+    }, [ orcamentoEditavel, observacoes, setOrcamento]);
         
-        //   useEffect(() => {
-        //     console.log('');
-        //     console.log('Orçamento atualizado:', orcamento);
-        //     console.log('');
-        //   }, [orcamento])
-
+        
 const alertaExclusao = (item)=>{
     Alert.alert('', `deseja excluir o item : ${item.descricao} ?`,[
         { text:'Não',
@@ -170,92 +201,13 @@ const alertaExclusao = (item)=>{
 }
 
 
-    const ItemsDoPedido2 = ({ item }) => (
-        <View style={{ backgroundColor: '#009de2', elevation: 7, margin: 3, borderRadius: 30, padding: 25 }}>
-            
-                <View style={{flexDirection:'row', justifyContent:"space-between"}}>
-                    <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                    Cod. {item.codigo}    Qtd. {item.quantidade}
-                    </Text>
-
-                           <TouchableOpacity onPress={()=> alertaExclusao(item)} style={{  elevation:5}}>    
-                             <FontAwesome name="close" size={24} color="white" />
-                           </TouchableOpacity>
-                </View>
-            
-            
-            <Text style={{ color: 'white', fontWeight: 'bold', width: 160 }} numberOfLines={2}>
-                {item.descricao}
-            </Text>
-
-        <TouchableOpacity style={{ elevation:5,  margin:2 , width:35, padding:5, backgroundColor:'white' , borderRadius:7, alignItems:"center"}} onPress={()=> setVisibleProdutos(true)}>
-            <Feather name="edit" size={24} color="#009de2" />
-            
-        </TouchableOpacity>
-        
-            <Modal
-            visible={visibleProdutos}
-            transparent={true}
-            >
-                    <View style={{
-                        marginTop: 25,margin:10, backgroundColor: 'white', borderRadius: 20, width: '96%',
-                        height: '80%', shadowColor: '#000',
-                        shadowOffset: { width: 0, height: 2, }, shadowOpacity: 0.25,
-                        shadowRadius: 4,
-                        elevation: 5,
-                    }}>
-
-                      <TouchableOpacity onPress={() => {setVisibleProdutos(false)  }}
-                          style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }} >
-                         <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                              voltar
-                        </Text>
-                    </TouchableOpacity>  
-
-
-                      <View style={{ margin:10 }} >   
-                            <Text style={{   fontWeight: 'bold' }}>
-                                Cod. {item.codigo}    Qtd. {item.quantidade}
-                            </Text>
-                            <Text style={{   fontWeight: 'bold', width: '80%' }} numberOfLines={2}>
-                                {item.descricao}
-                            </Text>
-                      </View>
-
-                      <View style={{ marginTop: 3 }}>
-                        <View style={{ alignItems: 'center' }}>
-                            <View style={{ backgroundColor: 'white', borderRadius: 25, elevation: 4, padding: 8, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontWeight: 'bold', textAlign: 'center' }}> { } </Text>
-                            </View>
-                            <View style={styles.buttonsContainer}>
-                            <TouchableOpacity onPress={() => handleIncrement(item)} style={styles.button}>
-                                <Text style={styles.buttonText}> + </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => handleDecrement(item)} style={styles.button}>
-                                <Text style={styles.buttonText}> - </Text>
-                            </TouchableOpacity>
-                            </View>
-                        </View>
-                        <View>
-                            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20, elevation: 5 }}>
-                            Total R$: {item.total}
-                            </Text>
-                        </View>
-            </View>
-
-                    </View>
-            </Modal>
-          
-
-        </View>
-    );
+                 
 
     const gravar = async () => {
         setLoading(true);
 
         if (editavel) {
             if( connected ){
-
                   try {
                       const response = await api.put('/orcamentos', orcamento);
                       if (response.status === 200) {
@@ -283,7 +235,13 @@ const alertaExclusao = (item)=>{
                 }
 
         } else {
+
             let cliente, produtos, parcelas;
+
+            setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                ...prevOrcamento,
+                    vendedor:usuario.codigo
+            }));
 
             if (!orcamento.cliente) {
                 Alert.alert('É necessário informar o cliente!');
@@ -324,9 +282,24 @@ const alertaExclusao = (item)=>{
                   }else{
 
                     try{
-                        await  useQuerypedidos.createOrder(orcamento);
+
+                        console.log(orcamento)
+
+                       let response =  await  useQuerypedidos.createOrder(orcamento);
+                        
+                       if(response > 0 ){
+                        console.log('')
+                        console.log('codigo oracamento resgistrado : ',response)
+                        console.log('')
+
                         setStatus(200)
-                    setResponse('Orçamento registrado com sucesso!')
+                        setResponse('Orçamento registrado com sucesso!')
+                        }
+                         else{
+                             setStatus(500)
+                         setResponse(' falha ao registrar orcamento! ')
+ 
+                         }
 
                     }catch(e ){ 
                         console.log('erro ao gravar o orcamento no SQLITE',e)
@@ -342,34 +315,78 @@ const alertaExclusao = (item)=>{
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
-               
+
+                         {/************* seletor tipo de orcamento  ************/}
+                        <View style={{marginLeft:10}}>        
+                            <Text style={{ fontWeight:"bold"}}>
+                                Tipo De Orcamento:
+                            </Text>
+                         </View>
+                    <View style={{ flexDirection:"row" ,margin:5, gap:8}} >
+                           
+                        <TouchableOpacity  onPress={ ()=> setTipoOrcamento(1) }
+                            style={ [{backgroundColor: tipoOrcamento === 1 ? '#009de2' : '#FFF'}, { width:'20%' ,elevation:5, borderRadius:5 , padding:5 }] }>
+                                <Text style={
+                                    [{  color: tipoOrcamento === 1 ? '#FFF' : 'black' }, { fontWeight:"bold"}]
+                                } >
+                                    VENDA
+                                </Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity  onPress={ ()=> setTipoOrcamento(2) }
+                       style={ [{backgroundColor: tipoOrcamento === 2 ? '#009de2' : '#FFF'}, { width:'20%', elevation:5, borderRadius:5 , padding:5}] }>
+                             <Text style= { [{ color: tipoOrcamento === 2 ? '#FFF' : 'black' },{ fontWeight:"bold"}]} >
+                                OS
+                            </Text>
+                        </TouchableOpacity>
+                     
+                     </View>
+                     {/**** */}
+
+  {/** *** separador ***/} 
+  <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
+  {/** ***   ***/} 
 
               <View style={{ flexDirection: 'row' }}>
                     <ListaClientes orcamentoEditavel={orcamentoEditavel} />
                 </View>
    
-      
                 <View style={{ justifyContent: 'center', backgroundColor: '#FFF', padding: 7 }}>
-                    <View style={{ borderWidth: 0.4 }}></View>
+                    
                     <Text style={{ fontWeight: 'bold' }}> {orcamento.cliente?.nome}</Text>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={{ fontWeight: 'bold' }}> cnpj: {orcamento?.cliente?.cnpj}</Text>
                         <Text style={{ fontWeight: 'bold' }}>contato: {orcamento?.cliente?.celular}</Text>
                     </View>
                 </View>
+
+
+
+        {/*//////////////// components serviços  ////////////////////////*/    }  
+      
+            {/** ***   ***/} 
+
+                            { tipoOrcamento === 2 ?
+                                    <View> 
+                                   
+                                            <Servico/>
+                                        </View>
+                                    :null
+                                }    
+
                   
       {/*//////////////// components produtos  ////////////////////////*/    }  
-                <View style={{ flexDirection: 'row' }}>
+
+                <View style={{ flexDirection: 'row' , margin: 5}}>
                        <ListaProdutos orcamentoEditavel={orcamentoEditavel?.produtos} />
                  <Cart/>
-
                  </View>
+      {/*////////////////////////////////////////////////////////////////*/    }  
+  
 
-
-                 <View style={{ borderWidth: 0.4, margin: 5 }}></View>
-
-                 {orcamento.produtos && Array.isArray(orcamento.produtos) && orcamento.produtos.length > 0 && (
-                
+                 {/** 
+                  
+                 
                     <FlatList
                         data={orcamento.produtos}
                         horizontal={true}
@@ -377,43 +394,31 @@ const alertaExclusao = (item)=>{
                         keyExtractor={ (item)=> item.codigo.toString()}
                     />
                 
-                )}
+                )
+              */  }
+
       {/*////////////////////////////////////////////////////////////////*/    }  
 
-
-                <View style={{ marginTop: '5%' }}>
-                    <View style={{ borderWidth: 0.4, margin: 5 }}></View>
+                    <View style={{ borderWidth: 0.4, margin: 10 }}></View>
                     <View style={{ margin: 5 }}>
                         <Parcelas orcamentoEditavel={orcamentoEditavel} />
                     </View>
                     <View style={{ borderWidth: 0.2, margin: 5 }}></View>
-                </View>
+
+ {/*********************************************/}
+                <Detalhes/>
+ {/*********************************************/}
 
              {/**   <View style={{ margin: 3 }}>
                     <ListaItemOrcamento /> 
                 </View>*/} 
-   
-            
- 
-                 
-                
 
-                <View style={{ borderWidth: 0.2, margin: 5 }}></View>
 
-                <View style={{ margin: 5 }}>
-                    <Text style={{ fontWeight: 'bold' }}> observções</Text>
-                    <TextInput
-                        style={{ margin: 5, borderWidth: 2, borderRadius: 7, borderColor: '#009de2', textAlign: "center" }}
-                        numberOfLines={5}
-                        placeholder="observações"
-                        onChangeText={(v: string) => setObservacoes(v)}
-                    />
-                </View>
+               
             </ScrollView>
-
                        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', borderColor: '#ccc', borderWidth: 1, borderRadius: 5, elevation: 5, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                 <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Total: R$ {totalGeral?.toFixed(2)}</Text>
-                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {descontosGeral?.toFixed(2)}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {descontosGeral ? descontosGeral.toFixed(2) :  0 }</Text>
 
                 <TouchableOpacity
                     style={{ padding: 7, backgroundColor: '#009de2', elevation: 5, margin: 3, borderRadius: 5 }}

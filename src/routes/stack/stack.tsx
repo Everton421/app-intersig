@@ -16,11 +16,11 @@ import { useContext } from "react";
 import ProdutosProvider, { ProdutosContext } from "../../contexts/produtosDoOrcamento";
 import { Cliente    } from "../../screens/teste";
 import { TabsOrcamento } from "../bottomTabsOrcamento/tabs";
-import { EditarOrcamento } from "../../screens/orcamento/editar";
+import { EditarOrcamento } from "../../screens/editar_orcamento";
 import OrcamentoProvider from "../../contexts/orcamentoContext";
-import { NovoOrcamento } from "../../screens/orcamento/novo";
+import { NovoOrcamento } from "../../screens/novo_orcamento";
 import { Registrados } from "../../screens/orcamento/registrados";
-import { Vendas } from "../../screens/vendas";
+import { Vendas } from "../../screens/tela_orcamentos";
 import { ItemSQLITE } from '../../components/teste/index'
 
 const Stack = createStackNavigator();

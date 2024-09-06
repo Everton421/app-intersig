@@ -25,7 +25,7 @@ export const Routes = ()=>{
       // Adiciona o listener
       const unsubscribe = NetInfo.addEventListener(state => {
          
-      //  setConnected(false)
+      //    setConnected(false)
          setConnected(state.isConnected);
            console.log('conectado :', state.isConnected);
       

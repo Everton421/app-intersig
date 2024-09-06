@@ -14,7 +14,7 @@ import Feather from '@expo/vector-icons/Feather';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-export const Parcelas = ({orcamentoEditavel}) => {
+export const ParcelasPersonalizadas = ({orcamentoEditavel}) => {
 
     const [visible, setVisible] = useState(false);
     const [total, setTotal] = useState<number>(0);
@@ -35,34 +35,10 @@ export const Parcelas = ({orcamentoEditavel}) => {
     const useQueryFpgt = useFormasDePagamentos();
     /***************** ******* ***************** ******* ***************** ******* * ******/
 
-    useEffect(() => {
-        if(!orcamentoEditavel ||  orcamentoEditavel === null){
-            setEditavel(false)
-          return;
-        }else{
-          setEditavel(true)
-        }
-      }, [])
+   
 
 
-    useEffect(() => {
-       
-        async function busca() {
-            if( connected){
-                 try {
-                     const response = await api.get('/formas_pagamento');
-                     setFormas(response.data);
-                 } catch (err) {
-                     console.log(err);
-                 }
-             }else{
-                 let aux = await useQueryFpgt.selectAll();
-                 setFormas(aux);
-            }
-         
-        }
-        busca();
-    }, [ press ]);
+   
 
 
     useEffect(() => {
@@ -167,14 +143,19 @@ export const Parcelas = ({orcamentoEditavel}) => {
             const ano = currentDate.getFullYear();
             const vencimento = `${ano}-${mes}-${dia}`;
 
+
           //  let parcelaSelecionada =  orcamento.parcelas.findIndex( i => i.parcela = item.parcela )
             
             orcamento.parcelas.forEach( (i)=>{
+
                 if(item.parcela === i.parcela ){
+
                     item.vencimento = vencimento
                 }
             })
              
+
+
 
             item.vencimento = vencimento
             setShowPicker(false);

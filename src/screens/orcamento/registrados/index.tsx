@@ -1,19 +1,21 @@
 import { useContext, useEffect, useState } from "react"
 import { Text, View, FlatList, Modal, TextInput, StyleSheet} from "react-native"
 import { api } from "../../../services/api"
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import Feather from '@expo/vector-icons/Feather';
 import { OrcamentoContext } from "../../../contexts/orcamentoContext";
 import { ClienteContext } from "../../../contexts/clienteDoOrcamento";
 import { green } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
+import { AuthContext } from "../../../contexts/auth";
 
 export const Registrados = ({navigation})=>{
 
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
 
     const { connected ,setConnected } = useContext ( ConnectedContext )
+    const { usuario } = useContext(AuthContext);
 
     const useQuerypedidos = usePedidos();
 
@@ -32,9 +34,9 @@ export const Registrados = ({navigation})=>{
                        setPesquisa('*')
                    }
                try{
-                   const response = await api.get(`/orcamentos/diario/${pesquisa}`);
-                  // console.log(response.data);
-                   if(response.status === 200 ){
+                   const response = await api.get(`/orcamentos/diario?parametro=${pesquisa}&vendedor=${usuario.codigo}`);
+                    console.log(response.data);
+                   if(response.status === 200  ){
                        setOrcamentosRegistrados(response.data);
                    }
        
@@ -152,7 +154,7 @@ function stiloItem(item:any){
     }
 
     return (
-        <View>
+        <View  >
 
         < TextInput 
             style={{  margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
@@ -160,7 +162,7 @@ function stiloItem(item:any){
             placeholder="pesquisar"
         /> 
         {/*********    lista de status dos pedidos  */}
-        <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around', margin:3}}>
+        <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-around', margin:3,}}>
          <View style={{flexDirection:"row", alignItems:"center"}}>
                 <View style={{padding:4,    backgroundColor:'green' , borderRadius:4}}>
                 </View>
@@ -196,10 +198,12 @@ function stiloItem(item:any){
               </View>
         </View>
         {/******************************************* */}
-        <FlatList
-        data={orcamentosRegistrados}
-        renderItem={({item})=> <ItemOrcamento item={item}/>}
-        />
+            <View style={{marginBottom:5 }}>
+                <FlatList
+                data={orcamentosRegistrados}
+                renderItem={({item})=> <ItemOrcamento item={item}/>}
+                />
+              </View>
         </View >
     )
 

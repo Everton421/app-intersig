@@ -1,17 +1,29 @@
 import { createContext, useState } from "react";
 
+const getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Adiciona zero à esquerda se o mês for menor que 10
+    const day = String(now.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se o dia for menor que 10
 
+    return `${year}-${month}-${day}`;
+  };
+  
+  let data_atual = getCurrentDate();
 
        export  interface OrcamentoModel  {
             "produtos": [],
             "cliente":{},
-            "parcelas":[]
+            "parcelas":[],
+            "servicos":[],
+            "data_cadastro":string
         }
 export const OrcamentoContext = createContext({
   orcamento: {
     produtos: [],
     cliente: {},
-    parcelas: []
+    parcelas: [],
+    data_cadastro: ""
   },
   setOrcamento: (orcamento: OrcamentoModel) => {}
 });
@@ -19,7 +31,9 @@ export const OrcamentoContext = createContext({
             const [ orcamento , setOrcamento]  = useState  ( {
                 "produtos": [],
                 "cliente":{},
-                "parcelas":[]
+                "parcelas":[],
+                "servicos":[],
+                "data_cadastro": ""
             } );
 
             return (

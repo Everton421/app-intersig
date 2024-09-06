@@ -7,6 +7,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { OrcamentoContext, OrcamentoModel } from '../../../../contexts/orcamentoContext';
 import { ConnectedContext } from '../../../../contexts/conectedContext';
 import { useClients } from '../../../../database/queryClientes/queryCliente';
+import { AuthContext } from '../../../../contexts/auth';
 
 
 
@@ -26,6 +27,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
 
+    const { usuario } = useContext(AuthContext);
 
 
 
@@ -33,7 +35,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
     const busca = async () => {
        if( connected ){
          try {
-           const response = await api.get(`clientes/${pesquisa}`);
+           const response = await api.get(`clientes?vendedor=${usuario.codigo}&cliente=${pesquisa}`);
            setData(response.data);
          } catch (err) {
            console.log(err);
@@ -125,13 +127,13 @@ function seleciona(item){
   return (
     <View style={styles.container}>
 
-    <TouchableOpacity onPress={()=>setVisibleClientes(true)} style={{ justifyContent:'flex-start', flexDirection:'row',margin:10,backgroundColor:'#FFF',borderRadius:7 , padding:5, elevation:5}}>
-                        <Text style={{fontWeight:'bold' }}>
-                          <FontAwesome name="search" size={22} color="black" />
+    <TouchableOpacity onPress={()=>setVisibleClientes(true)  }  
+    style={{ justifyContent:'space-between', flexDirection:'row',margin:10,backgroundColor:'#009de2',borderRadius:7 , padding:5, elevation:5}}>
+                        <Text style={{fontWeight:'bold' , fontSize:20, color:'white'}}>
+                        <FontAwesome name="search" size={22} color="white" />
                           clientes
                        </Text> 
-                       <AntDesign name="caretdown" size={24} color="black" />
-                   
+                       <AntDesign name="caretdown" size={24} color="white"    />
 
       </TouchableOpacity>
 
@@ -206,7 +208,7 @@ function seleciona(item){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#dcdcdd'
+     
   },
   item: {
     padding: 20,

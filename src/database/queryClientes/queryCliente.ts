@@ -43,7 +43,6 @@ try{
     async function selectAll( ) {
         try{
         const result = await db.getAllAsync(` SELECT * FROM clientes  `);
-        console.log(result);
         return result;
     }catch( e ){ console.log(`erro ao consultar o clientes`,e )} 
     }

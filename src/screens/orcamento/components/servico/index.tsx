@@ -1,75 +1,30 @@
 import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useProducts } from '../../database/queryProdutos/queryProdutos';
-import { api } from '../../services/api';
-import NetInfo from '@react-native-community/netinfo';
-import { ConnectedContext } from '../../contexts/conectedContext';
-import { useClients } from '../../database/queryClientes/queryCliente';
-import { useFormasDePagamentos } from '../../database/queryFormasPagamento/queryFormasPagamento';
-import { usePedidos } from '../../database/queryPedido/queryPedido';
-import { TextInput } from 'react-native-gesture-handler';
-import * as Crypto from 'expo-crypto';
-import { useParcelas } from '../../database/queryParcelas/queryParcelas';
-import { Produto } from '../../screens/dados/produtos';
-import { OrcamentoContext } from '../../contexts/orcamentoContext';
-import { useItemsPedido } from '../../database/queryPedido/queryItems';
-import { Cart } from '../../screens/orcamento/components/Cart';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Detalhes } from '../../screens/orcamento/components/detalhes';
-import { useUsuario } from '../../database/queryUsuario/queryUsuario';
+import { TextInput, ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+ 
+import { api } from '../../../../services/api'; 
+ 
 import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { ItensServicoListaHorizontal } from '../itens_Servico_lista';
+import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
 
 
-import Entypo from '@expo/vector-icons/Entypo';
-import { ItensServicoListaHorizontal } from '../../screens/orcamento/components/itens_Servico_lista';
-
-export const ItemSQLITE = () => {
-  const [sync, setSync] = useState(false);
-  const db = useSQLiteContext();
-  const { connected } = useContext(ConnectedContext);
-
-  const useQueryProdutos = useProducts();
-  const useQueryClientes = useClients();
-  const useQueryFpgt = useFormasDePagamentos();
-  const useQuerypedidos = usePedidos();
-  const useQueryParcelas = useParcelas();
-  const useQueryItems = useItemsPedido();
-  const useQueryUsers = useUsuario();
-
-  const { orcamento, setOrcamento } = useContext(OrcamentoContext);
-
-  const [codigoUsuario, setCodigoUsuario] = useState('12345');
-
- const tipoOs = 
- [
-    {"codigo":1, "descricao":"teste1" },
-    {"codigo":2, "descricao": "teste2"},
-    {"codigo":3, "descricao": "teste3"},
-    {"codigo":4, "descricao": "teste4"}, 
-
-  ]
-  const servicos = [
-    {"codigo":1, "aplicacao":'teste1' , "valor":10},
-    {"codigo":2, "aplicacao": 'teste2', "valor":30},
-    {"codigo":3, "aplicacao": 'teste3', "valor":50},
-    {"codigo":4, "aplicacao": 'teste4', "valor":100},
-  ]
-
-  const Teste = ()=>{
+export const Servico = ()=>{
     const [ selectedTipo , setSelectedTipo  ] = useState(null);
     const [presstipoOs,    setPresstipoOS   ] = useState(false); 
     const [ verServicos ,  setVerServicos   ] = useState(false);
     const [ pesquisa,      setPesquisa      ] = useState();
-
+    const [ tipoOs , setTipoOs] = useState([]);
      const [ dadosServicos , setDadosServicos ] = useState([]);
 
     const [ servicosSelecionado, setServicosSelecionado ] = useState([]);
     const [totalItens, setTotalItens ]= useState(0);
 
-useEffect(
+      const { orcamento, setOrcamento } = useContext( OrcamentoContext )
+
+    useEffect(
   ()=>{ 
     async function busca(){
       try{
@@ -86,6 +41,34 @@ useEffect(
   },[ pesquisa ]
 )
 
+useEffect(
+    ()=>{
+        async function busca(){
+            try{
+            const response = await api.get(`/tipos_os`);
+              if( response.status === 200 ){
+                setTipoOs(response.data);
+              }
+          }catch(e){
+            console.log( 'erro ao consultar os servicos! ', e )
+          }
+          }
+          busca();
+    },[ selectedTipo ]
+)
+
+useEffect(
+  ()=>{
+      // quando ouver alteracao nos dados dos servicos por outro componente
+      //  
+    if(orcamento.servicos.length !== servicosSelecionado.length  ){ 
+      let aux = orcamento.servicos;
+      setServicosSelecionado(aux) 
+      }
+      
+  },[ orcamento.servicos ]
+)
+
 useEffect(() => {
   let aux = 0;
   servicosSelecionado.forEach((e) => {
@@ -93,7 +76,13 @@ useEffect(() => {
     aux += e.total;
   });
   setTotalItens(aux);
+  
 
+
+  setOrcamento((prevOrcamento: OrcamentoModel) => ({
+    ...prevOrcamento,
+    servicos: servicosSelecionado,
+}));
  
 }, [ servicosSelecionado ]);
 
@@ -225,20 +214,34 @@ const handleDecrement = (item) => {
         <View>
           {/** separador */}
       <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-
-       
+                    <View style={{flexDirection:'row', alignItems:'center',   justifyContent:'center'}}>
+                      <Text style={{fontSize:15,fontWeight:'bold' }}>
+                          Serviços
+                       </Text>
+                      </View>
           <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
           onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
-            < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Tipos De OS</Text>
+            { selectedTipo ?
+               ( <Text  style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}  > Tipo De OS: {selectedTipo?.descricao} </Text> ) 
+               :
+               (  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Tipos De OS</Text> )       
+
+            }      
+           
+      
       <FontAwesome name="search" size={22} color="#FFF" />
 
           </TouchableOpacity>
           
-                <Text> Tipo OS: {selectedTipo?.descricao} </Text>       
              
               {/**modal tipos de OS  */ }
+               
               <Modal visible={presstipoOs} transparent={true}   >
-                <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
+
+                {
+                  tipoOs.length > 0 ? 
+                  ( 
+                    <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
                     <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
                           <Text style={{margin:5, fontWeight:'bold'}} > Tipos De OS </Text>
                           <FlatList
@@ -247,6 +250,23 @@ const handleDecrement = (item) => {
                             />
                       </View>
                   </View>
+                  )
+                  :
+                  ( 
+                    <View style={{backgroundColor:'#FFF', flex:1}} >
+                        <TouchableOpacity onPress={() => {setPresstipoOS(false)  }}
+                          style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                        <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                          voltar
+                        </Text>
+                      </TouchableOpacity>
+                      <Text>
+                        NENHUM TIPO DE OS ENCONTRADO!
+                      </Text>
+                    </View>
+                    )
+                }  
+            
               </Modal>
               {/******* */}
            
@@ -265,7 +285,7 @@ const handleDecrement = (item) => {
 
                         <TextInput
                             placeholder='pesquisar'
-                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'40%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
+                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
                             onChangeText={ (t)=>  setPesquisa(t) }
                            />  
 
@@ -317,74 +337,58 @@ const handleDecrement = (item) => {
       )
   }
  
- 
 
-  return (
-    <View style={styles.container}>
-      <Text>Status internet: {connected ? 'Conectado' : 'Desconectado'}</Text>
- 
- 
-  {/** separador */}
 
-      <View style={{backgroundColor:'#F5F6F8'}}>
-         
-          <Teste/>
-      
-      </View>
 
- 
 
-    </View>
-  );
-}
 
- 
 const styles = StyleSheet.create({
-  container: {
-    flex:1
-   },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
-    elevation: 5
-  },
-  searchContainer: {
-    justifyContent: 'space-around',
-    backgroundColor: '#FFF',
-    borderRadius: 5,
-    elevation: 10,
-  },
-  limpar: {
-    borderRadius: 5,
-    backgroundColor: 'red',
-    width: 50,
-    height: 35,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginEnd: 1
-  },
-  limparText: {
-    color: '#FFF'
-  },
-  buttonsContainer: {
-    flexDirection: 'row'
-  },
-  button: {
-    margin: 3,
-    backgroundColor: '#FFF',
-    elevation: 4,
-    width: 60,
-    height: 35,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    fontSize: 15
-  },
- 
-});
+    container: {
+      flex:1
+     },
+    item: {
+      backgroundColor: '#f9c2ff',
+      padding: 20,
+      marginVertical: 8,
+      marginHorizontal: 16,
+      borderRadius: 5,
+      elevation: 5
+    },
+    searchContainer: {
+      justifyContent: 'space-around',
+      backgroundColor: '#FFF',
+      borderRadius: 5,
+      elevation: 10,
+    },
+    limpar: {
+      borderRadius: 5,
+      backgroundColor: 'red',
+      width: 50,
+      height: 35,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginEnd: 1
+    },
+    limparText: {
+      color: '#FFF'
+    },
+    buttonsContainer: {
+      flexDirection: 'row'
+    },
+    button: {
+      margin: 3,
+      backgroundColor: '#FFF',
+      elevation: 4,
+      width: 60,
+      height: 35,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 5
+    },
+    buttonText: {
+      fontWeight: 'bold',
+      fontSize: 15
+    },
+   
+  });
+  

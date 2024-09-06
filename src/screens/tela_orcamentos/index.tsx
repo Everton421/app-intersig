@@ -9,11 +9,16 @@ import { Registrados } from "../orcamento/registrados";
 export const Vendas = ({navigation})=>{
 
 return (
-    <View >
+    <View  >
       <Registrados navigation={navigation} />
         
      <TouchableOpacity onPress={()=> navigation.navigate('novoOrcamento')} 
-      style={{borderColor:'#009de2',borderWidth:3, backgroundColor:'#fff', padding:7 ,borderRadius:50, width:'16%', alignItems:'center', position:"absolute" , marginLeft:"80%",marginTop:'99%', elevation:10}}>
+      style={{
+        borderColor:'#009de2', borderWidth:3,
+         backgroundColor:'#fff' ,
+           width:50, height:50,
+           borderRadius:25,
+            position:"absolute" , marginLeft:"80%",marginTop:'99%', elevation:10  , alignItems:"center", justifyContent:"center" }}>
         <Text style={{fontSize:25, fontWeight:"bold", color:'#009de2'}}>
             +
         </Text>

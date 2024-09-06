@@ -3,17 +3,19 @@ import { useItemsPedido } from "./queryItems";
 import { useParcelas } from "../queryParcelas/queryParcelas";
 import { useProducts } from "../queryProdutos/queryProdutos";
 import { useClients } from "../queryClientes/queryCliente";
+import { useServicosPedido } from "./queryServicosPedido";
 
 
 export const usePedidos = () =>{
 
     const db =  useSQLiteContext();
-  const queryItems    = useItemsPedido();
-  const queryParcelas = useParcelas(); 
-  const queryProdutos = useProducts();
-  const queryClientes = useClients();
-
-      type produto_pedido = {
+  const queryItems          = useItemsPedido();
+  const queryParcelas       = useParcelas(); 
+  const queryProdutos       = useProducts();
+  const queryClientes       = useClients();
+  const queryServicosPedido =  useServicosPedido();
+      
+  type produto_pedido = {
         codigo:number,
         desconto:number,
         quantidade:number,
@@ -25,21 +27,30 @@ export const usePedidos = () =>{
       parcela:number,
       valor:number,
       vencimento:string
-  } 
-
+    } 
+    type servico_pedido = {
+      codigo:number,
+      desconto:number,
+      quantidade:number,
+      valor:number,
+      total:number 
+  }
   type pedido ={ 
     codigo?:number,
     situacao:string,
     descontos:number,
+    vendedor:number,
     forma_pagamento:number,
     observacoes:string,
     quantidade_parcelas:number,
     total_geral:number,
     total_produtos:number,
+    total_servicos:number,
     cliente:number ,
     produtos:produto_pedido[],
     parcelas:parcela[], 
-    data_cadastro:string
+    data_cadastro:string,
+    tipo:number
 }
 
 const getCurrentDate = () => {
@@ -56,7 +67,39 @@ const getCurrentDate = () => {
       let data = getCurrentDate();
       pedido.situacao = 'EA';
       try{
-
+        console.log(  ` INSERT INTO pedidos 
+          (
+          codigo,
+          situacao,
+          vendedor,
+          descontos,
+          forma_pagamento,
+          observacoes,
+          quantidade_parcelas,
+          total_geral,
+          total_produtos,
+          total_servicos,
+          cliente,
+          data_cadastro,
+          tipo  
+          ) VALUES (
+           ${ pedido.codigo}, 
+           '${ pedido.situacao}',
+            ${ pedido.vendedor},
+           ${ pedido.descontos},
+          ${ pedido.forma_pagamento},
+          '${ pedido.observacoes}',
+          ${ pedido.quantidade_parcelas},
+          ${ pedido.total_geral},
+          ${ pedido.total_produtos},
+          ${ pedido.total_servicos},
+          ${ pedido.cliente.codigo},
+        '${ pedido.data_cadastro }',
+         ${ pedido.tipo}
+          )`  )
+          console.log('');
+          console.log('');
+  
      
 
         let result = await db.runAsync(
@@ -64,28 +107,35 @@ const getCurrentDate = () => {
             (
             codigo,
             situacao,
+            vendedor,
             descontos,
             forma_pagamento,
             observacoes,
             quantidade_parcelas,
             total_geral,
             total_produtos,
+            total_servicos,
             cliente,
-            data_cadastro  
+            data_cadastro,
+              tipo  
             ) VALUES (
              ${ pedido.codigo}, 
              '${ pedido.situacao}',
-            ${ pedido.descontos},
+              ${ pedido.vendedor},
+             ${ pedido.descontos},
             ${ pedido.forma_pagamento},
             '${ pedido.observacoes}',
             ${ pedido.quantidade_parcelas},
             ${ pedido.total_geral},
             ${ pedido.total_produtos},
+            ${ pedido.total_servicos},
             ${ pedido.cliente.codigo},
-          '${ data }' 
+          '${ pedido.data_cadastro }',
+           ${ pedido.tipo}
             )` 
         );
-      
+  
+
         console.log(' orcamento inserido codigo : ' ,result.lastInsertRowId);
         console.log('');
         return result.lastInsertRowId;
@@ -105,9 +155,11 @@ const getCurrentDate = () => {
           p.situacao,
           p.descontos,
           p.forma_pagamento,
+          p.vendedor,
           p.total_geral,
           p.total_produtos,
-             p.data_cadastro
+          p.data_cadastro,
+          p.tipo
           FROM pedidos p
           JOIN  clientes c on c.codigo = p.cliente
           WHERE p.codigo = ${code}`
@@ -127,7 +179,9 @@ const getCurrentDate = () => {
           p.forma_pagamento,
           p.total_geral,
           p.total_produtos, 
-          p.data_cadastro
+          p.data_cadastro,
+          p.vendedor,
+          p.tipo
           FROM pedidos p
           JOIN  clientes c on c.codigo = p.cliente
           `);
@@ -145,11 +199,13 @@ const getCurrentDate = () => {
           let clientOrder = dataClientOrder[0];
 
           let producstOrder:any  = await queryItems.selectByCodeOrder(code);
+          let servicesOrder:any = await queryServicosPedido.selectByCodeOrder(code);
            let parcelas:any = await queryParcelas.selectByCodeOrder(code) 
             
            order.produtos = producstOrder;
            order.parcelas = parcelas
            order.cliente = clientOrder
+           order.servicos = servicesOrder
            //console.log(order);
            return order
 
@@ -157,20 +213,14 @@ const getCurrentDate = () => {
 
         }
 
+
+
     async function createOrder( order:pedido ){
        
          if( !order.codigo ){
            let code = Date.now();
           order.codigo = code;
-
-          if(   !order.produtos.length   ||  order.produtos.length < 0 ){
-            console.log(`nao foi informado os produtos`)
-            return;
-          }//else{
-           //  console.log('')
-           //   console.log(order.produtos)
-           //   console.log('')
-           //} 
+ 
 
           if(   !order.parcelas.length   ||  order.parcelas.length < 0 ){
             console.log(`nao foi informado os parcelas`)
@@ -182,15 +232,32 @@ const getCurrentDate = () => {
            //}
           let produtos:any = order.produtos;
           let parcelas: parcela[] = order.parcelas;
+          let servicos: any = order.total_servicos;
              let codeOrder:any = await create(order);
-                         if( codeOrder !== undefined  ){
-                          produtos.forEach( async (prod:produto_pedido)=>{
-                            await queryItems.create( prod, order.codigo )
-                            })
-                             parcelas.forEach( async (par :parcela)=>{
-                                await queryParcelas.create(par , order.codigo  )
-                             })
-                        }
+
+                         if( codeOrder > 0 || codeOrder !== undefined  ){
+             
+                                if(  produtos.length > 0    ){
+                                  produtos.forEach( async (prod:produto_pedido)=>{
+                                    await queryItems.create( prod, order.codigo )
+                                    })
+                                } 
+
+                                if( servicos.length > 0 ){
+                                  servicos.forEach( async ( ser:servico_pedido )=>{
+                                    await queryServicosPedido.create( ser, order.codigo )
+                                    })
+                                }
+                                
+                                parcelas.forEach( async (par :parcela)=>{
+                                    await queryParcelas.create(par , order.codigo  )
+                                })
+
+                                return order.codigo ;
+                        
+                         }else{
+                          console.log('ocorreu um erro ao tentar gravar o orcamento!')
+                     }
           }  
 
     }
@@ -208,11 +275,13 @@ const getCurrentDate = () => {
       try{
           const result = await db.runAsync(` DELETE from pedidos where codigo = ${code}`)
           console.log(result);
+          
           if( result.lastInsertRowId  ){
             await queryItems.deleteByCodeOrder(code);
             await  queryParcelas.deleteByCodeOrder(code);
-
+            await queryServicosPedido.deleteByCodeOrder(code);
           }
+
           console.log(`deletado parcelas do orcamento codigo: ${code}`)
 
        }catch(e){
@@ -225,7 +294,6 @@ const getCurrentDate = () => {
 
     try{
         const result = await db.runAsync(` DELETE from pedidos  `)
-       
      
      }catch(e){
       console.log(e)
@@ -248,17 +316,31 @@ const getCurrentDate = () => {
 
 
             if(aux.lastInsertRowId){
-               await queryItems.deleteByCodeOrder(order.codigo);
-               await queryParcelas.deleteByCodeOrder(order.codigo)
+                
+                
+                await queryParcelas.deleteByCodeOrder(order.codigo)
+                
+                  if( order.produtos.length > 0 ){
+                    await queryItems.deleteByCodeOrder(order.codigo);
+                    order.produtos.forEach( async (p)=>{
+                        await queryItems.create( p,order.codigo)
+                        })
 
-               order.produtos.forEach( async (p)=>{
-                await queryItems.create( p,order.codigo)
-              })
+                    }
+                
+                    if( order.servicos.length > 0  ){
+                      await queryServicosPedido.deleteByCodeOrder(order.codigo)
+                      order.servicos.forEach( async (s)=>{
+                        await queryServicosPedido.create( s,order.codigo)
+                        })
+                    }
 
-                order.parcelas.forEach( async (pa)=>{
-                  await queryParcelas.create( pa, order.codigo);
-                })
-              } 
+
+                  
+                  order.parcelas.forEach( async (pa)=>{
+                    await queryParcelas.create( pa, order.codigo);
+                  })
+             } 
 
       }
     
@@ -278,7 +360,8 @@ const getCurrentDate = () => {
           quantidade_parcelas = ${ pedido.quantidade_parcelas},
           total_geral  =  ${ pedido.total_geral},
           total_produtos =  ${ pedido.total_produtos}, 
-          cliente  =  ${ pedido.cliente.codigo} 
+          cliente  =  ${ pedido.cliente.codigo},
+          data_cadastro = ${ pedido.data_cadastro}
           WHERE codigo = ${ pedido.codigo}  
            ` 
       );

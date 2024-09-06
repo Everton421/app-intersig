@@ -10,6 +10,7 @@ import { usePedidos } from "../../database/queryPedido/queryPedido"
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento"
 import { useClients } from "../../database/queryClientes/queryCliente"
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
+import { AuthContext } from "../../contexts/auth"
 
 export const Configurações = () => {
     const [conectado, setConectado] = useState<boolean>()
@@ -22,7 +23,7 @@ export const Configurações = () => {
 
 
     const {connected, setConencted} = useContext(ConnectedContext);
-    
+    const { usuario } = useContext(AuthContext);
  
     const useQueryProdutos = useProducts();
     const useQueryClientes = useClients();
@@ -75,7 +76,7 @@ export const Configurações = () => {
 
     async function fetchClientes() {
         try {
-          const aux = await api.get('/offline/clientes');
+          const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);
           const dados = aux.data;
           if (dados.length > 0) {
             for (const v of dados) {

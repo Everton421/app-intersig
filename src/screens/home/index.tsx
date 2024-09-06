@@ -14,23 +14,23 @@ export const Home = ({navigation}:any) => {
 
   const data = [
     { "nome":"vendas",
-      "icon":<MaterialCommunityIcons name="cart-variant" size={30} color="black" />
+      "icon":<MaterialCommunityIcons name="cart-variant" size={30} color="#009de2" />
       },
     { "nome": "Acerto",
-    "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="black" />
+    "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
      },
      { "nome": "acertoProduto",
-     "icon":<AntDesign name="calculator" size={30} color="black" />
+     "icon":<AntDesign name="calculator" size={30} color="#009de2" />
       },
 
       { "nome":"Produtos",
-      "icon": <Foundation name="book" size={30} color="black" />
+      "icon": <Foundation name="book" size={30} color="#009de2" />
       },
       { "nome":"configurações",
-      "icon":<Feather name="settings" size={30} color="black" />
+      "icon":<Feather name="settings" size={30} color="#009de2" />
       }, 
       { "nome":"ItemSQLITE",
-        "icon":<Feather name="settings" size={30} color="black" />
+        "icon":<Feather name="settings" size={30} color="#009de2" />
         }, 
       
       
@@ -39,7 +39,7 @@ export const Home = ({navigation}:any) => {
 
   const Item = ({ value }: any) => {
     return (
-<View style={{alignItems:"center"}}>
+<View style={{alignItems:"center"  , margin:5, backgroundColor:'#F5F6F8', elevation:5, borderRadius:5, padding:3}}>
       <TouchableOpacity onPress={ ()=> navigation.navigate(value.nome) }
         style={{
           backgroundColor: "#FFF",
@@ -54,13 +54,13 @@ export const Home = ({navigation}:any) => {
       >
         {value.icon}
       </TouchableOpacity>
-        <Text style={{fontSize:13}}> {value.nome}</Text>
+        <Text style={{fontSize:13, fontWeight:"bold"}}> {value.nome}</Text>
         </View>
     );
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#e9ecf1" }}>
+    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
       <StatusBar backgroundColor={'#333'}/>
       <View style={{ alignItems: "center", justifyContent: "space-between", flexDirection: "row", backgroundColor:'#333', elevation:7, padding:5 ,   }}>
         <Image

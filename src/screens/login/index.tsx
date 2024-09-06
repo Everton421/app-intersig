@@ -13,16 +13,16 @@ const { setLogado ,usuario , setUsuario }:any = useContext(AuthContext)
 
     async function   buscaUsuario(){
 
-  //  try{
-  //      const response = await api.post('/auth',{"nome":usuario, "senha":senha})
-  //      console.log(response.data)
-  //      if(response.status === 200 ){
-  //          setLogado(true)
-  //      }
-  //  }catch(err:any){
-  //          Alert.alert("erro", err.response.data.error)
-  //}
-  setLogado(true)
+     try{
+         const response = await api.post('/auth',{"nome":usuario, "senha":senha})
+         console.log(response.data)
+         if(response.status === 200 ){
+             setLogado(true)
+             setUsuario(response.data)
+         }
+     }catch(err:any){
+             Alert.alert("erro", err.response.data.error)
+   }
 }
 
     return(
@@ -36,7 +36,7 @@ const { setLogado ,usuario , setUsuario }:any = useContext(AuthContext)
             <TextInput
             style={{ 
                 width:'70%', margin:10,padding:10, borderRadius:10,
-                 backgroundColor:"#FFF",elevation:3, borderWidth:2, borderColor:'#999' 
+                 backgroundColor:"#FFF",elevation:5    
                 }}
             onChangeText={(value:any)=> setUsuario(value)}
             placeholder="usuario"
@@ -44,7 +44,7 @@ const { setLogado ,usuario , setUsuario }:any = useContext(AuthContext)
             <TextInput
              style={{ 
                 width:'70%', margin:10,padding:10, borderRadius:10,
-                 backgroundColor:"#FFF",elevation:3, borderWidth:2, borderColor:'#999' 
+                 backgroundColor:"#FFF",elevation:5 
                 }}
              onChangeText={(value:any)=> setSenha(value)}
               placeholder="senha"

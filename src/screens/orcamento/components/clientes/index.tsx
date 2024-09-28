@@ -33,20 +33,10 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
   useEffect(() => {
     const busca = async () => {
-       if( connected ){
-         try {
-           const response = await api.get(`clientes?vendedor=${usuario.codigo}&cliente=${pesquisa}`);
-           setData(response.data);
-         } catch (err) {
-           console.log(err);
-         }
-       }else{
         try{
           let aux:any = await  useQueryClients.selectByDescription(pesquisa,10);
           setData(aux)
         }catch(e){ console.log(e)}
-       }
-     
     };
     busca();
 

@@ -6,7 +6,7 @@ import { ListaClientes } from "./clientes";
 import { Parcelas } from "./parcelas";  
 import { FlatList, TextInput } from "react-native-gesture-handler";
 import { api } from "../../../services/api";  
-import { OrcamentoContext } from "../../../contexts/orcamentoContext";
+import { OrcamentoContext, OrcamentoModel } from "../../../contexts/orcamentoContext";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
 import Feather from '@expo/vector-icons/Feather';
@@ -16,8 +16,12 @@ import { Cart } from "./Cart";
 import { Detalhes } from "./detalhes";
 import { AuthContext } from "../../../contexts/auth";
 import { Servico } from "./servico";
+import { useItemsPedido } from "../../../database/queryPedido/queryItems";
+import { useParcelas } from "../../../database/queryParcelas/queryParcelas";
+import { useServicosPedido } from "../../../database/queryPedido/queryServicosPedido";
 
-export const Orcamento = ({orcamentoEditavel, navigation}) => {
+export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
+
     const [visibleProdutos, setVisibleProdutos] = useState<boolean>(false);
     const [visibleClientes, setVisibleClientes] = useState<boolean>(false);
     const [totalGeral, setTotalGeral] = useState<number | undefined>();
@@ -32,6 +36,8 @@ export const Orcamento = ({orcamentoEditavel, navigation}) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [ dataAtual, setDataAtual ] = useState<any>();
     const [ tipoOrcamento , setTipoOrcamento ] = useState<number>(1)
+    const [ codigoOrcamento , setCodigoOrcamento ] = useState<number>()
+
 /////
 
   const [selectedItem, setSelectedItem] = useState([]);
@@ -42,7 +48,9 @@ const { usuario } = useContext(AuthContext)
     const { orcamento, setOrcamento } = useContext(OrcamentoContext);
     const { connected } = useContext(ConnectedContext)
     const useQuerypedidos = usePedidos();
-
+    const useQueryitems = useItemsPedido();
+    const useQueryParcelas = useParcelas();
+    const useQueryServicos =   useServicosPedido();
 
     const getCurrentDate = () => {
         const now = new Date();
@@ -55,195 +63,188 @@ const { usuario } = useContext(AuthContext)
       };
 
 
-     useEffect(() => {
-        if (status === 200 && response) {
-            setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                ...prevOrcamento,
-                cliente: null,
-                produtos: [],
-                parcelas: [],
-                vendedor:0,
-                tipo:tipoOrcamento
-            }));
-            setTotalGeral(0);
-            setDescontosGeral(0);
+ 
+
+
+      const updateOrder = async ()=> {
+        await useQuerypedidos.update(orcamento)
+      }
+
+    ////////////////////////////////////////////////////////////////////////////
+      useEffect(() => {
             
-            Alert.alert(response);
-            navigation.navigate('vendas');
+            async function init(){
+        let data = getCurrentDate();
+            if (!orcamentoEditavel || orcamentoEditavel === null) {
+                
+                  
+                let lastId = await  useQuerypedidos.selectLastId();                          
+
+                    let codigoDoOrcamento;
+
+                    if( lastId[0].codigo === 0 ){
+                        codigoDoOrcamento = 1
+                        setCodigoOrcamento(codigoDoOrcamento)
+                    }else{
+                        codigoDoOrcamento = lastId[0].codigo + 1 
+                        setCodigoOrcamento(codigoDoOrcamento)
+                    }
+
+
+                setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                    ...prevOrcamento,
+                    vendedor: usuario.codigo,
+                    total_produtos: 0,
+                    total_geral: 0,
+                    descontos: 0,
+                    observacoes: observacoes || '',
+                    codigo:codigoDoOrcamento,
+                    quantidade_parcelas:0,
+                    cliente: {},
+                    parcelas: [],
+                    produtos:[],
+                    servicos:[],
+                    data_cadastro: data,
+                    veiculo:0,
+                    tipo_os:0,
+                    tipo:tipo
+                }));
+
+            } else {
+                setEditavel(true);
+                setCodigoOrcamento(orcamentoEditavel.codigo)
+            }
         }
 
-        if(status === 500 ){
+        init();
+
+
+        }, [         ]);
+    ////////////////////////////////////////////////////////////////////////////
+     useEffect(() => {
+        if (status === 200 && response) {
+             
             setOrcamento((prevOrcamento: OrcamentoModel) => ({
                 ...prevOrcamento,
                 cliente: null,
                 produtos: [],
                 parcelas: [],
                 vendedor:0,
-                tipo:tipoOrcamento
+                tipo:tipo
             }));
             setTotalGeral(0);
             setDescontosGeral(0);
             
             Alert.alert(response);
-            navigation.navigate('vendas');
+            navigation.goBack();
+        }
+
+        if( status === 500   ){
+            setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                ...prevOrcamento,
+                cliente: null,
+                produtos: [],
+                parcelas: [],
+                vendedor:0,
+                tipo:tipo
+            }));
+            setTotalGeral(0);
+            setDescontosGeral(0);
+            Alert.alert(response);
+            navigation.goBack();
         }
 
     }, [status, response, navigation, setOrcamento]);
-   
+    ////////////////////////////////////////////////////////////////////////////
+      useEffect(() => {
+          let novoTotalGeralProdutos = 0;
+          let totaDescontosProdutos = 0;
+          let totalValorProdutos = 0;
   
-     useEffect(() => {
-         let novoTotalGeralProdutos = 0;
-         let totaDescontosProdutos = 0;
-         let totalValorProdutos = 0;
- 
-         let novoTotalGeralServicos = 0;
-         let totaDescontosServicos = 0;
-         let totalValorServicos = 0;
-        
-            let totalGeralOrcamento = 0;
-             
-            ////****  
-            ////**** total de descontos esta considerando somente os 
-            ////**** descontos dos produtos 
-            ////****
+          let novoTotalGeralServicos = 0;
+          let totaDescontosServicos = 0;
+          let totalValorServicos = 0;
+             let totalGeralOrcamento = 0;
+             ////****  
+             ////**** total de descontos esta considerando somente os 
+             ////**** descontos dos produtos 
+             ////****
 
-         if( !orcamento.produtos){
-             return
-         }
-         if( !orcamento.servicos){
-            return
-        } 
-
-         if( orcamento.produtos.length > 0  ){
-            orcamento.produtos.forEach((i: any) => {
-                     novoTotalGeralProdutos+= i.total;
-                     totaDescontosProdutos += i.desconto;
-                     totalValorProdutos += i.preco * i.quantidade;
-                 });
-             setTotalProdutos(totalValorProdutos);
-             setTotalGeral(novoTotalGeralProdutos);
-             setDescontosGeral(totaDescontosProdutos);
+            if( orcamento.produtos.length > 0  ){
+                orcamento.produtos.forEach((i: any) => {
+                         novoTotalGeralProdutos+= i.total;
+                         totaDescontosProdutos += i.desconto;
+                         totalValorProdutos += i.preco * i.quantidade;
+                     });
+                 setTotalProdutos(totalValorProdutos);
+                 setTotalGeral(novoTotalGeralProdutos);
+                 setDescontosGeral(totaDescontosProdutos);
+                } 
+    
+            if( orcamento.servicos.length > 0  ){
+                orcamento.servicos.forEach((i: any) => {
+                    novoTotalGeralServicos+= i.total;
+                    totaDescontosServicos += i.desconto;
+                    totalValorServicos += i.valor * i.quantidade;
+                });
+               }
+                totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos
+               
+                setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                    ...prevOrcamento,
+                    total_produtos: totalValorProdutos,
+                    total_servicos: totalValorServicos, 
+                    total_geral: totalGeralOrcamento,
+                    descontos: totaDescontosProdutos,
+                   }));
+               
+                 //  updateOrder()
+           
           
-     }
+      }, [   orcamento.produtos, orcamento.parcelas, observacoes,   orcamento.descontos ,orcamento.servicos   ]);
+    ////////////////////////////////////////////////////////////////////////////
+     
 
-        if( orcamento.servicos.length > 0  ){
-            orcamento.servicos.forEach((i: any) => {
-                novoTotalGeralServicos+= i.total;
-                totaDescontosServicos += i.desconto;
-                totalValorServicos += i.valor * i.quantidade;
-            });
-        }
-            totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos
 
-        setOrcamento((prevOrcamento: OrcamentoModel) => ({
-            ...prevOrcamento,
-            total_produtos: totalValorProdutos,
-            total_servicos: totalValorServicos, 
-            total_geral: totalGeralOrcamento,
-            descontos: totaDescontosProdutos,
-            observacoes: observacoes || '',
-        }));
-
-     }, [orcamento.produtos, orcamento.parcelas, observacoes, setOrcamento , orcamento.descontos  , orcamento.servicos ]);
-    
+ 
     /////////////////////////////
+    const ver = async ()=>{
+        let produtos = await useQueryitems.selectByCodeOrder(codigoOrcamento);
+            console.log('produtos :',produtos )
     
-    useEffect(()=>{
-    
-        console.log('');
-        console.log('Orçamento atualizado : ' ,orcamento);
-        console.log('');
-        console.log(`Codigo usuario:  `,usuario.codigo);
+        let dados = await useQuerypedidos.selectByCode(codigoOrcamento);
+        console.log('dados :',dados )
+        let parc = await useQueryParcelas.selectByCodeOrder(codigoOrcamento);
 
-    },[ orcamento ])
-    
+        console.log('parcelas :',parc )
+        
+        let servicos = await useQueryServicos.selectByCodeOrder(codigoOrcamento);
+        console.log('servicos :',servicos )
+        }
     /////////////////////////////
-    
-    
-    useEffect(() => {
-            let data = getCurrentDate();
-        if (!orcamentoEditavel || orcamentoEditavel === null) {
-            
-            setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                ...prevOrcamento,
-                vendedor: usuario.codigo,
-                total_produtos: 0,
-                total_geral: 0,
-                descontos: 0,
-                observacoes: observacoes || '',
-                codigo:0,
-                quantidade_parcelas:0,
-                cliente: {},
-                parcelas: [],
-                produtos:[],
-                servicos:[],
-                data_cadastro: data
-            }));
 
-        } else {
-          //  setOrcamento(orcamentoEditavel); 
-           // console.log(orcamentoEditavel)
-            setEditavel(true);
-        }
-    }, [ orcamentoEditavel, observacoes, setOrcamento]);
         
-        
-const alertaExclusao = (item)=>{
-    Alert.alert('', `deseja excluir o item : ${item.descricao} ?`,[
-        { text:'Não',
-            onPress: ()=> console.log('nao excluido o item'),
-            style:'cancel',
-        },
-        {
-            text: 'Sim', onPress:()=> console.log(`Excluindo o item ${item.descricao}`)
-        }
-    ] )
-}
-
-
-                 
 
     const gravar = async () => {
         setLoading(true);
 
         if (editavel) {
-            if( connected ){
-                  try {
-                      const response = await api.put('/orcamentos', orcamento);
-                      if (response.status === 200) {
-                          setStatus(response.status);
-                          setResponse(response.data.msg);
-                      }
-                  } catch (err) {
-                      console.error(  'Erro ao enviar o orcamento para a api ! ', err  );
-                      setResponse('Erro ao salvar o orçamento.');
-                  } finally {
-                      setLoading(false);
-                  }
-  
-                  
-                  }else{
-                
+        
                     try{
-                    await  useQuerypedidos.updateOrder(orcamento);
+                    await  useQuerypedidos.updateOrder(orcamento, codigoOrcamento);
                     setStatus(200)
-                    setResponse('Orçamento registrado com sucesso!')
-                    }catch(e ){ console.log('erro ao gravar o orcamento no SQLITE',e)
+                    setResponse('Orçamento atualizado com sucesso!')
+                    }catch(e ){ console.log('erro ao atualizar o orcamento no SQLITE',e)
                         } finally {
                             setLoading(false);
                         }
-                }
 
         } else {
 
             let cliente, produtos, parcelas;
 
-            setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                ...prevOrcamento,
-                    vendedor:usuario.codigo
-            }));
 
-            if (!orcamento.cliente) {
+            if (!orcamento.cliente.codigo) {
                 Alert.alert('É necessário informar o cliente!');
                 setLoading(false);
                 return;
@@ -251,13 +252,7 @@ const alertaExclusao = (item)=>{
                 cliente = orcamento.cliente;
             } 
 
-            if (!orcamento.produtos || orcamento.produtos.length === 0 ) {
-                Alert.alert('É necessário informar os produtos!');
-                setLoading(false);
-                return;
-            } else {
-                produtos = orcamento.produtos;
-            }
+        
             if (orcamento.parcelas.length === 0) {
                 Alert.alert('É necessário informar as parcelas!');
                 setLoading(false);
@@ -266,47 +261,27 @@ const alertaExclusao = (item)=>{
                 parcelas = orcamento.parcelas;
             }
 
-             if(connected ){
-                      try {
-                          const response = await api.post('/orcamentos', orcamento);
-                          if (response.status === 200) {
-                              setStatus(response.status);
-                              setResponse(response.data.msg);
-                          }
-                      } catch (err) {
-                        console.error(  'Erro ao enviar o orcamento para a api ! ', err  );
-                          setResponse('Erro ao salvar o orçamento.');
-                      } finally {
-                          setLoading(false);
-                      }
-                  }else{
 
                     try{
-
-                        console.log(orcamento)
-
                        let response =  await  useQuerypedidos.createOrder(orcamento);
-                        
+                       
+                       
                        if(response > 0 ){
                         console.log('')
                         console.log('codigo oracamento resgistrado : ',response)
                         console.log('')
-
                         setStatus(200)
                         setResponse('Orçamento registrado com sucesso!')
                         }
                          else{
                              setStatus(500)
                          setResponse(' falha ao registrar orcamento! ')
- 
                          }
-
                     }catch(e ){ 
                         console.log('erro ao gravar o orcamento no SQLITE',e)
                     } finally {
                     setLoading(false);
                     }
-                }
         }
     };
  
@@ -315,37 +290,14 @@ const alertaExclusao = (item)=>{
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
-
-                         {/************* seletor tipo de orcamento  ************/}
-                        <View style={{marginLeft:10}}>        
-                            <Text style={{ fontWeight:"bold"}}>
-                                Tipo De Orcamento:
-                            </Text>
-                         </View>
-                    <View style={{ flexDirection:"row" ,margin:5, gap:8}} >
-                           
-                        <TouchableOpacity  onPress={ ()=> setTipoOrcamento(1) }
-                            style={ [{backgroundColor: tipoOrcamento === 1 ? '#009de2' : '#FFF'}, { width:'20%' ,elevation:5, borderRadius:5 , padding:5 }] }>
-                                <Text style={
-                                    [{  color: tipoOrcamento === 1 ? '#FFF' : 'black' }, { fontWeight:"bold"}]
-                                } >
-                                    VENDA
-                                </Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity  onPress={ ()=> setTipoOrcamento(2) }
-                       style={ [{backgroundColor: tipoOrcamento === 2 ? '#009de2' : '#FFF'}, { width:'20%', elevation:5, borderRadius:5 , padding:5}] }>
-                             <Text style= { [{ color: tipoOrcamento === 2 ? '#FFF' : 'black' },{ fontWeight:"bold"}]} >
-                                OS
-                            </Text>
-                        </TouchableOpacity>
-                     
-                     </View>
-                     {/**** */}
+ 
 
   {/** *** separador ***/} 
   <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-  {/** ***   ***/} 
+
+                    <Text>
+                       codigo: {codigoOrcamento}
+                    </Text>
 
               <View style={{ flexDirection: 'row' }}>
                     <ListaClientes orcamentoEditavel={orcamentoEditavel} />
@@ -360,44 +312,24 @@ const alertaExclusao = (item)=>{
                     </View>
                 </View>
 
-
-
         {/*//////////////// components serviços  ////////////////////////*/    }  
       
-            {/** ***   ***/} 
-
-                            { tipoOrcamento === 2 ?
+                            { orcamento.tipo === 3 ?
                                     <View> 
-                                   
-                                            <Servico/>
+                                            <Servico orcamentoEditavel={orcamentoEditavel}  />
                                         </View>
-                                    :null
-                                }    
-
+                         :  <View style={{ borderWidth: 0.4, margin: 10 }}></View>
+       
+                             }    
                   
       {/*//////////////// components produtos  ////////////////////////*/    }  
-
                 <View style={{ flexDirection: 'row' , margin: 5}}>
-                       <ListaProdutos orcamentoEditavel={orcamentoEditavel?.produtos} />
-                 <Cart/>
+                          <ListaProdutos orcamentoEditavel={orcamentoEditavel} />
                  </View>
-      {/*////////////////////////////////////////////////////////////////*/    }  
-  
 
-                 {/** 
-                  
-                 
-                    <FlatList
-                        data={orcamento.produtos}
-                        horizontal={true}
-                        renderItem={({ item }) => <ItemsDoPedido2 item={item} />}
-                        keyExtractor={ (item)=> item.codigo.toString()}
-                    />
-                
-                )
-              */  }
+            
 
-      {/*////////////////////////////////////////////////////////////////*/    }  
+      {/*/////////////////////////// parcelas /////////////////////////////////////*/    }  
 
                     <View style={{ borderWidth: 0.4, margin: 10 }}></View>
                     <View style={{ margin: 5 }}>
@@ -405,34 +337,29 @@ const alertaExclusao = (item)=>{
                     </View>
                     <View style={{ borderWidth: 0.2, margin: 5 }}></View>
 
- {/*********************************************/}
-                <Detalhes/>
- {/*********************************************/}
+      {/*/////////////////////////// detalhes /////////////////////////////////////*/    }  
+                      <Detalhes orcamentoEditavel={ orcamentoEditavel } />
 
-             {/**   <View style={{ margin: 3 }}>
-                    <ListaItemOrcamento /> 
-                </View>*/} 
-
-
-               
             </ScrollView>
                        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', borderColor: '#ccc', borderWidth: 1, borderRadius: 5, elevation: 5, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Total: R$ {totalGeral?.toFixed(2)}</Text>
-                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {descontosGeral ? descontosGeral.toFixed(2) :  0 }</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Total: R$ {orcamento.total_geral?.toFixed(2)}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {orcamento.descontos? descontosGeral.toFixed(2) :  0 }</Text>
 
                 <TouchableOpacity
-                    style={{ padding: 7, backgroundColor: '#009de2', elevation: 5, margin: 3, borderRadius: 5 }}
+                    style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
                     onPress={() => gravar()}
                 >
                     <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Salvar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={{ padding: 7, backgroundColor: '#009de2', elevation: 5, margin: 3, borderRadius: 5 }}
+                    style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
                     onPress={() => console.log(orcamento)}
                 >
-                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>mostrar</Text>
+                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Mostrar</Text>
                 </TouchableOpacity>
+               
+              
             </View>
 
             {loading && (

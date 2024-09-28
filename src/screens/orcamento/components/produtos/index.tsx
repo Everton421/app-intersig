@@ -7,6 +7,8 @@ import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
 import { ConnectedContext } from '../../../../contexts/conectedContext';
 import { useProducts } from '../../../../database/queryProdutos/queryProdutos';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useItemsPedido } from '../../../../database/queryPedido/queryItems';
+import { Cart } from '../Cart';
 
 
 
@@ -22,6 +24,8 @@ export const ListaProdutos = ({ orcamentoEditavel }) => {
 const { connected, setConnected } = useContext(ConnectedContext)
 
   const useQueryProdutos = useProducts();
+
+  const useQueryItemsPedido = useItemsPedido();
 
   const handleIncrement = (item) => {
     setSelectedItem((prevSelectedItems) => {
@@ -82,20 +86,9 @@ const { connected, setConnected } = useContext(ConnectedContext)
     }));
   }, [selectedItem]);
 
+
   useEffect(() => {
     const busca = async () => {
-       if(connected ){
-          setLoading(true);
-             try {
-               const response = await api.get(`produtos/${pesquisa}`);
-               setData(response.data);
-             } catch (err) {
-               console.log(err);
-             } finally {
-               setLoading(false);
-             }
-         }else{
-
           try{
             let aux:any = await useQueryProdutos.selectByDescription(pesquisa,10);
             setData(aux);
@@ -104,7 +97,6 @@ const { connected, setConnected } = useContext(ConnectedContext)
           }finally {
                setLoading(false);
              }
-       }
     }
 
     if (pesquisa.trim() !== '') {
@@ -113,10 +105,21 @@ const { connected, setConnected } = useContext(ConnectedContext)
       setData([]);
     }
 
-
-
   }, [ pesquisa    ]);
 
+
+  useEffect(
+    ()=>{
+      async function init(){
+        if(orcamentoEditavel !== null  ){
+
+            let data = await useQueryItemsPedido.selectByCodeOrder(orcamentoEditavel.codigo);
+             setSelectedItem(data)
+        } 
+      }
+
+      init()
+    },[])
 
 
   const adiciona = (dado) => setPesquisa(dado);
@@ -124,10 +127,65 @@ const { connected, setConnected } = useContext(ConnectedContext)
     setSelectedItem([]);
     setPesquisa('');
   };
- 
+
+  function renderProdutosSelecionado ( item ){
+
+    return(
+      <View style={{ backgroundColor: '#FFF', elevation: 7, margin: 3, borderRadius: 30, padding: 35, width:300 }}>
+         
+         <View style={{flexDirection:'row', justifyContent:'space-between', margin:3}}>
+            
+            <View style={{flexDirection:'row' }}>
+              <Text style={{fontWeight:'bold'}}>
+               Codigo:
+              </Text>
+              <Text> { ' '+item.codigo} </Text>
+            </View>
+
+              <View style={{flexDirection:'row' }}>
+                <Text style={{fontWeight:'bold'}} >
+                  Unitario:
+                </Text>
+                <Text>
+                {' '+ item.preco}
+                </Text>
+              </View>
+          
+          </View>
+
+          <Text numberOfLines={2} >
+            { item.descricao } 
+          </Text>
+
+
+    <View style={{flexDirection:'row', justifyContent:'space-between' }} >
+          <View style={{flexDirection:'row' }}>
+            <Text style={{fontWeight:'bold'}} >
+              Quantidade:
+            </Text>
+            <Text>
+            {' '+item.quantidade}
+            </Text>
+          </View>
+
+          <View style={{flexDirection:'row' }}>
+              <Text style={{fontWeight:'bold'}} >
+                Total: 
+              </Text>
+              <Text>
+               {' '+item.total}
+              </Text>
+          </View>
+        </View>        
+      
+
+      </View>
+    )
+}
+
 
   const renderItem = ({ item }) => {
-    const isSelected = selectedItem.find(i => i.codigo === item.codigo);
+    const isSelected = orcamento.produtos.find(i => i.codigo === item.codigo);
     const quantidade = isSelected ? isSelected.quantidade : 0;
     const desconto = isSelected ? isSelected.desconto : 0;
     item.preco = 10;
@@ -193,6 +251,13 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
   return (
     <View style={styles.container}>
+
+            <View style={{ alignItems:'center'}}>
+              <Text style={{ fontWeight:'bold'}}>
+                Produtos
+              </Text>
+            </View>
+
       <TouchableOpacity onPress={() => setVisibleProdutos(true)} 
       style={{margin:5,   elevation: 5, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#009de2', padding:10, borderRadius: 10 }}>
       <FontAwesome name="search" size={22} color="#FFF" />
@@ -250,6 +315,25 @@ const { connected, setConnected } = useContext(ConnectedContext)
             </View>
           </View>
         </Modal>
+
+
+  
+                        <View style={{ flexDirection: 'row' , justifyContent:"space-between", margin: 5}}>
+                            <Cart/>
+                              <Text style={{ fontSize:15 ,fontWeight:'bold'}}> 
+                                Total Produtos: { orcamento?.total_produtos}
+                              </Text>
+                      
+                         </View>
+                         
+                         <FlatList
+                          data={orcamento.produtos}
+                          horizontal={true}
+                          renderItem={({item})=> renderProdutosSelecionado(item)}
+                          keyExtractor={ (item)=> item.codigo.toString()}
+
+                         />
+
       </View>
     </View>
   );

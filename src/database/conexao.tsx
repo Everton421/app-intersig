@@ -4,48 +4,54 @@ import { View, Text, StyleSheet } from 'react-native';
 
 export async function construtor(db: SQLiteDatabase) {
     
-    await db.execAsync(`
+    await db.execAsync(` 
   PRAGMA journal_mode = 'wal';
-   --  DROP TABLE produtos;
+   --  DROP TABLE IF EXISTS produtos;
    --  DROP TABLE IF EXISTS clientes;
    --  DROP TABLE IF EXISTS forma_pagamento;
-      DROP TABLE IF EXISTS pedidos;
-       DROP TABLE IF EXISTS produtos_pedido ;
-       DROP TABLE IF EXISTS servicos_pedido ;
-       DROP TABLE IF EXISTS parcelas ;
-       DROP TABLE IF EXISTS usuarios ;
-       DROP TABLE IF EXISTS servicos ;
-
+   --  DROP TABLE IF EXISTS usuarios ;
+   --  DROP TABLE IF EXISTS servicos ;
+   --  DROP TABLE IF EXISTS tipos_os;
+   --  DROP TABLE IF EXISTS veiculos;
+   
+   --  DROP TABLE IF EXISTS pedidos;
+   --  DROP TABLE IF EXISTS produtos_pedido ;
+   --  DROP TABLE IF EXISTS servicos_pedido ;
+   --  DROP TABLE IF EXISTS parcelas ;
+    
 
 
      CREATE TABLE IF NOT EXISTS produtos (
-      codigo INTEGER PRIMARY KEY NOT NULL,
-      estoque REAL DEFAULT 0 ,
-      preco REAL DEFAULT 0,
-      grupo INTEGER DEFAULT 0,
-      origem TEXT,   
-      descricao TEXT NOT NULL,
-      num_fabricante,
-      num_original TEXT,
-      sku TEXT,
-      marca INTEGER DEFAULT 0,
-      ativo TEXT DEFAULT 'S',
-      class_fiscal TEXT ,
-      cst TEXT DEFAULT '00',
-      observacoes1 BLOB,
-      observacoes2 BLOB,
-      observacoes3 BLOB,
-      tipo TEXT);
+      codigo          INTEGER PRIMARY KEY NOT NULL,
+      estoque         REAL DEFAULT 0 ,
+      preco           REAL DEFAULT 0,
+      grupo           INTEGER DEFAULT 0,
+      origem          TEXT,   
+      descricao       TEXT NOT NULL,
+      num_fabricante  TEXT,
+      num_original    TEXT,
+      sku             TEXT,
+      marca           INTEGER DEFAULT 0,
+      ativo           TEXT DEFAULT 'S',
+      class_fiscal    TEXT ,
+      cst             TEXT DEFAULT '00',
+      data_cadastro   TEXT NOT NULL,
+      data_recadastro TEXT NOT NULL, 
+      observacoes1    BLOB,
+      observacoes2    BLOB,
+      observacoes3    BLOB,
+      tipo TEXT
+      );
       
 
-      CREATE TABLE IF NOT EXISTS servicos (
+      CREATE TABLE IF NOT EXISTS servicos ( 
       codigo INTEGER PRIMARY KEY NOT NULL,
       valor REAL DEFAULT 0,
       aplicacao TEXT NOT NULL,
       tipo_serv INTEGER DEFAULT 0 
        );
     
-     -- Create the customers table
+
     CREATE TABLE IF NOT EXISTS clientes (
       codigo INTEGER PRIMARY KEY NOT NULL,
       celular TEXT,
@@ -55,8 +61,11 @@ export async function construtor(db: SQLiteDatabase) {
       ie TEXT,
       numero TEXT,
       cnpj TEXT,
-      cidade TEXT
-    );
+      cidade TEXT,
+      data_cadastro TEXT NOT NULL,
+      data_recadastro TEXT NOT NULL,
+      vendedor INTEGER NOT NULL DEFAULT 0
+     );
       --
       CREATE TABLE IF NOT EXISTS forma_pagamento (
         codigo INTEGER PRIMARY KEY NOT NULL ,
@@ -80,7 +89,9 @@ export async function construtor(db: SQLiteDatabase) {
       total_produtos REAL DEFAULT 0.00,
       total_servicos REAL DEFAULT 0.00,
       cliente INTEGER NOT NULL DEFAULT 0,
+      veiculo INTEGER NOT NULL DEFAULT 0,
       data_cadastro TEXT NOT NULL,
+      tipo_os INTEGER DEFAULT 0, 
       tipo INTEGER NOT NULL DEFAULT 1   --1 = Orçamento (gerado no sistema); 2 = Orçamento (gerado fora do sistema); 3 = Ordem de Serviço; 4 = Contrato de Prestação de Serviços; 5 = Devolução
     ); 
   
@@ -95,7 +106,7 @@ export async function construtor(db: SQLiteDatabase) {
       FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
     );
       
-    
+     
     CREATE TABLE IF NOT EXISTS servicos_pedido (
       pedido INTEGER NOT NULL,
       codigo INTEGER NOT NULL,
@@ -117,10 +128,29 @@ export async function construtor(db: SQLiteDatabase) {
     );
 
     CREATE TABLE IF NOT EXISTS usuarios (
-      usuario INTEGER PRIMARY KEY NOT NULL,
-      nome TEXT NOT NULL 
+      codigo INTEGER PRIMARY KEY NOT NULL,
+      nome TEXT NOT NULL,
+      senha TEXT NOT NULL 
     );
+
+      CREATE TABLE IF NOT EXISTS tipos_os (
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       descricao TEXT NOT NULL 
+      );
+
+      CREATE TABLE IF NOT EXISTS veiculos (
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       cliente INTEGER  NOT NULL DEFAULT 0,
+       placa TEXT NOT NULL,
+       marca INTEGER  NOT NULL DEFAULT 0,
+       modelo INTEGER  NOT NULL DEFAULT 0,
+       ano TEXT NOT NULL,
+       cor INTEGER  NOT NULL DEFAULT 0,
+       combustivel TEXT NOT NULL 
+      );
  
+      
+
      `); 
  
   console.log('banco carregado com sucesso !');

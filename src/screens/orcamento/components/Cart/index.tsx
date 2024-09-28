@@ -18,7 +18,9 @@ const [ deleteItem, setDeleteItem ] = useState({})
 
     function incrementProduto( item ){
         if(! orcamento.produtos || orcamento.produtos.length === 0   ){
-            console.log( 'nenhum produto informado ')      
+          
+          //console.log( 'nenhum produto informado ')      
+          
           } else{
                    const  produto = orcamento.produtos.find( i => i.codigo === item.codigo );
 
@@ -55,8 +57,10 @@ const [ deleteItem, setDeleteItem ] = useState({})
       function handleDescontoChange( item , value){
          
             if(! orcamento.produtos || orcamento.produtos.length === 0   ){
-                console.log( 'nenhum produto informado ')      
-              } else{
+               
+            //  console.log( 'nenhum produto informado ')      
+              
+            } else{
                        const  produto = orcamento.produtos.find( i => i.codigo === item.codigo );
     
                 if( produto !== undefined   && value !== null ){
@@ -92,7 +96,9 @@ const [ deleteItem, setDeleteItem ] = useState({})
 
       function decrementProduto( item ){
         if(! orcamento.produtos || orcamento.produtos.length === 0   ){
-            console.log( 'nenhum produto informado ')      
+
+          //  console.log( 'nenhum produto informado ')      
+          
           } else{
                    const  produto = orcamento.produtos.find( i => i.codigo === item.codigo );
 
@@ -282,8 +288,8 @@ const [ deleteItem, setDeleteItem ] = useState({})
 
 return(
 
-    <View>
-        <TouchableOpacity style={{    margin:10 }} onPress={ ()=>setVisible(true)} >
+    <View style={{    marginTop:10, margin:5  }} >
+        <TouchableOpacity  onPress={ ()=>setVisible(true)} >
             <View style={{backgroundColor:'#009de2', width:20, height:20,borderRadius:10, alignItems:"center", justifyContent:"center", position:'absolute', zIndex: 99, top:-9, right:-1 }} >  
               
                     { orcamento.produtos ?  <Text style={{fontWeight:'bold' }}> {orcamento?.produtos.length} </Text> : <Text style={{fontWeight:'bold' }}> 0 </Text>  }

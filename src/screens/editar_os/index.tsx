@@ -5,7 +5,7 @@ import { ClienteContext } from "../../contexts/clienteDoOrcamento";
 import { Orcamento } from "../orcamento/components";
 
 
- export const EditarOrcamento = ({ navigation}:any)=>{
+ export const EditarOS = ({ navigation}:any)=>{
    const [ loading  , setLoading  ] = useState<boolean>(true);
 
 
@@ -14,7 +14,7 @@ import { Orcamento } from "../orcamento/components";
 
     return(
     
-            <Orcamento navigation={navigation} orcamentoEditavel={orcamento} tipo={1}/>
+            <Orcamento navigation={navigation} orcamentoEditavel={orcamento} tipo={3}/>
         
       
     )

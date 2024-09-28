@@ -16,18 +16,18 @@ import NetInfo from '@react-native-community/netinfo';
 import { Login } from "../screens/login";
 
 export const Routes = ()=>{
-    const { logado}:any = useContext(AuthContext)
+    const { logado, setLogado }:any = useContext(AuthContext)
 
     const {connected,  setConnected} = useContext(ConnectedContext)
-  
+    
       
     React.useEffect(() => {
       // Adiciona o listener
       const unsubscribe = NetInfo.addEventListener(state => {
          
-      //    setConnected(false)
-         setConnected(state.isConnected);
-           console.log('conectado :', state.isConnected);
+            //setConnected(false)
+              setConnected(state.isConnected);
+              console.log('conectado :', state.isConnected);
       
         });
       // Remove o listener quando o componente for desmontado
@@ -37,18 +37,16 @@ export const Routes = ()=>{
   }, [setConnected]);
      
     return(
-     
 
         <NavigationContainer>
-      
-      {
-        logado ?
-                      <OrcamentoProvider>
-                                    <MyStack/>
-                    </OrcamentoProvider>
-            :
-            <Login/>  
-            }
+          {
+            logado ?
+                        <OrcamentoProvider>
+                                      <MyStack/>
+                      </OrcamentoProvider>
+              :
+              <Login/>  
+              }
         </NavigationContainer> 
          
          

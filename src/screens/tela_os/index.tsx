@@ -4,15 +4,16 @@ import { OrcamentoContext } from "../../contexts/orcamentoContext";
 import { Orcamento } from "../orcamento/components";
 import { api } from "../../services/api";
 import Feather from '@expo/vector-icons/Feather';
-import { OrcamentosRegistrados } from "../orcamento/registrados";
+import { OrcamentosRegistrados  } from "../orcamento/registrados";
 
-export const Vendas = ({navigation})=>{
+export const Tela_os = ({navigation})=>{
 
 return (
-    <View  style={{flex:1}} >
-      <OrcamentosRegistrados tipo={1}  navigation={navigation} />
+    <View style={{flex:1}}  >
+      <OrcamentosRegistrados  tipo={3} navigation={navigation} />
         
-     <TouchableOpacity onPress={()=> navigation.navigate('novoOrcamento')} 
+     <TouchableOpacity
+      onPress={()=> navigation.navigate('NovaOs') } 
       style={{
         borderColor:'#009de2', borderWidth:3,
          backgroundColor:'#fff' ,

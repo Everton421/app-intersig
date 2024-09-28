@@ -35,11 +35,32 @@ type servico_pedido = {
                 )
 
                 console.log('')
-                console.log(`produto inserido com sucesso para o orcamento codigo ${codeOrder} ${produto.codigo} `  );
+                console.log(`servico inserido com sucesso para o orcamento codigo ${codeOrder} ${servico.codigo} `  );
                 console.log('')
-            }catch(e   ){ console.log( `erro ao inserir produto do orcamento` , e )}
+            }catch(e   ){ console.log( `erro ao inserir servico do orcamento` , e )}
         }
 
+        async function update(servico:servico_pedido, codeOrder:number){
+            try{
+ 
+                let result = await db.runAsync(
+                    `
+                    UPDATE servicos_pedido SET 
+                    
+                    desconto = ${servico.desconto}, 
+                    quantidade = ${servico.quantidade},
+                    valor =     ${servico.valor},
+                    total = ${servico.total} 
+                     WHERE codigo = ${servico.codigo}
+                      AND pedido = ${codeOrder}
+                      `
+                )
+
+                console.log('')
+                console.log(`servico ${servico.codigo} atualizado para o orcamento numero:  ${codeOrder}  `  );
+                console.log('')
+            }catch(e   ){ console.log( `erro ao atualizar servico do orcamento` , e )}
+        }
 
         async function selectByCodeOrder( codeOrder:number ){
             try{
@@ -53,6 +74,24 @@ type servico_pedido = {
                 return result;
             }catch(e){console.log(e)}
         }
+
+
+        async function selectServiceByCodeOrder(codeService:number,  codeOrder:number ){
+            try{
+                const result = await db.getAllAsync(` SELECT sp.codigo , sp.pedido, sp.desconto, sp.valor, sp.quantidade, sp.total,
+                                                        s.aplicacao
+
+                                                        FROM servicos_pedido as sp
+                                                        JOIN servicos as s on s.codigo = sp.codigo
+                                                        WHERE 
+                                                        sp.pedido = ${codeOrder} AND 
+                                                        sp.codigo = ${codeService}
+                                                        `)
+
+                return result;
+            }catch(e){console.log(e)}
+        }
+
 
 
         async function selectAll(  ){
@@ -71,7 +110,7 @@ type servico_pedido = {
 
         async function deleteByCodeOrder( code:number){
                try{
-                   await db.runAsync(` DELETE from servico_pedido where pedido = ${code}`)
+                   await db.runAsync(` DELETE from servicos_pedido where pedido = ${code}`)
                    console.log(`deletado servico do orcamento codigo: ${code}`)
                     return true;
                 }catch(e){
@@ -83,6 +122,20 @@ type servico_pedido = {
 
 
 
-        return { selectByCodeOrder, create ,deleteByCodeOrder,selectAll }
+            async function deleteServiceByCodeOrder(codeService:number,  codeOrder:number ){
+                try{
+                    const result = await db.getAllAsync(` DELETE 
+                                                            FROM servicos_pedido  
+                                                            WHERE 
+                                                             pedido = ${codeOrder} AND 
+                                                             codigo = ${codeService}
+                                                            `)
+                        console.log(`deletado servico ${codeService} do orcamento codigo: ${codeOrder}`)
+                    return result;
+                }catch(e){console.log(e)}
+            }
+
+
+        return { update, deleteServiceByCodeOrder, selectServiceByCodeOrder, selectByCodeOrder, create ,deleteByCodeOrder,selectAll }
 
 }

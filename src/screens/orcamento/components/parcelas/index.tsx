@@ -41,6 +41,31 @@ export const Parcelas = ({orcamentoEditavel}) => {
           return;
         }else{
           setEditavel(true)
+            //setParcelasGeradas(orcamento.parcelas)
+            setDate(orcamentoEditavel.data_cadastro)
+
+            setSelectedForma( orcamento.forma_pagamento )
+
+
+          if(!orcamentoEditavel.parcelas ){
+                let totais = 0;
+                if(orcamento.produtos && !selectedForma){
+                    orcamento?.produtos.forEach((element:any) => {
+                        totais += element.total;
+                    });
+                }
+
+                const vencimento =   new Date();
+                let parcela = [ { parcela: 1 ,valor: totais, vencimento: format(vencimento, 'yyyy-MM-dd') }];
+                setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                    ...prevOrcamento,
+                    forma_pagamento:0,
+                    parcelas: parcela,
+                    quantidade_parcelas: 1
+                }));
+                    
+        }
+
         }
       }, [])
 
@@ -48,18 +73,10 @@ export const Parcelas = ({orcamentoEditavel}) => {
     useEffect(() => {
        
         async function busca() {
-            if( connected){
-                 try {
-                     const response = await api.get('/formas_pagamento');
-                     setFormas(response.data);
-                 } catch (err) {
-                     console.log(err);
-                 }
-             }else{
+          
                  let aux = await useQueryFpgt.selectAll();
                  setFormas(aux);
-            }
-         
+            
         }
         busca();
     }, [ press ]);
@@ -94,7 +111,11 @@ export const Parcelas = ({orcamentoEditavel}) => {
                         totais += element.total;
                     });
                 }
-                
+                if(orcamento.servicos ){
+                    orcamento?.servicos.forEach((element:any) => {
+                        totais += element.total;
+                    });
+                }
                 setTotal(totais);
 
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
@@ -121,6 +142,11 @@ export const Parcelas = ({orcamentoEditavel}) => {
                     });
                 }
 
+                if(orcamento.servicos && !selectedForma){
+                    orcamento?.servicos.forEach((element:any) => {
+                        totais += element.total;
+                    });
+                }
                 const vencimento =   new Date();
                 let parcela = [ { parcela: 1 ,valor: totais, vencimento: format(vencimento, 'yyyy-MM-dd') }];
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
@@ -129,11 +155,14 @@ export const Parcelas = ({orcamentoEditavel}) => {
                     parcelas: parcela,
                     quantidade_parcelas: 1
                   }));
-            }
+            
+                   
+                }
+
         }
             calculaParcelaUnica();
         }
-    }, [selectedForma,  total , orcamento.produtos ] );
+    }, [selectedForma,  total , orcamento.produtos, orcamento.servicos ] );
 
 
  
@@ -182,13 +211,13 @@ export const Parcelas = ({orcamentoEditavel}) => {
         };
 
         return (
-            <View style={{margin:5, elevation:5, backgroundColor:'#009de2',padding:5, borderRadius:7}}>
+            <View style={{margin:5,  backgroundColor:'#ced1d8',padding:5, borderRadius:7}}>
                 <TouchableOpacity style={{margin:3}} 
                 //onPress={ ()=> setShowPicker(true)}
                 
                 >
-                    <Text style={{color:'#fff', fontWeight:"bold"}} >Parcela {item.parcela}:  R$ {item.valor.toFixed(2)}</Text>
-                    <Text style={{color:'#fff', fontWeight:"bold"}} >  vencimento: {item.vencimento }  <Fontisto name="date" size={20} color="white" /> </Text>
+                    <Text style={{  fontWeight:"bold"}} >Parcela {item.parcela}:  R$ {item.valor.toFixed(2)}</Text>
+                    <Text style={{  fontWeight:"bold"}} >  vencimento: {item.vencimento }  <Fontisto name="date" size={20} color="black" /> </Text>
                     {showPicker && (
                         <DateTimePicker
                         value={ date  }
@@ -286,7 +315,7 @@ export const Parcelas = ({orcamentoEditavel}) => {
                             </View>
 
                              <View style={{ margin:5 ,flexDirection:"row" ,  alignItems:"center", justifyContent:"space-between"}} >
-                                <TouchableOpacity onPress={() => setPress(true)} style={{ borderRadius:5, backgroundColor: '#009de2', padding: 5, elevation:5, width:'65%'    }}>
+                                <TouchableOpacity onPress={() => setPress(true)} style={{ borderRadius:5, backgroundColor: '#009de2', padding: 5, elevation:5    }}>
                                     <View style={{flexDirection:'row'}}>
                                           <Text style={{color:'#FFF', fontWeight:'bold', fontSize:15}}> Formas De Pagamento  </Text>
                                          <FontAwesome name="search" size={22} color="#FFF" />
@@ -294,10 +323,12 @@ export const Parcelas = ({orcamentoEditavel}) => {
                                     <Text style={{color:'#FFF', fontWeight:'bold'}} numberOfLines={1} > {selectedForma?.descricao} </Text>
                                 </TouchableOpacity>
                                 
+                                {/** 
                                 <TouchableOpacity style={{ elevation:5,  margin:2 ,  padding:5, backgroundColor:'#009de2' , borderRadius:7, alignItems:"center"}}  >
                                    <Feather name="edit" size={24} color="#FFF" />
                                    <Text style={{color:'#FFF', fontWeight:'bold'}} > Personalizada </Text>
                                 </TouchableOpacity> 
+                                */}
                               </View>
 
                             {/**  <TouchableOpacity onPress={() => console.log(parcelas)} style={{ backgroundColor: 'red' }}>

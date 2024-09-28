@@ -9,65 +9,84 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ItensServicoListaHorizontal } from '../itens_Servico_lista';
 import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
+import { ConnectedContext } from '../../../../contexts/conectedContext';
+import { useServices } from '../../../../database/queryServicos/queryServicos';
+import { useFormasDePagamentos } from '../../../../database/queryFormasPagamento/queryFormasPagamento';
+import { useTipoOs } from '../../../../database/queryTipoOs/queryTipoOs';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { useServicosPedido } from '../../../../database/queryPedido/queryServicosPedido';
+import { useVeiculos } from '../../../../database/queryVceiculos/queryVeiculos';
 
-
-export const Servico = ()=>{
+export const Servico = ( { orcamentoEditavel } )=>{
     const [ selectedTipo , setSelectedTipo  ] = useState(null);
     const [presstipoOs,    setPresstipoOS   ] = useState(false); 
     const [ verServicos ,  setVerServicos   ] = useState(false);
+    const [ verVeiculos ,  setVerVeiculos   ] = useState(false);
+    const [ selectedVeiculo , setSelectedVeiculo  ] = useState(null);
+
     const [ pesquisa,      setPesquisa      ] = useState();
+    const [ pesquisaVeiculo,   setPesquisaVeiculo    ] = useState();
+
     const [ tipoOs , setTipoOs] = useState([]);
      const [ dadosServicos , setDadosServicos ] = useState([]);
+     const [ dadosVeiculos , setDadosVeiculos ] = useState([]);
+
 
     const [ servicosSelecionado, setServicosSelecionado ] = useState([]);
     const [totalItens, setTotalItens ]= useState(0);
 
       const { orcamento, setOrcamento } = useContext( OrcamentoContext )
+      const { connected, setConnected } = useContext(ConnectedContext)
 
+        const useQueryServicos = useServices();
+        const useQueryFpgt =  useFormasDePagamentos();
+        const useQueryTipoOs = useTipoOs();
+      const useServicosDoPedido = useServicosPedido();
+      const useQueryVeiculos = useVeiculos();
+
+  //////////////////////////////////////////////      
     useEffect(
-  ()=>{ 
-    async function busca(){
-      try{
-      const response = await api.get(`/servicos/${pesquisa}`);
-        if( response.status === 200 ){
-          setDadosServicos(response.data);
-        }
-    }catch(e){
-      console.log( 'erro ao consultar os servicos! ', e )
-    }
-    }
-    busca();
-
-  },[ pesquisa ]
-)
-
-useEffect(
-    ()=>{
-        async function busca(){
+        ()=>{
+          async function buscaLocal(){
             try{
-            const response = await api.get(`/tipos_os`);
-              if( response.status === 200 ){
-                setTipoOs(response.data);
+            const response:any = await useQueryServicos.selectByDescription( pesquisa, 10);
+                if( response.length > 0  ){
+                  setDadosServicos(response);
               }
+
           }catch(e){
             console.log( 'erro ao consultar os servicos! ', e )
           }
           }
-          busca();
-    },[ selectedTipo ]
-)
+        buscaLocal();
 
-useEffect(
-  ()=>{
-      // quando ouver alteracao nos dados dos servicos por outro componente
-      //  
-    if(orcamento.servicos.length !== servicosSelecionado.length  ){ 
-      let aux = orcamento.servicos;
-      setServicosSelecionado(aux) 
+        },[ pesquisa ])
+  //////////////////////////////////////////////      
+  
+    useEffect(
+    ()=>{
+      async function buscaLocal(){
+        try{
+          const response:any = await useQueryTipoOs.selectAll();
+
+              if( response.length > 0  ){
+                setTipoOs(response);
+            }else{
+              console.log('nenhum tipo de Os encontrada')
+            }
+    
+        }catch(e){
+          console.log( 'erro ao consultar os servicos! ', e )
+        }
       }
-      
-  },[ orcamento.servicos ]
-)
+
+      buscaLocal();
+
+    },[ presstipoOs ])
+  //////////////////////////////////////////////      
+
+ 
+ 
 
 useEffect(() => {
   let aux = 0;
@@ -77,22 +96,72 @@ useEffect(() => {
   });
   setTotalItens(aux);
   
-
-
   setOrcamento((prevOrcamento: OrcamentoModel) => ({
     ...prevOrcamento,
     servicos: servicosSelecionado,
 }));
  
 }, [ servicosSelecionado ]);
+  //////////////////////////////////////////////      
 
-  
+  useEffect(
+    ()=>{
+      async function init(){
+
+        if(orcamentoEditavel !== null  ){
+              setServicosSelecionado(orcamentoEditavel.servicos)
+              setOrcamento((prevOrcamento: OrcamentoModel) => ({
+                ...prevOrcamento,
+                servicos: orcamentoEditavel.servicos,
+                veiculo: orcamentoEditavel.veiculo
+            }));
+
+ 
+
+
+            const responseVeic:any = await useQueryVeiculos.selectByCode( orcamentoEditavel.veiculo );
+            setSelectedVeiculo(  responseVeic[0]  );
+             
+            const response:any = await useQueryTipoOs.selectAll();
+              if( response.length > 0  ){
+
+                setTipoOs(response);
+                let aux = response.find( i => i.codigo === orcamentoEditavel.tipo_os)
+                setSelectedTipo(aux)
+              }
+
+            }  
+
+
+        //if( orcamento.cliente.codigo  ){
+        //  const response:any = await useQueryVeiculos.selectByClient(  orcamento.cliente.codigo ) ;
+        //  setDadosVeiculos(response); 
+        //}
+
+      }
+
+      init()
+    },[])
+
+         useEffect(()=>{
+           async function filter(){
+               if( orcamento.cliente?.codigo   ){
+                 const response:any = await useQueryVeiculos.selectByClient(  orcamento.cliente?.codigo ) ;
+                 setDadosVeiculos(response); 
+      //        console.log('dados veiculo', response)
+    
+             }
+         }
+       filter()
+         },[ verVeiculos ])
+    
+
 const handleIncrement = (item) => {
   setServicosSelecionado((prevSelectedItems) => {
     return prevSelectedItems.map((i) => {
       if (i.codigo === item.codigo) {
         return { ...i, quantidade: i.quantidade + 1 };
-      }
+      } 
       return i;
     });
   });
@@ -111,9 +180,25 @@ const handleDecrement = (item) => {
 
     function handleSelectOS (item) {
       setSelectedTipo(item),
-      console.log(selectedTipo)
+
+      setOrcamento((prevOrcamento: OrcamentoModel) => ({
+        ...prevOrcamento,
+        tipo_os: item.codigo,
+    }));
+      // console.log(selectedTipo)
       setPresstipoOS(false)
     }
+
+    function selecionaVeiculo (item) {
+      setSelectedVeiculo(item),
+      setOrcamento((prevOrcamento: OrcamentoModel) => ({
+        ...prevOrcamento,
+        veiculo: item.codigo,
+    }));
+     // console.log(selectedVeiculo)
+      setVerVeiculos(false)
+    }
+
 
     function renderItemOS  (item) {
       return ( 
@@ -124,6 +209,22 @@ const handleDecrement = (item) => {
         </TouchableOpacity>
       )
     }
+
+    function renderItemVeiculo  (item) {
+
+      return ( 
+        <TouchableOpacity style={[ {    backgroundColor: selectedVeiculo?.codigo === item.codigo  ? '#009de2' : '#FFF'},
+           {  margin:5, padding:7, borderRadius:5 , elevation:4}] } 
+        onPress={ ()=> selecionaVeiculo(item)}  >
+          
+          <Text style={ [ {  color: selectedVeiculo?.codigo === item.codigo ? 'white' : 'black' },{   fontWeight:'bold'}]} >
+
+            codigo:  {item.codigo} placa: {item.placa}
+          </Text>
+        </TouchableOpacity>
+      )
+    }
+
 
     function selecionaServico(item) {
       setServicosSelecionado((prev) => {
@@ -138,7 +239,6 @@ const handleDecrement = (item) => {
         }
       });
     }
-  
 
 
 
@@ -148,7 +248,9 @@ const handleDecrement = (item) => {
 
       return ( 
         <TouchableOpacity 
-        style={ [  {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#339' : '#009de2'} , {  margin:5, padding:7, borderRadius:5 , elevation:4} ] } onPress={ ()=> selecionaServico(item)}  >
+        style={ [
+            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#339' : '#009de2'} , 
+        {  margin:5, padding:7, borderRadius:5 , elevation:4} ] } onPress={ ()=> selecionaServico(item)}  >
           
             <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
              <Text style={{ color:'white', fontWeight:'bold'}} >
@@ -161,7 +263,7 @@ const handleDecrement = (item) => {
 
             </View>
           
-          <Text style={{ color:'white', fontWeight:'bold'}} >
+          <Text style={{ color:'white', fontWeight:'bold'}} numberOfLines={2} >
                {item.aplicacao}
           </Text>
           
@@ -209,31 +311,120 @@ const handleDecrement = (item) => {
       )
     }
 
-  
+
+  function renderServicoSelecionado ( item ){
+
       return(
-        <View>
+        <View style={{ backgroundColor: '#FFF', elevation: 7, margin: 3, borderRadius: 30, padding: 35, width:300 }}>
+           
+           <View style={{flexDirection:'row', justifyContent:'space-between', margin:3}}>
+              
+              <View style={{flexDirection:'row' }}>
+                <Text style={{fontWeight:'bold'}}>
+                 Codigo:
+                </Text>
+                <Text> { ' '+item.codigo} </Text>
+              </View>
+
+                <View style={{flexDirection:'row' }}>
+                  <Text style={{fontWeight:'bold'}} >
+                    Unitario:
+                  </Text>
+                  <Text>
+                  {' '+ item.valor}
+                  </Text>
+                </View>
+            
+            </View>
+
+            <Text numberOfLines={2} >
+              { item.aplicacao } 
+            </Text>
+
+
+      <View style={{flexDirection:'row', justifyContent:'space-between' }} >
+            <View style={{flexDirection:'row' }}>
+              <Text style={{fontWeight:'bold'}} >
+                Quantidade:
+              </Text>
+              <Text>
+              {' '+item.quantidade}
+              </Text>
+            </View>
+
+            <View style={{flexDirection:'row' }}>
+                <Text style={{fontWeight:'bold'}} >
+                  Total: 
+                </Text>
+                <Text>
+                 {' '+item.total}
+                </Text>
+            </View>
+          </View>        
+        
+
+        </View>
+      )
+  }
+
+      return(
+        
+        <View   >
+
           {/** separador */}
       <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-                    <View style={{flexDirection:'row', alignItems:'center',   justifyContent:'center'}}>
+                   
+                    <View style={{flexDirection:'row', alignItems:'center',   justifyContent:'center'  }}>
                       <Text style={{fontSize:15,fontWeight:'bold' }}>
                           Serviços
                        </Text>
                       </View>
-          <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
-          onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
-            { selectedTipo ?
-               ( <Text  style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}  > Tipo De OS: {selectedTipo?.descricao} </Text> ) 
-               :
-               (  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Tipos De OS</Text> )       
 
-            }      
+
+            <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
+            onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
+              { selectedTipo ?
+                ( <Text  style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}  numberOfLines={2}>    {selectedTipo?.descricao} </Text> ) 
+                :
+                (  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Tipos De OS</Text> )       
+
+              }      
+
+            {
+              selectedTipo ?
+              (  <FontAwesome5 name="toolbox" size={28} color="#FFF" /> )
+              :
+              ( <AntDesign name="down" size={28} color="#FFF" />
+              )
+            }
            
-      
-      <FontAwesome name="search" size={22} color="#FFF" />
+            
 
-          </TouchableOpacity>
+            </TouchableOpacity>
+
+
+            <View style={{alignItems:'center' , justifyContent:'space-between', flexDirection:'row'}}>
+                  <TouchableOpacity style={{backgroundColor:'#009de2',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
+                            onPress={ ()=>    setVerServicos(true) } >
+                          < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Serviços</Text>
+
+                    <FontAwesome5 name="tools" size={24} color="white" />
+                
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={{backgroundColor:'#009de2',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
+                            onPress={ ()=>    setVerVeiculos(true) } >
+                          < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Veiculo</Text>
+
+                              {
+                                selectedVeiculo &&  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}> {selectedVeiculo.codigo}</Text>
+                              }
+
+                    <FontAwesome5 name="car" size={24} color="white" />
+                </TouchableOpacity>
+                
+                </View>
           
-             
               {/**modal tipos de OS  */ }
                
               <Modal visible={presstipoOs} transparent={true}   >
@@ -243,7 +434,16 @@ const handleDecrement = (item) => {
                   ( 
                     <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
                     <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
+                          
+                          <View style={{ flexDirection:'row', justifyContent:'space-between'}}> 
                           <Text style={{margin:5, fontWeight:'bold'}} > Tipos De OS </Text>
+
+                            <TouchableOpacity 
+                              onPress={()=>  setPresstipoOS(false)  }
+                              >
+                                  <AntDesign name="closecircle" size={24} color="red" />
+                              </TouchableOpacity>
+                            </View>
                           <FlatList
                               data={ tipoOs }
                               renderItem={ ( {item} )=> renderItemOS(item)}
@@ -302,34 +502,64 @@ const handleDecrement = (item) => {
                 </View>
             </Modal>
 
-        
+          {/****** modal veiculos */}
+           <Modal visible={verVeiculos} transparent={true}>
+                <View style={{ backgroundColor:'rgba( 50,50,50, 0.5 )', flex:1, alignItems:'center', justifyContent:'center' }} > 
+                  <View style={{ backgroundColor:'#FFF', width:'95%' , height:'90%' ,padding:5, borderRadius:15}}>
 
-          <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
-                    onPress={ ()=>    setVerServicos(true) } >
-                  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Serviços</Text>
-             <AntDesign name="caretdown" size={24} color={ 'white'} />
-                </TouchableOpacity>
-
-              <View style={{alignItems:'center' , justifyContent:'center'}}>
-                 { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens}  </Text>): null }
+                   <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                       <TouchableOpacity onPress={() => {setVerVeiculos(false)  }}
+                              style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                             <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                               voltar
+                           </Text>
+                        </TouchableOpacity>
+                        <Text style={{margin:15, fontWeight:'bold'}}>
+                          Veiculos
+                        </Text>
+                    </View>
+                       
+                       {/**  <TextInput
+                            placeholder='pesquisar'
+                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
+                            onChangeText={ (t)=>  setPesquisaVeiculo(t) }
+                           />  
+                       */ }
+                        <View style={{ height:'75%' }} >
+                         
+                  <FlatList
+                              data={ dadosVeiculos }
+                              renderItem={ ({item})=> renderItemVeiculo( item ) }
+                              keyExtractor={ (item:any) =>item.codigo.toString() }
+                            />  
+                            
+                        </View>
+                      
                  </View>
-    
 
-                  
-  {/**   <Button
-          title='ver'
-          onPress={()=> console.log(servicosSelecionado)}
-          />
-          */}
+                </View>
+            </Modal>
+
                 {  
-                  servicosSelecionado &&
-                    <FlatList
-                      data={servicosSelecionado}
-                      horizontal={true}
-                      renderItem={({ item }) => <ItensServicoListaHorizontal item={item} handleDecrement={handleDecrement} handleIncrement={handleIncrement} />}
-                      keyExtractor={ (item)=> item.codigo.toString()}
-                      />
-                   }
+                    servicosSelecionado &&
+                    <View style={{marginTop:5, marginBottom:5}}>
+                      <FlatList
+                        data={servicosSelecionado}
+                        horizontal={true}
+                        renderItem={({ item }) => renderServicoSelecionado(item) } 
+                        keyExtractor={ (item)=> item.codigo.toString()}
+                        />
+                    </View>
+
+                     }
+
+          <View style={{ flexDirection:'row', justifyContent:'space-between', margin:10}}>
+            { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens}  </Text>): null }
+                      {
+                        selectedVeiculo ? ( <Text style={{fontWeight:'bold'}}> placa: {selectedVeiculo.placa } </Text>) : null
+                      } 
+            </View>                    
+
                 
       <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
                 

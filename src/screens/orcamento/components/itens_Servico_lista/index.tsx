@@ -54,33 +54,43 @@ export const ItensServicoListaHorizontal = ({ item, handleDecrement, handleIncre
 
     return (
 
-        <View style={{ backgroundColor: '#009de2', elevation: 7, margin: 3, borderRadius: 30, padding: 25 }}>
+        <View style={{ backgroundColor: '#009de2', elevation: 7, margin: 3, borderRadius: 30, padding: 35 }}>
+
+
+            <View style={{flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
+                  
+                    <TouchableOpacity onPress={() => alertaExclusao(item)} style={{ elevation: 5 }}>
+                        <FontAwesome name="close" size={24} color="white" />
+                    </TouchableOpacity>
+
+                     <TouchableOpacity style={{   margin: 2, width: 35, padding: 5,   borderRadius: 7, alignItems: "center" }}
+                            onPress={() => setVisibleModalServices(true)} >
+                            <Feather name="edit" size={24} color="white" />
+                        </TouchableOpacity>
+                </View>
 
             <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>
-                    Cod. {item.codigo}    Qtd. {item.quantidade}
+                <Text style={styles.buttonText}>
+                    Codigo: {item.codigo}    Quantidade: {item.quantidade}
                 </Text>
-            {/***  item exclusao */}
-                <TouchableOpacity onPress={() => alertaExclusao(item)} style={{ elevation: 5 }}>
-                    <FontAwesome name="close" size={24} color="white" />
-                </TouchableOpacity>
-            
+                {/***  item exclusao */}
             </View>
 
-            <Text style={{ color: 'white', fontWeight: 'bold', width: 160 }} numberOfLines={2}>
+            <Text style={ [styles.buttonText,{   width: '90%' }]}  >
                 {item.aplicacao}
             </Text>
 
-            <TouchableOpacity style={{ elevation: 5, margin: 2, width: 35, padding: 5, backgroundColor: 'white', borderRadius: 7, alignItems: "center" }}
-                onPress={() => setVisibleModalServices(true)} >
-                <Feather name="edit" size={24} color="#009de2" />
-            </TouchableOpacity>
+    
 
+       
+                
+                    <Text style={styles.buttonText}> Unitario: {item?.valor.toFixed(2)} </Text>
+            
 
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 15, elevation: 5 }}>
-                Total R$: {item.total}
-            </Text>
-            <Text style={{ color: '#FFF', fontWeight: 'bold' }}> Unitario:{item?.valor.toFixed(2)} </Text>
+              <Text style={[ styles.buttonText ,{ color: 'white',  elevation: 5 } ] }>
+                        Total R$: {item.total}
+             </Text>
+
 
             <Modal visible={visibleModalServices} transparent={true} >
                 <View style={{
@@ -94,14 +104,14 @@ export const ItensServicoListaHorizontal = ({ item, handleDecrement, handleIncre
                     <TouchableOpacity
                         onPress={() => { setVisibleModalServices(false) }}
                         style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }} >
-                        <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                        <Text style={styles.buttonText}>
                             voltar
                         </Text>
                     </TouchableOpacity>
 
 
                     <View style={{ margin: 10 }} >
-                        <Text style={{ fontWeight: 'bold' }}>
+                        <Text style={styles.buttonText}>
                             Cod. {item.codigo}    Qtd. {item.quantidade}
                         </Text>
                         <Text style={{ fontWeight: 'bold', width: '80%' }} numberOfLines={2}>

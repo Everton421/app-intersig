@@ -4,7 +4,8 @@ export const useUsuario = ()=>{
 
 type Usuario = {
     codigo:number,
-    nome:string
+    nome:string,
+    senha:string
 }
 
 const db = useSQLiteContext();
@@ -24,7 +25,16 @@ async function selectAll(){
 
 async function selectByCode( code:number ){
     try{
-        let result = await db.getAllAsync(`SELECT * FROM usuarios where usuario = ${ code } `);
+        let result = await db.getAllAsync(`SELECT * FROM usuarios where codigo = ${ code } `);
+        console.log(result);
+        return result;
+    }catch( e){
+        console.log(`erro ao buscar usuarios `, e);
+    } 
+}
+async function selectByName( name:string ){
+    try{
+        let result = await db.getAllAsync(`SELECT * FROM usuarios where nome = '${ name }' `);
         console.log(result);
         return result;
     }catch( e){
@@ -33,33 +43,75 @@ async function selectByCode( code:number ){
 }
 
 
+ 
 async function create ( user:Usuario ){
-
-   let  { codigo , nome } = user;
-   
+   let  { codigo , nome, senha  } = user;
    let verifyUser: any = await selectByCode( codigo );
-   
-   if(verifyUser.length > 0 ){
-
+         
+    if(verifyUser.length > 0 ){
     console.log('Usuario', nome,' ja foi cadastrado!');    
-   }else{
-   
-   try{
+        }else{
+        
+            let verifyName:any = await selectByName(nome);
 
+                    if( verifyName?.length > 0  ){
+                        if(verifyUser.nome === user.nome){
+                            console.log(` ${nome} ja esta sendo utilizado pelo usuario codigo: ${verifyUser.codigo}  `)    
+                            return;
+                        } 
+                    }else{
+                        try{
+                            let result = await db.runAsync(
+                                ` INSERT INTO usuarios
+                                    ( codigo, nome, senha  ) VALUES 
+                            ( ${codigo}, '${nome}', '${senha}'); `);
+                            console.log('Usuario cadastrado: ',result.lastInsertRowId);
+                            return result.lastInsertRowId
+    
+                    }catch(e){
+                        console.log('Erro ao criar o usuario: ', codigo,' nome: ', nome ,' ', e)
+                    }
+                   }
 
-
-            let result = await db.runAsync(
-                ` INSERT INTO usuarios
-                    ( usuario, nome ) VALUES 
-            ( ${codigo}, '${nome}'); `);
-             console.log('Usuario cadatrado: ',result.lastInsertRowId);
-             return result.lastInsertRowId
-
-    }catch(e){
-        console.log('Erro ao criar o usuario: ', codigo,' nome: ', nome ,' ', e)
-    }
+        }
 }
-}
-return  { selectAll, create  } 
+
+async function update ( user:Usuario ){
+    let  { codigo , nome, senha  } = user;
+    
+    let verifyUser: any = await selectByCode( codigo );
+    
+    if(verifyUser.length > 0 ){
+       // console.log('Usuario', nome,' ja foi cadastrado!');    
+    try{
+ 
+             let result = await db.runAsync(
+                 ` UPDATE usuarios SET 
+                         
+             codigo =  ${codigo},  nome = '${nome}', senha = '${senha}' where codigo = ${codigo} `);
+              console.log(`Usuario codigo:${codigo} atualizado ! ` );
+
+              return result.lastInsertRowId
+ 
+     }catch(e){
+         console.log('Erro ao atualizar o usuario: ', codigo,' nome: ', nome ,' ', e)
+     }
+ }
+ }
+ 
+ async function signin ( user:Usuario ){
+    let { nome , senha  } = user; 
+    try{
+        let result = await db.getAllAsync(`SELECT * FROM usuarios where nome = '${ nome }' and senha = '${senha}' `);
+      //  console.log(result);
+        return result;
+    }catch( e){
+        console.log(`erro ao buscar usuarios `, e);
+    } 
+ }
+ 
+
+
+return  { signin ,selectAll, create, update, selectByCode, selectByName  } 
 
 }

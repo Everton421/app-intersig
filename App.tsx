@@ -15,11 +15,11 @@ export default function App() {
 
   return (
     <ConnectedProvider>
-        <AuthProvider>
-          <SQLite.SQLiteProvider databaseName="test.db" onInit={construtor }>
-          <Routes/>
-        </SQLite.SQLiteProvider>
-        </AuthProvider>
+          <AuthProvider>
+              <SQLite.SQLiteProvider databaseName="test.db" onInit={construtor }>
+                <Routes/>
+            </SQLite.SQLiteProvider>
+          </AuthProvider>
     </ConnectedProvider>
  
   );

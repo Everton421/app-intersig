@@ -5,10 +5,10 @@ import { ClienteContext } from "../../contexts/clienteDoOrcamento";
 import { Orcamento } from "../orcamento/components";
 
 
- export const NovoOrcamento = ({ navigation})=>{
+ export const NovaOs = ({ navigation})=>{
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext); 
 
     return(
-              <Orcamento navigation={navigation} orcamentoEditavel={null} tipo={1}/>
+              <Orcamento navigation={navigation} orcamentoEditavel={null} tipo={3}/>
     )
  }

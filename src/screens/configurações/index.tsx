@@ -11,6 +11,17 @@ import { useFormasDePagamentos } from "../../database/queryFormasPagamento/query
 import { useClients } from "../../database/queryClientes/queryCliente"
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
 import { AuthContext } from "../../contexts/auth"
+import { useServices } from "../../database/queryServicos/queryServicos"
+import { useTipoOs } from "../../database/queryTipoOs/queryTipoOs"
+import {    useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
+import { orderServices    } from "../../services/sync"
+import { formatItem } from "../../services/formatStrings"
+import { restartDatabaseService } from "../../services/restartDatabase"
+
+
+
+
+
 
 export const Configurações = () => {
     const [conectado, setConectado] = useState<boolean>()
@@ -22,7 +33,7 @@ export const Configurações = () => {
     const [sync, setSync] = useState(false);
 
 
-    const {connected, setConencted} = useContext(ConnectedContext);
+    const {connected, setConnected } = useContext(ConnectedContext);
     const { usuario } = useContext(AuthContext);
  
     const useQueryProdutos = useProducts();
@@ -31,18 +42,26 @@ export const Configurações = () => {
     const useQuerypedidos = usePedidos();
     const useQueryParcelas = useParcelas();
     const useQueryItems = useItemsPedido();
- 
+    const useQueryTipoOs = useTipoOs();
+    const useQueryVeiculos =     useVeiculos();
+    const useQueryServices = useServices();
+    const useRestartService = restartDatabaseService()
 
+    const formatData = formatItem()
+
+    const servicesPedidos= orderServices();
 
     async function connect() {
         try {
             const response = await api.get('/');
             if (response.status === 200 && response.data.ok) {
                 setConectado(true)
+                setConnected(true)
             console.log(response.data);
 
             } else {
                 setConectado(false)
+                setConnected(false)
                 console.log({"err":"erro ao conectar"})
             }
             setError(undefined)
@@ -76,7 +95,7 @@ export const Configurações = () => {
 
     async function fetchClientes() {
         try {
-          const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);
+          const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);  
           const dados = aux.data;
           if (dados.length > 0) {
             for (const v of dados) {
@@ -95,8 +114,14 @@ export const Configurações = () => {
           if (dados.length > 0) {
             for (const v of dados) {
               const verifyProduct = await useQueryProdutos.selectByCode(v.codigo);
+
               if (verifyProduct.length > 0) {
-                await useQueryProdutos.update(v, v.codigo);
+                  let data_recadastro = formatData.formatDateTime(v.data_recadastro);
+                    if(  data_recadastro > verifyProduct[0].data_recadastro   ){
+                        await useQueryProdutos.update(v, v.codigo);
+                      }else{
+                        console.log(` nao será atualizao do produto ${v.codigo} ${data_recadastro} > ${verifyProduct[0].data_recadastro}`)
+                      }
               } else {
                 await useQueryProdutos.createByCode(v, v.codigo);
               }
@@ -113,7 +138,13 @@ export const Configurações = () => {
           const data = aux.data;
           if (data.length > 0) {
             for (const f of data) {
-              await useQueryFpgt.create(f);
+                  const verifiFpgt:any =  await useQueryFpgt.selectByCode( f.codigo );
+                  
+                     if(verifiFpgt.length > 0 ){
+                       await useQueryFpgt.update(f, f.codigo);
+                     }else{
+                       await useQueryFpgt.create(f);
+                     }
             }
           }
         } catch (e) {
@@ -121,17 +152,64 @@ export const Configurações = () => {
         }
       }
 
-  
-    useEffect(  () => {
-        connect();
-        // Configura um temporizador para verificar a conexão com a API a cada 60 segundos
-        const intervalId = setInterval(() => {
-            connect();
-        }, 30000);
+      async function fetchServices() {
+        try {
+          const aux = await api.get('/offline/servicos');
+          const dados = aux.data;
+          if (dados.length > 0) {
+            for (const v of dados) {
+              const verifyServices = await useQueryServices.selectByCode(v.codigo);
+              if (verifyServices.length > 0) {
+              //  await useQueryServices.update(v, v.codigo);
+              } else {
+                await useQueryServices.createByCode(v, v.codigo);
+              }
+            }
+          }
+        } catch (e) {
+          console.log(e);
+        }
+       
+      }
+ 
+      async function fetchVeiculos() {
+        try {
+          const aux = await api.get('/offline/veiculos');
+          const dados = aux.data;
+          if (dados.length > 0) {
+            for (const v of dados) {
+               await useQueryVeiculos.createVeiculo(v);
+          }
+        }
+        } catch (e) {
+          console.log(e);
+        }
+       
+      }
 
-        return () => clearInterval(intervalId); // Limpa o temporizador quando o componente é desmontado
-    }, []);
 
+      async function fetchTiposOs() {
+        try {
+          const aux = await api.get('/offline/tipos_os');
+          const data = aux.data;
+          console.log(data)
+            if (data.length > 0) {
+              for (const o of data) {
+                  let verifiTipOs:any = await  useQueryTipoOs.selectByCode(o.codigo);
+                    
+                      if ( verifiTipOs.length > 0 ){
+                          await useQueryTipoOs.update(o,o.codigo);
+                      }else{
+                        await useQueryTipoOs.create(o);
+                      }
+              }
+            }
+        } catch (e) {
+          console.log(e);
+        }
+      }
+ 
+    
     const LoadingData = () => (
         <Modal animationType='slide' transparent={true} visible={sync}>
           <View style={styles.loadingContainer}>
@@ -140,18 +218,26 @@ export const Configurações = () => {
           </View>
         </Modal>
       );
-
+/////////////////////////////////////////////
     useEffect(() => {
         if(!connected){
           setSync(false);
     
           Alert.alert('É necessario estabelecer conexão com a internet para efetuar o sicronismo dos dados! ')
         return
-        } 
+        } else{
         if (sync  ) {
           const syncData = async () => {
             try {
-              await Promise.all([fetchClientes(), fetchProdutos(), fetchFpgt()]);
+              await Promise.all( 
+                [
+                  fetchClientes(),
+                 fetchProdutos(),
+                  fetchFpgt(),
+                   fetchServices(),
+                   fetchTiposOs(),
+                  // fetchVeiculos()
+                  ]);
             } catch (e) {
               console.log(e);
             } finally {
@@ -160,19 +246,40 @@ export const Configurações = () => {
           };
           syncData();
         }
+      }
       }, [sync]);
-    
+/////////////////////////////////////////////
+      useEffect(  () => {
+         connect();
+
+       // const intervalId = setInterval(() => {
+       //     connect();
+       // }, 60000);
+//
+       // return () => clearInterval(intervalId); // Limpa o temporizador quando o componente é desmontado
+    }, []);
+/////////////////////////////////////////////
+
+
+
+async function testedate(){
+  const dateTimeString = '2024-09-26T15:30:00'; // String de exemplo
+  const formattedDateTime = formatData.formatDateTime(dateTimeString);
+  console.log(formattedDateTime); 
+}
  
 
+async function testeServices(){
+  const result = await servicesPedidos.filterOrders() ;
+}
+
+
     return (
-        <View>
-
-                <LoadingData />
-
-
-            <Text> status internet:  {connected ? 'conectado' : 'desconectado'}</Text>
-
-            <Text>status api:</Text>{loading ? (
+       <View>
+           <LoadingData />
+       <View style={{flexDirection:"row"}}>
+ 
+          <Text>status api: </Text>{loading ? (
 
                 <Text>Conectando...</Text>
                         ) : (
@@ -181,18 +288,34 @@ export const Configurações = () => {
                                     <Text>{error}</Text>
                                 ) : (
                                     <View  >
-                                    {conectado ? <Text style={{ color:'green' }}> Conectado! </Text> 
+                                    {connected ? <Text style={{ color:'green' }}> Conectado! </Text> 
                                     : <Text style={{ color:'red' }}> Não conectado!</Text>}
                                     </View>
                                 )}
                             </>
                         )}
+          </View>
 
             <View style={{margin:10 }}>
-      <Button title='Sync' onPress={() => setSync(true)} />
-               
+            <Button title='teste' onPress={() => connect() } />
+              <Button title='Sync' onPress={() => setSync(true)} />
+                
+              <Button title='enviar dados' onPress={() => testeServices()} />
 
-            </View>
+                     <View style={{ margin:35 }}>
+                        <Button title='clean Clients' onPress={() => useQueryClientes.deleteAll()} />
+                        <Button title='clean products' onPress={() => useQueryProdutos.deleteAll()} />
+                        
+                        <Button title='clean database' onPress={() => useRestartService.restart()} />
+                        
+                        
+
+                   </View>
+
+              
+              
+
+              </View>
         </View>
     )
 }

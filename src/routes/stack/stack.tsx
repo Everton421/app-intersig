@@ -19,9 +19,12 @@ import { TabsOrcamento } from "../bottomTabsOrcamento/tabs";
 import { EditarOrcamento } from "../../screens/editar_orcamento";
 import OrcamentoProvider from "../../contexts/orcamentoContext";
 import { NovoOrcamento } from "../../screens/novo_orcamento";
-import { Registrados } from "../../screens/orcamento/registrados";
+import { OrcamentosRegistrados } from "../../screens/orcamento/registrados";   
 import { Vendas } from "../../screens/tela_orcamentos";
-import { ItemSQLITE } from '../../components/teste/index'
+import {   Teste } from '../../components/teste/index'
+import { NovaOs } from "../../screens/nova_os";
+import { Tela_os } from "../../screens/tela_os";
+import { EditarOS } from "../../screens/editar_os";
 
 const Stack = createStackNavigator();
 
@@ -41,10 +44,16 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="TabsOrcamento" component={TabsOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                   
                     <Stack.Screen name="editarOrcamento" component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="editarOS" component={EditarOS}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+
                     <Stack.Screen name="novoOrcamento" component={NovoOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="orçamentos" component={Registrados}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="orçamentos" component={OrcamentosRegistrados}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="vendas" component={Vendas}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="ItemSQLITE" component={ItemSQLITE}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="NovaOs" component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                   
+                    <Stack.Screen name="OS" component={Tela_os}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                   
+                    <Stack.Screen name="Teste" component={Teste}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
 
                     
                 </Stack.Navigator>

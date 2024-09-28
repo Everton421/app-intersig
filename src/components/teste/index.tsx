@@ -1,390 +1,242 @@
 import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { useContext, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, View, Animated } from "react-native";
 import { useProducts } from '../../database/queryProdutos/queryProdutos';
-import { api } from '../../services/api';
-import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from '../../contexts/conectedContext';
 import { useClients } from '../../database/queryClientes/queryCliente';
 import { useFormasDePagamentos } from '../../database/queryFormasPagamento/queryFormasPagamento';
-import { usePedidos } from '../../database/queryPedido/queryPedido';
-import { TextInput } from 'react-native-gesture-handler';
-import * as Crypto from 'expo-crypto';
-import { useParcelas } from '../../database/queryParcelas/queryParcelas';
-import { Produto } from '../../screens/dados/produtos';
-import { OrcamentoContext } from '../../contexts/orcamentoContext';
-import { useItemsPedido } from '../../database/queryPedido/queryItems';
-import { Cart } from '../../screens/orcamento/components/Cart';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Detalhes } from '../../screens/orcamento/components/detalhes';
-import { useUsuario } from '../../database/queryUsuario/queryUsuario';
-import Feather from '@expo/vector-icons/Feather';
-import AntDesign from '@expo/vector-icons/AntDesign';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useServices } from '../../database/queryServicos/queryServicos';
+import { api } from '../../services/api';
+import { useTipoOs } from '../../database/queryTipoOs/queryTipoOs';
+import { AuthContext } from '../../contexts/auth';
+import { formatItem } from '../../services/formatStrings';
 
+const LoadingData = ({ isLoading, item , progress }) => (
+  <Modal animationType='slide' transparent={true} visible={isLoading}>
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="red" />
+      <Text style={styles.loadingText}>Carregando  {item} ... {progress}%</Text>
+      <Animated.View style={[styles.progressBar, { width: `${progress}%` }]} />
+    </View>
+  </Modal>
+);
 
-import Entypo from '@expo/vector-icons/Entypo';
-import { ItensServicoListaHorizontal } from '../../screens/orcamento/components/itens_Servico_lista';
-
-export const ItemSQLITE = () => {
-  const [sync, setSync] = useState(false);
-  const db = useSQLiteContext();
+export const Teste = () => {
   const { connected } = useContext(ConnectedContext);
+  const { usuario } = useContext(AuthContext);
 
   const useQueryProdutos = useProducts();
   const useQueryClientes = useClients();
   const useQueryFpgt = useFormasDePagamentos();
-  const useQuerypedidos = usePedidos();
-  const useQueryParcelas = useParcelas();
-  const useQueryItems = useItemsPedido();
-  const useQueryUsers = useUsuario();
+  const useQueryTipoOs = useTipoOs();
+  const useQueryServices = useServices();
 
-  const { orcamento, setOrcamento } = useContext(OrcamentoContext);
-
-  const [codigoUsuario, setCodigoUsuario] = useState('12345');
-
- const tipoOs = 
- [
-    {"codigo":1, "descricao":"teste1" },
-    {"codigo":2, "descricao": "teste2"},
-    {"codigo":3, "descricao": "teste3"},
-    {"codigo":4, "descricao": "teste4"}, 
-
-  ]
-  const servicos = [
-    {"codigo":1, "aplicacao":'teste1' , "valor":10},
-    {"codigo":2, "aplicacao": 'teste2', "valor":30},
-    {"codigo":3, "aplicacao": 'teste3', "valor":50},
-    {"codigo":4, "aplicacao": 'teste4', "valor":100},
-  ]
-
-  const Teste = ()=>{
-    const [ selectedTipo , setSelectedTipo  ] = useState(null);
-    const [presstipoOs,    setPresstipoOS   ] = useState(false); 
-    const [ verServicos ,  setVerServicos   ] = useState(false);
-    const [ pesquisa,      setPesquisa      ] = useState();
-
-     const [ dadosServicos , setDadosServicos ] = useState([]);
-
-    const [ servicosSelecionado, setServicosSelecionado ] = useState([]);
-    const [totalItens, setTotalItens ]= useState(0);
-
-useEffect(
-  ()=>{ 
-    async function busca(){
-      try{
-      const response = await api.get(`/servicos/${pesquisa}`);
-        if( response.status === 200 ){
-          setDadosServicos(response.data);
-        }
-    }catch(e){
-      console.log( 'erro ao consultar os servicos! ', e )
-    }
-    }
-    busca();
-
-  },[ pesquisa ]
-)
-
-useEffect(() => {
-  let aux = 0;
-  servicosSelecionado.forEach((e) => {
-    e.total = (e.quantidade * e.valor)  
-    aux += e.total;
-  });
-  setTotalItens(aux);
-
- 
-}, [ servicosSelecionado ]);
-
-  
-const handleIncrement = (item) => {
-  setServicosSelecionado((prevSelectedItems) => {
-    return prevSelectedItems.map((i) => {
-      if (i.codigo === item.codigo) {
-        return { ...i, quantidade: i.quantidade + 1 };
-      }
-      return i;
-    });
-  });
-};
-
-const handleDecrement = (item) => {
-  setServicosSelecionado((prevSelectedItems) => {
-    return prevSelectedItems.map((i) => {
-      if (i.codigo === item.codigo) {
-        return { ...i, quantidade: Math.max(i.quantidade - 1, 1) };
-      }
-      return i;
-    });
-  });
-};
-
-    function handleSelectOS (item) {
-      setSelectedTipo(item),
-      console.log(selectedTipo)
-      setPresstipoOS(false)
-    }
-
-    function renderItemOS  (item) {
-      return ( 
-        <TouchableOpacity style={{ backgroundColor:'#009de2', margin:5, padding:7, borderRadius:5 , elevation:4}} onPress={ ()=> handleSelectOS(item)}  >
-          <Text style={{ color:'white', fontWeight:'bold'}} >
-            codigo:  {item.codigo} descricao: {item.descricao}
-          </Text>
-        </TouchableOpacity>
-      )
-    }
-
-    function selecionaServico(item) {
-      setServicosSelecionado((prev) => {
-        // Verifica se o serviço já está no array
-        //const existe = prev.some(servico => servico.codigo === item.codigo);
-        const index = prev.findIndex(i => i.codigo === item.codigo);
-
-        if (index !== -1) {
-          return prev.filter(i => i.codigo !== item.codigo);
-        } else {
-          return [...prev, { ...item, quantidade: 1, desconto: 0 }];
-        }
-      });
-    }
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [data, setData] = useState([]);
+  const [ item , setItem ] = useState<String>();
 
 
 
-    function renderItemServico(item  ){
-    const isSelected = servicosSelecionado.find(i => i.codigo === item.codigo);
-    const quantidade = isSelected ? isSelected.quantidade : 0;
+  const formataDados =  formatItem();
 
-      return ( 
-        <TouchableOpacity 
-        style={ [  {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#339' : '#009de2'} , {  margin:5, padding:7, borderRadius:5 , elevation:4} ] } onPress={ ()=> selecionaServico(item)}  >
-          
-            <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-             <Text style={{ color:'white', fontWeight:'bold'}} >
-              codigo:  {item.codigo}  
-             </Text>
-             
-             <Text style={{ color:'white', fontWeight:'bold'}} >
-             valor:  {item.valor}  
-             </Text>
 
-            </View>
-          
-          <Text style={{ color:'white', fontWeight:'bold'}} >
-               {item.aplicacao}
-          </Text>
-          
-          
-          { isSelected ?
-             
-             <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 2 }}>
+
+
+  const fetchClientes = async () => {
+    try {
+        setItem('clientes');
+        const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);
+        const dados = aux.data;
+
+          const totalClientes = dados.length;
+
+          if( totalClientes > 0 ){
         
-              <View style={{ marginTop: 3 }}>
-                <View style={{ alignItems: 'center' }}>
-                  <View style={{ backgroundColor: 'white', borderRadius: 25, elevation: 4, padding: 8, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{ fontWeight: 'bold', textAlign: 'center' }}> {  quantidade  } </Text>
-                  </View>
-                  <View
-                   style={styles.buttonsContainer} 
-                  >
-                    <TouchableOpacity 
-                      onPress={() =>  handleIncrement(item)} 
-                       style={styles.button}
-                      >
-                      <Text 
-                       style={styles.buttonText}
-                       >  + </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                         onPress={() => handleDecrement(item)} 
-                        style={styles.button}
-                        >
-                      <Text   style={styles.buttonText}
-                      > - </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View>
-                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20, elevation: 5 }}>
-                    Total R$: {item.total}
-                  </Text>
-                </View>
-              </View>
-           </View>
+              for (let v = 0;  v<= totalClientes; v++) {
+                
+                let result:any  = await useQueryClientes.selectByCnpjAndCode(dados[v]);
+                
+                    if(result?.length > 0  ){
 
-          :null
+                      const data_recadastro =   formataDados.formatDate(dados[v].data_recadastro)
+                        if(   data_recadastro > result[0].data_recadastro ){
+                          await useQueryClientes.update(dados[v],dados[v].codigo)
+                        }else{
+                          console.log('cliente nao atualizado');
+                        }
+
+                      }else{
+                        await useQueryClientes.create(dados[v])
+                      }
+            const progressPercentage = Math.floor(((v + 1) / totalClientes) * 100);
+           setProgress(progressPercentage);  
+              }
+            }
+        } catch (e) {
+        console.log(e);
+    }
+  };
+
+  const fetchProdutos = async () => {
+    try {
+      setItem('produtos');
+  
+      const aux = await api.get('/offline/produtos');
+      const dados = aux.data;
+      const totalProdutos = dados.length;
+  
+      for (let v = 0; v < totalProdutos; v++) {
+        const verifyProduct = await useQueryProdutos.selectByCode(dados[v].codigo);
+        if (verifyProduct.length > 0) {
+          let data_recadastro = dados[v].data_recadastro; // Ajuste se necessário
+          if (data_recadastro > verifyProduct[0].data_recadastro) {
+            await useQueryProdutos.update(dados[v], dados[v].codigo);
           }
-        </TouchableOpacity>
-      )
+        } else {
+          await useQueryProdutos.createByCode(dados[v], dados[v].codigo );
+        }
+        const progressPercentage = Math.floor(((v + 1) / totalProdutos) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      }
+    } catch (e) {
+      console.log(e);
     }
+  };
 
-  
-      return(
-        <View>
-          {/** separador */}
-      <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
+  const fetchFpgt = async () => {
+    setItem('formas de pagamento');
 
+    try {
+      const aux = await api.get('/formas_pagamento');
+      const data = aux.data;
+
+      const totalFormas = data.length
+      for (let f =0; f <  data.length; f++ ) {
+        const verifiFpgt = await useQueryFpgt.selectByCode( data[f].codigo);
+
+              if (verifiFpgt.length > 0) {
+                await useQueryFpgt.update(data[f], data[f].codigo);
+              } else {
+                await useQueryFpgt.create(data[f]);
+              }
+        const progressPercentage = Math.floor(((f + 1) / totalFormas) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      }
        
-          <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
-          onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
-            < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Tipos De OS</Text>
-      <FontAwesome name="search" size={22} color="#FFF" />
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-          </TouchableOpacity>
-          
-                <Text> Tipo OS: {selectedTipo?.descricao} </Text>       
-             
-              {/**modal tipos de OS  */ }
-              <Modal visible={presstipoOs} transparent={true}   >
-                <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
-                    <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
-                          <Text style={{margin:5, fontWeight:'bold'}} > Tipos De OS </Text>
-                          <FlatList
-                              data={ tipoOs }
-                              renderItem={ ( {item} )=> renderItemOS(item)}
-                            />
-                      </View>
-                  </View>
-              </Modal>
-              {/******* */}
-           
-           {/****** modal servicos */}
-            <Modal visible={verServicos} transparent={true}>
-                <View style={{ backgroundColor:'rgba( 50,50,50, 0.5 )', flex:1, alignItems:'center', justifyContent:'center' }} > 
-                  <View style={{ backgroundColor:'#FFF', width:'95%' , height:'90%' ,padding:5, borderRadius:15}}>
+  const fetchServices = async () => {
+    try {
+    setItem('serviços');
 
-                   
-        <TouchableOpacity onPress={() => {setVerServicos(false)  }}
-                      style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                      <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                        voltar
-                      </Text>
-                    </TouchableOpacity>
+      const aux = await api.get('/offline/servicos');
+      const dados = aux.data;
+        const totalServicos = dados.length;
 
-                        <TextInput
-                            placeholder='pesquisar'
-                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'40%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
-                            onChangeText={ (t)=>  setPesquisa(t) }
-                           />  
+      for (let v = 0; v <  totalServicos; v++ ) {
+      
+        const verifyServices = await useQueryServices.selectByCode(dados[v].codigo);
+        if (verifyServices.length > 0) {
+          useQueryServices.update(dados[v])
+        }else{
+          await useQueryServices.create(dados[v], dados[v].codigo);
 
-                        <View style={{ height:'75%' }} >
-                            <FlatList
-                              data={dadosServicos}
-                              renderItem={ ({item})=> renderItemServico( item ) }
-                              keyExtractor={(item)=>item.codigo}
-                            />
-                        </View>
-                      
-                 </View>
+        }
+      
+        const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
 
-                </View>
-            </Modal>
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
+  const fetchTiposOs = async () => {
+    setItem('tipo de os');
+
+    try {
+      const aux = await api.get('/offline/tipos_os');
+      const data = aux.data;
+      
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiTipOs = await useQueryTipoOs.selectByCode(data[i].codigo);
         
+        if (verifiTipOs.length > 0) {
+          await useQueryTipoOs.update( data[i], data[i].codigo);
+        } else {
+          await useQueryTipoOs.create(data[i]);
+        }
+      
+      }        const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
+      setProgress(progressPercentage); // Atualiza progresso
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-          <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
-                    onPress={ ()=>    setVerServicos(true) } >
-                  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Serviços</Text>
-             <AntDesign name="caretdown" size={24} color={ 'white'} />
-                </TouchableOpacity>
+  const syncData = async () => {
+    setIsLoading(true);
+    setProgress(0);
 
-              <View style={{alignItems:'center' , justifyContent:'center'}}>
-                 { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens}  </Text>): null }
-                 </View>
-    
+    try {
+      await fetchClientes();
+      await fetchProdutos();
+      await fetchFpgt();
+      await fetchServices();
+      await fetchTiposOs();
+      setData([]); // Atualiza o estado para mostrar dados após a sincronização
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setProgress(0), 1000); // Reseta o progresso após 1 segundo
+    }
+  };
 
-                  
-  {/**   <Button
-          title='ver'
-          onPress={()=> console.log(servicosSelecionado)}
-          />
-          */}
-                {  
-                  servicosSelecionado &&
-                    <FlatList
-                      data={servicosSelecionado}
-                      horizontal={true}
-                      renderItem={({ item }) => <ItensServicoListaHorizontal item={item} handleDecrement={handleDecrement} handleIncrement={handleIncrement} />}
-                      keyExtractor={ (item)=> item.codigo.toString()}
-                      />
-                   }
-                
-      <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-                
-        </View>
-      )
-  }
- 
- 
+  const handleSync = () => {
+    if (!connected) {
+      Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
+      return;
+    }
+    syncData();
+  };
 
   return (
-    <View style={styles.container}>
-      <Text>Status internet: {connected ? 'Conectado' : 'Desconectado'}</Text>
- 
- 
-  {/** separador */}
-
-      <View style={{backgroundColor:'#F5F6F8'}}>
-         
-          <Teste/>
-      
+    <View style={{ flex: 1 }}>
+      <LoadingData isLoading={isLoading} item={item} progress={progress} />
+      <Button title='Sync' onPress={handleSync} />
+      <View>
+        <Text>Dados recebidos:</Text>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => <Text>{item.codigo}</Text>}
+          keyExtractor={item => item.codigo}
+        />
       </View>
-
- 
-
     </View>
   );
 }
 
- 
 const styles = StyleSheet.create({
-  container: {
-    flex:1
-   },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
-    elevation: 5
+  loadingText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
-  searchContainer: {
-    justifyContent: 'space-around',
-    backgroundColor: '#FFF',
+  progressBar: {
+    height: 10,
+    backgroundColor: '#007bff',
     borderRadius: 5,
-    elevation: 10,
+    width: '100%', // Garantir que a barra de progresso tenha uma largura inicial
   },
-  limpar: {
-    borderRadius: 5,
-    backgroundColor: 'red',
-    width: 50,
-    height: 35,
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginEnd: 1
+    backgroundColor: 'rgba(0,0,0,0.5)', // Cor de fundo com opacidade
   },
-  limparText: {
-    color: '#FFF'
-  },
-  buttonsContainer: {
-    flexDirection: 'row'
-  },
-  button: {
-    margin: 3,
-    backgroundColor: '#FFF',
-    elevation: 4,
-    width: 60,
-    height: 35,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 5
-  },
-  buttonText: {
-    fontWeight: 'bold',
-    fontSize: 15
-  },
- 
 });

@@ -50,6 +50,8 @@ export const usePedidos = () =>{
     produtos:produto_pedido[],
     parcelas:parcela[], 
     data_cadastro:string,
+    veiculo:number,
+    tipo_os:number,
     tipo:number
 }
 
@@ -67,40 +69,7 @@ const getCurrentDate = () => {
       let data = getCurrentDate();
       pedido.situacao = 'EA';
       try{
-        console.log(  ` INSERT INTO pedidos 
-          (
-          codigo,
-          situacao,
-          vendedor,
-          descontos,
-          forma_pagamento,
-          observacoes,
-          quantidade_parcelas,
-          total_geral,
-          total_produtos,
-          total_servicos,
-          cliente,
-          data_cadastro,
-          tipo  
-          ) VALUES (
-           ${ pedido.codigo}, 
-           '${ pedido.situacao}',
-            ${ pedido.vendedor},
-           ${ pedido.descontos},
-          ${ pedido.forma_pagamento},
-          '${ pedido.observacoes}',
-          ${ pedido.quantidade_parcelas},
-          ${ pedido.total_geral},
-          ${ pedido.total_produtos},
-          ${ pedido.total_servicos},
-          ${ pedido.cliente.codigo},
-        '${ pedido.data_cadastro }',
-         ${ pedido.tipo}
-          )`  )
-          console.log('');
-          console.log('');
-  
-     
+      
 
         let result = await db.runAsync(
             ` INSERT INTO pedidos 
@@ -117,27 +86,30 @@ const getCurrentDate = () => {
             total_servicos,
             cliente,
             data_cadastro,
+            veiculo,
+            tipo_os,
               tipo  
             ) VALUES (
              ${ pedido.codigo}, 
-             '${ pedido.situacao}',
-              ${ pedido.vendedor},
+            '${ pedido.situacao}',
+             ${ pedido.vendedor},
              ${ pedido.descontos},
-            ${ pedido.forma_pagamento},
+             ${ pedido.forma_pagamento},
             '${ pedido.observacoes}',
-            ${ pedido.quantidade_parcelas},
-            ${ pedido.total_geral},
-            ${ pedido.total_produtos},
-            ${ pedido.total_servicos},
-            ${ pedido.cliente.codigo},
-          '${ pedido.data_cadastro }',
-           ${ pedido.tipo}
+             ${ pedido.quantidade_parcelas},
+             ${ pedido.total_geral},
+             ${ pedido.total_produtos},
+             ${ pedido.total_servicos},
+             ${ pedido.cliente.codigo},
+            '${ pedido.data_cadastro }',
+             ${ pedido.veiculo},
+             ${ pedido.tipo_os},
+             ${ pedido.tipo}
             )` 
         );
   
 
-        console.log(' orcamento inserido codigo : ' ,result.lastInsertRowId);
-        console.log('');
+      //  console.log(' orcamento inserido codigo : ' ,result.lastInsertRowId);
         return result.lastInsertRowId;
         }catch( e ){ console.log(` ocorreu um erro ao gravar o orcamento `,e)}
     
@@ -153,12 +125,15 @@ const getCurrentDate = () => {
           p.quantidade_parcelas,
           c.nome,
           p.situacao,
+          p.observacoes,
           p.descontos,
           p.forma_pagamento,
           p.vendedor,
           p.total_geral,
           p.total_produtos,
-          p.data_cadastro,
+          p.veiculo,
+          strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          p.tipo_os,
           p.tipo
           FROM pedidos p
           JOIN  clientes c on c.codigo = p.cliente
@@ -168,6 +143,31 @@ const getCurrentDate = () => {
       }catch(e){console.log(e)}
   }
 
+  async function selectByCode2( code:number ) {
+    try{
+      let result = await db.getAllAsync(
+        `SELECT
+         codigo,
+         quantidade_parcelas,
+         situacao,
+         descontos,
+         forma_pagamento,
+        observacoes,
+         vendedor,
+         total_geral,
+         total_produtos,
+          veiculo,
+        strftime('%Y-%m-%d', data_cadastro) AS data_cadastro,
+         tipo_os,
+         tipo
+        FROM pedidos  
+        WHERE codigo = ${code}`
+      );
+      return result;
+    }catch(e){console.log(e)}
+}
+
+
     async function selectAll(){
         try{ 
         let result = await db.getAllAsync(`SELECT 
@@ -176,11 +176,14 @@ const getCurrentDate = () => {
           c.codigo as codigo_cliente,
           p.situacao,
           p.descontos,
+          p.observacoes,
           p.forma_pagamento,
           p.total_geral,
           p.total_produtos, 
-          p.data_cadastro,
+          p.veiculo,
+          strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
           p.vendedor,
+          p.tipo_os,
           p.tipo
           FROM pedidos p
           JOIN  clientes c on c.codigo = p.cliente
@@ -190,49 +193,92 @@ const getCurrentDate = () => {
           }catch(e){ console.log(' erro ao consultar os pedidos! ',e) }
     }
 
+      async function findByTipe( tipo:number, vendedor:number ){
+        try{ 
+        let result = await db.getAllAsync(`SELECT 
+          p.codigo,
+          c.nome,
+          c.codigo as codigo_cliente,
+          p.situacao,
+          p.observacoes,
+          p.descontos,
+          p.forma_pagamento,
+          p.total_geral,
+          p.total_produtos, 
+          p.data_cadastro,
+          p.veiculo,
+        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          p.vendedor,
+          p.tipo_os,
+          p.tipo
+          FROM pedidos p
+          JOIN  clientes c on c.codigo = p.cliente
+          WHERE p.tipo = ${tipo} AND p.vendedor =  ${vendedor}         
+          `);
+      //   console.log(result);
+          return result;
+          }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${vendedor}  `,e) }
+    }
+
+
+
     async function selectCompleteOrderByCode( code:number )  {
       try{
           let dataOrder:any  = await  selectByCode(code)
           let order = dataOrder[0];
-          
-          let dataClientOrder:any  = await queryClientes.selectByCode( order.codigo_cliente );
-          let clientOrder = dataClientOrder[0];
 
-          let producstOrder:any  = await queryItems.selectByCodeOrder(code);
-          let servicesOrder:any = await queryServicosPedido.selectByCodeOrder(code);
-           let parcelas:any = await queryParcelas.selectByCodeOrder(code) 
+          let clientOrder  
+          
+          try{
+          let dataClientOrder:any  = await queryClientes.selectByCode( order.codigo_cliente );
+          clientOrder = dataClientOrder[0];
+        }catch(e){console.log(e)}
+
+        let producstOrder:any
+
+          try{
+            producstOrder   = await queryItems.selectByCodeOrder(code);
+        }catch(e){console.log(e)}
+
+        let servicesOrder:any
+
+        try{
+            servicesOrder  = await queryServicosPedido.selectByCodeOrder(code);
+        }catch(e){console.log(e)}
+        
+        let parcelas:any
+
+        try{
+           parcelas  = await queryParcelas.selectByCodeOrder(code) 
+        }catch(e){console.log(e)}
             
            order.produtos = producstOrder;
            order.parcelas = parcelas
            order.cliente = clientOrder
            order.servicos = servicesOrder
-           //console.log(order);
            return order
 
         }catch(e){ `erro ao consultar o pedido codigo: ${code}`}
 
         }
 
+  async function selectLastId(){
+    try{ 
+      let result = await db.getAllAsync(`SELECT MAX(p.codigo) as codigo FROM pedidos p  `);
+        return result;
+        }catch(e){ console.log(' erro ao consultar os pedidos! ',e) }
+   }
+
 
 
     async function createOrder( order:pedido ){
-       
-         if( !order.codigo ){
-           let code = Date.now();
-          order.codigo = code;
- 
-
           if(   !order.parcelas.length   ||  order.parcelas.length < 0 ){
             console.log(`nao foi informado os parcelas`)
             return;  
-          }//else{
-           // console.log('')
-           // console.log(order.parcelas)
-           // console.log('')
-           //}
+          } 
           let produtos:any = order.produtos;
           let parcelas: parcela[] = order.parcelas;
-          let servicos: any = order.total_servicos;
+          let servicos: any = order.servicos;
              let codeOrder:any = await create(order);
 
                          if( codeOrder > 0 || codeOrder !== undefined  ){
@@ -258,7 +304,7 @@ const getCurrentDate = () => {
                          }else{
                           console.log('ocorreu um erro ao tentar gravar o orcamento!')
                      }
-          }  
+        //  }  
 
     }
 
@@ -277,12 +323,24 @@ const getCurrentDate = () => {
           console.log(result);
           
           if( result.lastInsertRowId  ){
-            await queryItems.deleteByCodeOrder(code);
-            await  queryParcelas.deleteByCodeOrder(code);
-            await queryServicosPedido.deleteByCodeOrder(code);
+
+            let items = await  queryItems.selectByCodeOrder(code);
+              if( items.length > 0 ){
+                await queryItems.deleteByCodeOrder(code);
+              }
+
+              let parcelas = await queryParcelas.selectByCodeOrder(code);
+              if( parcelas?.length > 0 ){
+                await queryParcelas.deleteByCodeOrder(code);
+              }
+
+              let servicos = await queryServicosPedido.selectByCodeOrder(code);
+              
+              if( servicos?.length > 0 ){
+                await queryServicosPedido.deleteByCodeOrder(code);
+              }
           }
 
-          console.log(`deletado parcelas do orcamento codigo: ${code}`)
 
        }catch(e){
         console.log(e)
@@ -291,58 +349,120 @@ const getCurrentDate = () => {
 
 
    async function deleteAllOrder(  ){
+      try{
+          const result = await db.runAsync(` DELETE from pedidos  `)
+      }catch(e){
+        console.log(e)
+      }
+  }
 
-    try{
-        const result = await db.runAsync(` DELETE from pedidos  `)
-     
-     }catch(e){
-      console.log(e)
-    }
- }
 
-   async function updateOrder(order ){
-       if( !order.codigo ){
+
+
+   async function updateOrder(order, codigoOrcamento ){
+       
+    if( !order.codigo ){
       console.log('é necessario informar um orcamento com um codigo valido')
         return 
       }
-    let verifyOrder:any = await selectByCode(order.codigo);
-    console.log(verifyOrder)
-  
+    
+      let verifyOrder:any = await selectByCode2(order.codigo);
 
+      let codigoRgistrado ;
 
-     if(verifyOrder?.length > 0 ){
-        console.log(order);
+    if(verifyOrder?.length > 0 ){
        let aux:any =  await update(order);
-
-
-            if(aux.lastInsertRowId){
-                
-                
-                await queryParcelas.deleteByCodeOrder(order.codigo)
-                
-                  if( order.produtos.length > 0 ){
-                    await queryItems.deleteByCodeOrder(order.codigo);
-                    order.produtos.forEach( async (p)=>{
-                        await queryItems.create( p,order.codigo)
-                        })
-
-                    }
-                
-                    if( order.servicos.length > 0  ){
-                      await queryServicosPedido.deleteByCodeOrder(order.codigo)
-                      order.servicos.forEach( async (s)=>{
-                        await queryServicosPedido.create( s,order.codigo)
-                        })
-                    }
-
-
-                  
-                  order.parcelas.forEach( async (pa)=>{
-                    await queryParcelas.create( pa, order.codigo);
-                  })
-             } 
-
+       codigoRgistrado = aux 
+      }else{
+        
+        console.log('nao foi encontrado orcamento com o codigo ', order.codigo)
+        let aux:any =  await create(order);
+        codigoRgistrado = aux 
       }
+
+             if( codigoRgistrado  > 0 ){
+
+                if( order.produtos.length === 0 ){
+                  let verifyProductsPedido:any = await  queryItems.selectByCodeOrder(codigoOrcamento);
+                  if( verifyProductsPedido?.length > 0 ){
+                    await queryItems.deleteByCodeOrder( codigoOrcamento )
+                    }
+                }
+     
+
+                if( order.servicos.length === 0 ){
+                  let verifyServicesPedido:any = await   queryServicosPedido.selectByCodeOrder(codigoOrcamento);
+                  if( verifyServicesPedido?.length > 0 ){
+                    await queryServicosPedido.deleteByCodeOrder( codigoOrcamento )
+                    }
+                }
+
+                  if( order.produtos.length > 0  ){
+                      let verifyProductsPedido:any = await  queryItems.selectByCodeOrder(codigoOrcamento);
+                    
+                      if( verifyProductsPedido?.length > 0 ){
+                        const produtosParaExcluir = verifyProductsPedido.filter(prodBd => !order.produtos.some( p => p.codigo === prodBd.codigo));
+                        for (const produto of produtosParaExcluir) {
+                          await queryItems.deleteProductByCodeOrder(produto.codigo, codigoOrcamento);
+                        }
+                    } else{
+                        console.log('nao foi encontrado produtos para este pedido')
+                    } 
+
+                    for( const p of order.produtos ){
+                      let aux = await queryItems.selectProductByCodeOrder( p.codigo , codigoOrcamento );
+                      console.log('')
+                      console.log('produto ', p.codigo,' encontrado', aux)
+
+                      
+
+                          if( aux?.length > 0    ){
+                            await queryItems.update(p, codigoOrcamento)
+                            console.log('atualizando produto', p.codigo )
+                        }else{
+                            await queryItems.create(p, codigoOrcamento);
+                            console.log('inserindo produto', p.codigo )
+  
+                        }
+                  }  
+
+               }
+
+
+
+                     if( order.servicos.length > 0  ){
+                            let verifyServicesPedido:any = await   queryServicosPedido.selectByCodeOrder(codigoOrcamento);
+                          
+                            if( verifyServicesPedido?.length > 0 ){
+                              const servicosParaExcluir = verifyServicesPedido.filter(servicoBd => !order.servicos.some(servico => servico.codigo === servicoBd.codigo));
+                              for (const servico of servicosParaExcluir) {
+                                await queryServicosPedido.deleteServiceByCodeOrder(servico.codigo, codigoOrcamento);
+                              }
+                          } else{
+                              console.log('nao foi encontrado servicos para este pedido')
+                          } 
+
+                          for( const s of order.servicos ){
+                            let aux = await queryServicosPedido.selectServiceByCodeOrder( s.codigo , codigoOrcamento   );
+                            if( aux?.length > 0    ){
+                                await queryServicosPedido.update(s, codigoOrcamento)
+                            }else{
+                                await queryServicosPedido.create(s, codigoOrcamento );
+                            }
+                        }  
+
+                     }
+ 
+                      if( order.parcelas.length > 0 ){
+                             await queryParcelas.deleteByCodeOrder( order.codigo );
+                        order.parcelas.forEach( async (pa)=>{
+                          await queryParcelas.create( pa, order.codigo);
+                        })
+                      }
+                  
+              } 
+
+              return codigoRgistrado ;
     
   } 
 
@@ -350,7 +470,8 @@ const getCurrentDate = () => {
     pedido.situacao = 'EA';
     try{
 
-
+  
+ 
       let result = await db.runAsync(
           ` UPDATE   pedidos SET
           situacao  =  '${ pedido.situacao}', 
@@ -361,7 +482,9 @@ const getCurrentDate = () => {
           total_geral  =  ${ pedido.total_geral},
           total_produtos =  ${ pedido.total_produtos}, 
           cliente  =  ${ pedido.cliente.codigo},
-          data_cadastro = ${ pedido.data_cadastro}
+          data_cadastro = '${pedido.data_cadastro}',
+          veiculo = ${pedido.veiculo},
+          tipo_os = ${pedido.tipo_os}
           WHERE codigo = ${ pedido.codigo}  
            ` 
       );
@@ -369,12 +492,18 @@ const getCurrentDate = () => {
   
       
     console.log(' orcamento codigo : ' ,result.lastInsertRowId,' atualizado com sucesso !');
-      return result;
-      }catch( e ){ console.log(` ocorreu um erro ao gravar o orcamento `,e)}
+      return result.lastInsertRowId;
+      }catch( e ){ 
+        console.log(` ocorreu um erro ao atualiza o orcamento `, e)
+        console.log('')
+
+
+      }
     }
   
       
 
-    return {deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
+    return {
+      update, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
 
 }

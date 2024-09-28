@@ -7,6 +7,8 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';
 import Fontisto from '@expo/vector-icons/Fontisto';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
 export const Home = ({navigation}:any) => {
   const { setLogado , setUsuario}: any = useContext(AuthContext);
 
@@ -16,6 +18,10 @@ export const Home = ({navigation}:any) => {
     { "nome":"vendas",
       "icon":<MaterialCommunityIcons name="cart-variant" size={30} color="#009de2" />
       },
+      { "nome":"OS",
+        "icon": <FontAwesome5 name="tools" size={24} color="#009de2" />
+        },
+
     { "nome": "Acerto",
     "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
      },
@@ -29,33 +35,26 @@ export const Home = ({navigation}:any) => {
       { "nome":"configurações",
       "icon":<Feather name="settings" size={30} color="#009de2" />
       }, 
-      { "nome":"ItemSQLITE",
+      { "nome":"Teste",
         "icon":<Feather name="settings" size={30} color="#009de2" />
-        }, 
-      
-      
-     
+        },
     ];
 
   const Item = ({ value }: any) => {
     return (
-<View style={{alignItems:"center"  , margin:5, backgroundColor:'#F5F6F8', elevation:5, borderRadius:5, padding:3}}>
-      <TouchableOpacity onPress={ ()=> navigation.navigate(value.nome) }
-        style={{
-          backgroundColor: "#FFF",
-          margin: 15,
-          borderRadius: 100,
-          width: 65,
-          height: 65,
-          alignItems: "center",
-          justifyContent: "center",
-          elevation:7
-        }}
-      >
-        {value.icon}
+      <TouchableOpacity style={{  margin: 5    }}    onPress={ ()=> navigation.navigate(value.nome) }    >
+          <View
+            style={{   backgroundColor: "#FFF", margin: 10, borderRadius: 100, width: 65, height: 65, alignItems: "center", justifyContent: "center",  elevation:5  }} >
+            
+
+              {value.icon}
+
+          </View>
+          <Text style={{fontSize:15, fontWeight:"bold", textAlign:"center"}}> {value.nome}</Text>
+ 
+
       </TouchableOpacity>
-        <Text style={{fontSize:13, fontWeight:"bold"}}> {value.nome}</Text>
-        </View>
+      
     );
   };
 
@@ -75,7 +74,7 @@ export const Home = ({navigation}:any) => {
        </TouchableOpacity>
 
         </View>
-      <View style={{margin:20,}}>
+      <View style={{margin:30,}}>
       <FlatList
         horizontal={true}
         data={data}

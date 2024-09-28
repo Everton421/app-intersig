@@ -36,6 +36,32 @@ type fpgt = {
             }catch( e ){ console.log(e) }
     }
 
+
+    async function update(forma:fpgt, code:number) {
+        let verifCode:any; 
+        try{
+              verifCode = await selectByCode(code);
+              if(verifCode.length > 0 ){
+                 // console.log('ja existe servico cadastrado com o codigo ', code );
+                //  console.log(verifCode);
+     let aux = await db.runAsync( `UPDATE forma_pagamento SET  
+            descricao = '${forma.descricao}',
+            desc_maximo = ${forma.desc_maximo},
+            parcelas = ${forma.parcelas},
+            intervalo = ${forma.intervalo},
+            recebimento =  ${forma.recebimento}
+            where codigo = ${code} ` 
+        )
+                console.log(`forma de pagamento codigo : ${ code} atualizada com sucesso! `)
+
+                  return;
+                  }else{
+                    console.log('nao foi encontrado forma_pagamento com o codigo:', code)
+                  }
+        }catch(e){ console.log(e) }
+       
+    }
+
     async function selectByCode( code:number ){
         let aux = 0;
         if( isNaN(code)){
@@ -53,11 +79,11 @@ type fpgt = {
     async function selectAll(){
         try{
             let result = await db.getAllAsync(`SELECT * from forma_pagamento;`);
-            console.log(result);
+           // console.log(result);
             return result;
         }catch(e){ console.log(e) }
     }  
 
-    return { selectAll, selectByCode, create} 
+    return { selectAll, selectByCode, create,update} 
 
 }

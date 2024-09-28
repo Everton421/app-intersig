@@ -15,8 +15,6 @@ type produto_pedido = {
         async function create(produto:produto_pedido, codeOrder:number){
             try{
  
-                
-
                 let result = await db.runAsync(
                     `
                     INSERT INTO produtos_pedido 
@@ -37,9 +35,7 @@ type produto_pedido = {
                     ) `
                 )
 
-                console.log('')
                 console.log(`produto inserido com sucesso para o orcamento codigo ${codeOrder} ${produto.codigo} `  );
-                console.log('')
             }catch(e   ){ console.log( `erro ao inserir produto do orcamento` , e )}
         }
 
@@ -84,8 +80,59 @@ type produto_pedido = {
         
             }
 
+            async function selectProductByCodeOrder( codigoProduto:number, code:number){
+                try{
+                    let aux = await db.getAllAsync(`
+                        SELECT pp.codigo , pp.pedido,  pp.desconto, pp.preco, pp.quantidade, pp.total, p.descricao
+                                                         FROM produtos_pedido pp
+                                                         JOIN produtos p on p.codigo = pp.codigo
+                                                         where pp.pedido = ${code}
+                                                            AND pp.codigo = ${codigoProduto}  `)
+                        
+                        
+                     return aux;
+                 }catch(e){
+                     console.log(` Erro ao filtrar o produto ${codigoProduto } do orcamento ${code}`, e)
+                 }
+         
+             }
+ 
+
+            async function deleteProductByCodeOrder(  codigoProduto:number , code:number){
+                try{
+                    await db.runAsync(` DELETE from produtos_pedido where  codigo = ${codigoProduto} AND pedido = ${code}`)
+                    console.log(`deletado iten  ${codigoProduto} do orcamento codigo: ${code}`)
+                     return true;
+                 }catch(e){
+                     console.log(e)
+                     return false;
+                 }
+         
+             }
 
 
-        return { selectByCodeOrder, create ,deleteByCodeOrder,selectAll }
+
+             async function update(produto , codeOrder:number){
+                try{
+     
+                    let result = await db.runAsync(
+                        `
+                        UPDATE produtos_pedido SET 
+                        desconto = ${produto.desconto}, 
+                        quantidade = ${produto.quantidade},
+                        preco =     ${produto.preco},
+                        total = ${produto.total} 
+                         WHERE codigo = ${produto.codigo}
+                          AND pedido = ${codeOrder}
+                          `
+                    )
+    
+                    console.log('')
+                    console.log(`produto ${produto.codigo} atualizado para o orcamento numero:  ${codeOrder}  `  );
+                    console.log('')
+                }catch(e   ){ console.log( `erro ao atualizar produto ${ produto.codigo} do orcamento` , e )}
+            }
+
+        return { selectByCodeOrder, selectProductByCodeOrder,  create ,deleteByCodeOrder,selectAll ,deleteProductByCodeOrder, update}
 
 }

@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Orcamento } from '../../screens/orcamento/components';
-import { Registrados } from '../../screens/orcamento/registrados';
+import { OrcamentosRegistrados    } from '../../screens/orcamento/registrados';
 const Tab = createBottomTabNavigator();
 
 
@@ -12,7 +12,7 @@ export function  TabsOrcamento({navigation}) {
         <Tab.Screen
          name="registrados"
          options={{ headerShown:false   }}
-         component={Registrados}
+         component={OrcamentosRegistrados}
           />
         <Tab.Screen
          name="novo"

@@ -15,10 +15,7 @@ const db = useSQLiteContext();
             try{
                 
                 let aux:any  = await selectByCode( tipoOs.codigo ); 
-                     if( aux.length  > 0 ){
-                         console.log(` o item ${ tipoOs.codigo } ja foi cadastrado!` )
-                         return;
-                     }else{
+                  
 
                  const result = await  db.runAsync(
                      `
@@ -28,28 +25,19 @@ const db = useSQLiteContext();
                       console.log('');
                       console.log(result);
                       console.log('');
-                     }
+                      
             }catch( e ){ console.log(e) }
     }
 
 
     async function update(tipoOs:tipoOs , code:number) {
-        let verifCode:any; 
         try{
-              verifCode = await selectByCode(code);
-              if(verifCode.length > 0 ){
-                  console.log('ja existe tipos_os cadastrado com o codigo ', code );
-                //  console.log(verifCode);
-     let aux = await db.runAsync( `UPDATE tipos_os SET  
-            descricao = '${tipoOs.descricao}' 
-            where codigo = ${code} ` 
-        )
+                let aux = await db.runAsync( `UPDATE tipos_os SET  
+                        descricao = '${tipoOs.descricao}' 
+                        where codigo = ${code} ` 
+                    )
                 console.log(`tipo_os codigo : ${ code} atualizada com sucesso! `)
-
                   return;
-                  }else{
-                    console.log('nao foi encontrado tipo_os com o codigo:', code)
-                  }
         }catch(e){ console.log(e) }
        
     }

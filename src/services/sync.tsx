@@ -19,18 +19,25 @@ export const orderServices = () => {
     const useQueryTipoOs = useTipoOs();
     const useQueryVeiculos = useVeiculos();
 
+
+    async function atualizacaoDePedidos(){
+
+         
+
+    }
+
     async function filterOrders() {
         async function postItem(dados) {
-            let aux = await api.post('/orcamentos/v1', dados);
+            let aux = await api.post('/pedidos', dados);
             console.log(aux.data);
             console.log('');
             console.log("status:",aux.status);
         }
 
-        let orders = await useQuerypedidos.selectAll();
+        let orders:any = await useQuerypedidos.selectAll();
 
         if (orders?.length > 0) {
-            const obj = []; // Inicializando como array
+            const obj:any = []; // Inicializando como array
             const promises = orders.map(async (i) => {
                 let aux = await useQuerypedidos.selectCompleteOrderByCode(i.codigo);
                 obj.push(aux); // Adicionando ao array

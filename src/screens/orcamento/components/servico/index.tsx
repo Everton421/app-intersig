@@ -554,7 +554,7 @@ const handleDecrement = (item) => {
                      }
 
           <View style={{ flexDirection:'row', justifyContent:'space-between', margin:10}}>
-            { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens}  </Text>): null }
+            { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens.toFixed(2)}  </Text>): null }
                       {
                         selectedVeiculo ? ( <Text style={{fontWeight:'bold'}}> placa: {selectedVeiculo.placa } </Text>) : null
                       } 

@@ -18,6 +18,12 @@ export const restartDatabaseService = ()=>{
       DROP TABLE IF EXISTS veiculos;
 
 
+       DROP TABLE IF EXISTS pedidos;
+       DROP TABLE IF EXISTS produtos_pedido ;
+       DROP TABLE IF EXISTS servicos_pedido ;
+       DROP TABLE IF EXISTS parcelas ;
+    
+
 
       CREATE TABLE IF NOT EXISTS produtos (
       codigo          INTEGER PRIMARY KEY NOT NULL,
@@ -73,7 +79,58 @@ export const restartDatabaseService = ()=>{
         intervalo INTEGER DEFAULT 0,  
         recebimento INTEGER DEFAULT 0  
       );
+       -- Create the orders table 
+    CREATE TABLE IF NOT EXISTS pedidos (
+      codigo INTEGER PRIMARY KEY AUTOINCREMENT,
+      vendedor INTEGER NOT NULL DEFAULT 0,   
+      situacao TEXT NOT NULL DEFAULT 'EA',
+      contato TEXT ,
+      descontos REAL DEFAULT 0.00,
+      forma_pagamento INTEGER DEFAULT 0,
+      observacoes BLOB,
+      quantidade_parcelas INTEGER DEFAULT 0,
+      total_geral REAL DEFAULT 0.00,
+      total_produtos REAL DEFAULT 0.00,
+      total_servicos REAL DEFAULT 0.00,
+      cliente INTEGER NOT NULL DEFAULT 0,
+      veiculo INTEGER NOT NULL DEFAULT 0,
+      data_cadastro TEXT NOT NULL,
+      data_recadastro TEXT NOT NULL,
+      tipo_os INTEGER DEFAULT 0, 
+      tipo INTEGER NOT NULL DEFAULT 1   --1 = Orçamento (gerado no sistema); 2 = Orçamento (gerado fora do sistema); 3 = Ordem de Serviço; 4 = Contrato de Prestação de Serviços; 5 = Devolução
+    ); 
   
+    -- Create the order items table
+    CREATE TABLE IF NOT EXISTS produtos_pedido (
+      pedido INTEGER NOT NULL,
+      codigo INTEGER NOT NULL,
+      desconto REAL DEFAULT 0.00,
+      quantidade REAL DEFAULT 0.00,
+      preco REAL DEFAULT 0.00,
+      total REAL DEFAULT 0.00,
+      FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
+    );
+      
+     
+    CREATE TABLE IF NOT EXISTS servicos_pedido (
+      pedido INTEGER NOT NULL,
+      codigo INTEGER NOT NULL,
+      desconto REAL DEFAULT 0.00,
+      quantidade REAL DEFAULT 0.00,
+      valor REAL DEFAULT 0.00,
+      total REAL DEFAULT 0.00,
+      FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
+    );
+
+
+
+    CREATE TABLE IF NOT EXISTS parcelas (
+      pedido INTEGER NOT NULL,
+      parcela INTEGER NOT NULL,
+      valor REAL NOT NULL DEFAULT 0.00,
+      vencimento TEXT NOT NULL DEFAULT '0000-00-00',
+       FOREIGN KEY (pedido) REFERENCES pedidos(codigo)
+    );
   
 
     CREATE TABLE IF NOT EXISTS usuarios (

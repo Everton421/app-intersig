@@ -16,14 +16,18 @@ const getCurrentDate = () => {
             "cliente":{},
             "parcelas":[],
             "servicos":[],
-            "data_cadastro":string
+            "data_cadastro":string,
+            "data_recadastro":string
+
         }
 export const OrcamentoContext = createContext({
   orcamento: {
     produtos: [],
     cliente: {},
     parcelas: [],
-    data_cadastro: ""
+    data_cadastro: "",
+    data_recadastro: "",
+
   },
   setOrcamento: (orcamento: OrcamentoModel) => {}
 });
@@ -33,8 +37,10 @@ export const OrcamentoContext = createContext({
                 "cliente":{},
                 "parcelas":[],
                 "servicos":[],
-                "data_cadastro": ""
-            } );
+                "data_cadastro": "",
+                "data_recadastro": ""
+            
+              } );
 
             return (
                 <OrcamentoContext.Provider value={ {  orcamento, setOrcamento}}>

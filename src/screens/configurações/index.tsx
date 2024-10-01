@@ -1,4 +1,4 @@
-import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet } from "react-native"
+import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet,Animated } from "react-native"
 import { api } from "../../services/api"
 import { useContext, useEffect, useState } from "react"
 import { TextInput } from "react-native-gesture-handler"
@@ -19,312 +19,350 @@ import { formatItem } from "../../services/formatStrings"
 import { restartDatabaseService } from "../../services/restartDatabase"
 
 
-
-
-
+const LoadingData = ({ isLoading, item , progress }) => (
+  <Modal animationType='slide' transparent={true} visible={isLoading}>
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#FFF" />
+      <Text style={styles.loadingText}>Carregando  {item} ... {progress}%</Text>
+      <Animated.View style={[styles.progressBar, { width: `${progress}%` }]} />
+    </View>
+  </Modal>
+);
 
 export const Configurações = () => {
-    const [conectado, setConectado] = useState<boolean>()
-    const [loading, setLoading] = useState<boolean>(true)
-    const [error, setError] = useState<string>()
+  const { usuario } = useContext(AuthContext);
+  const {connected, setConnected } = useContext(ConnectedContext);
 
-    const [url, setUrl] = useState<string>();
-    const [urlSave , setUrlSave] = useState<string>();
-    const [sync, setSync] = useState(false);
+  const useQueryProdutos = useProducts();
+  const useQueryClientes = useClients();
+  const useQueryFpgt = useFormasDePagamentos();
+  const useQueryTipoOs = useTipoOs();
+  const useQueryServices = useServices();
+  const useQueryVeiculos = useVeiculos();
+  const useQueryPedidos = usePedidos();
+  const servicesPedidos= orderServices();
+  const  useRestartService = restartDatabaseService();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [data, setData] = useState([]);
+  const [ item , setItem ] = useState<String>();
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string>()
+  const [conectado, setConectado] = useState<boolean>()
 
 
-    const {connected, setConnected } = useContext(ConnectedContext);
-    const { usuario } = useContext(AuthContext);
- 
-    const useQueryProdutos = useProducts();
-    const useQueryClientes = useClients();
-    const useQueryFpgt = useFormasDePagamentos();
-    const useQuerypedidos = usePedidos();
-    const useQueryParcelas = useParcelas();
-    const useQueryItems = useItemsPedido();
-    const useQueryTipoOs = useTipoOs();
-    const useQueryVeiculos =     useVeiculos();
-    const useQueryServices = useServices();
-    const useRestartService = restartDatabaseService()
 
-    const formatData = formatItem()
+  const formataDados =  formatItem();
 
-    const servicesPedidos= orderServices();
 
-    async function connect() {
-        try {
-            const response = await api.get('/');
-            if (response.status === 200 && response.data.ok) {
-                setConectado(true)
-                setConnected(true)
-            console.log(response.data);
+  async function connect() {
+    try {
+        const response = await api.get('/');
+        if (response.status === 200 && response.data.ok) {
+            setConectado(true)
+            setConnected(true)
+        console.log(response.data);
 
-            } else {
-                setConectado(false)
-                setConnected(false)
-                console.log({"err":"erro ao conectar"})
-            }
-            setError(undefined)
-        } catch (err) {
-            setError("Erro ao conectar na API. Por favor, tente novamente.")
-        } finally {
-            setLoading(false)
+        } else {
+            setConectado(false)
+            setConnected(false)
+            console.log({"err":"erro ao conectar"})
         }
+        setError(undefined)
+    } catch (err) {
+        setError("Erro ao conectar na API. Por favor, tente novamente.")
+    } finally {
+        setLoading(false)
     }
-
-    async function teste (){
-        try {
-            const response = await api.get('/');
-            if (response.status === 200 && response.data.ok) {
-                setConectado(true)
-            console.log(response.data)
-            Alert.alert(' ',"conectado!");
-
-            } else {
-                setConectado(false)
-                console.log({"err":"erro ao conectar"})
-            Alert.alert(' ',"falha ao conectar!");
-
-            }
-            setError(undefined)
-        } catch (err) {
-            setError("Erro ao conectar na API. Por favor, tente novamente.")
-        }
-    }
-
-
-    async function fetchClientes() {
-        try {
-          const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);  
-          const dados = aux.data;
-          if (dados.length > 0) {
-            for (const v of dados) {
-              await useQueryClientes.createByCode(v);
-            }
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    
-      async function fetchProdutos() {
-        try {
-          const aux = await api.get('/offline/produtos');
-          const dados = aux.data;
-          if (dados.length > 0) {
-            for (const v of dados) {
-              const verifyProduct = await useQueryProdutos.selectByCode(v.codigo);
-
-              if (verifyProduct.length > 0) {
-                  let data_recadastro = formatData.formatDateTime(v.data_recadastro);
-                    if(  data_recadastro > verifyProduct[0].data_recadastro   ){
-                        await useQueryProdutos.update(v, v.codigo);
-                      }else{
-                        console.log(` nao será atualizao do produto ${v.codigo} ${data_recadastro} > ${verifyProduct[0].data_recadastro}`)
-                      }
-              } else {
-                await useQueryProdutos.createByCode(v, v.codigo);
-              }
-            }
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    
-      async function fetchFpgt() {
-        try {
-          const aux = await api.get('/formas_pagamento');
-          const data = aux.data;
-          if (data.length > 0) {
-            for (const f of data) {
-                  const verifiFpgt:any =  await useQueryFpgt.selectByCode( f.codigo );
-                  
-                     if(verifiFpgt.length > 0 ){
-                       await useQueryFpgt.update(f, f.codigo);
-                     }else{
-                       await useQueryFpgt.create(f);
-                     }
-            }
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-
-      async function fetchServices() {
-        try {
-          const aux = await api.get('/offline/servicos');
-          const dados = aux.data;
-          if (dados.length > 0) {
-            for (const v of dados) {
-              const verifyServices = await useQueryServices.selectByCode(v.codigo);
-              if (verifyServices.length > 0) {
-              //  await useQueryServices.update(v, v.codigo);
-              } else {
-                await useQueryServices.createByCode(v, v.codigo);
-              }
-            }
-          }
-        } catch (e) {
-          console.log(e);
-        }
-       
-      }
- 
-      async function fetchVeiculos() {
-        try {
-          const aux = await api.get('/offline/veiculos');
-          const dados = aux.data;
-          if (dados.length > 0) {
-            for (const v of dados) {
-               await useQueryVeiculos.createVeiculo(v);
-          }
-        }
-        } catch (e) {
-          console.log(e);
-        }
-       
-      }
-
-
-      async function fetchTiposOs() {
-        try {
-          const aux = await api.get('/offline/tipos_os');
-          const data = aux.data;
-          console.log(data)
-            if (data.length > 0) {
-              for (const o of data) {
-                  let verifiTipOs:any = await  useQueryTipoOs.selectByCode(o.codigo);
-                    
-                      if ( verifiTipOs.length > 0 ){
-                          await useQueryTipoOs.update(o,o.codigo);
-                      }else{
-                        await useQueryTipoOs.create(o);
-                      }
-              }
-            }
-        } catch (e) {
-          console.log(e);
-        }
-      }
- 
-    
-    const LoadingData = () => (
-        <Modal animationType='slide' transparent={true} visible={sync}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="red" />
-            <Text style={styles.loadingText}>Carregando...</Text>
-          </View>
-        </Modal>
-      );
-/////////////////////////////////////////////
-    useEffect(() => {
-        if(!connected){
-          setSync(false);
-    
-          Alert.alert('É necessario estabelecer conexão com a internet para efetuar o sicronismo dos dados! ')
-        return
-        } else{
-        if (sync  ) {
-          const syncData = async () => {
-            try {
-              await Promise.all( 
-                [
-                  fetchClientes(),
-                 fetchProdutos(),
-                  fetchFpgt(),
-                   fetchServices(),
-                   fetchTiposOs(),
-                  // fetchVeiculos()
-                  ]);
-            } catch (e) {
-              console.log(e);
-            } finally {
-              setSync(false);
-            }
-          };
-          syncData();
-        }
-      }
-      }, [sync]);
-/////////////////////////////////////////////
-      useEffect(  () => {
-         connect();
-
-       // const intervalId = setInterval(() => {
-       //     connect();
-       // }, 60000);
-//
-       // return () => clearInterval(intervalId); // Limpa o temporizador quando o componente é desmontado
-    }, []);
-/////////////////////////////////////////////
-
-
-
-async function testedate(){
-  const dateTimeString = '2024-09-26T15:30:00'; // String de exemplo
-  const formattedDateTime = formatData.formatDateTime(dateTimeString);
-  console.log(formattedDateTime); 
 }
- 
+
+  const fetchClientes = async () => {
+    try {
+        setItem('clientes');
+        const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}`);
+        const dados = aux.data;
+
+          const totalClientes = dados.length;
+
+        
+              for (let v = 0;  v<= totalClientes; v++) {
+                
+                let result:any  = await useQueryClientes.selectByCnpjAndCode(dados[v]);
+                
+                    if(result?.length > 0  ){
+
+                      const data_recadastro =   formataDados.formatDate(dados[v].data_recadastro)
+                        if(   data_recadastro > result[0].data_recadastro ){
+                          await useQueryClientes.update(dados[v],dados[v].codigo)
+                        }else{
+                          console.log('cliente nao atualizado');
+                        }
+
+                      }else{
+                        await useQueryClientes.create(dados[v])
+                      }
+            const progressPercentage = Math.floor(((v + 1) / totalClientes) * 100);
+           setProgress(progressPercentage);  
+              }
+        } catch (e) {
+        console.log(e);
+    }
+  };
+
+  const fetchProdutos = async () => {
+    try {
+      setItem('produtos');
+  
+      const aux = await api.get('/offline/produtos');
+      const dados = aux.data;
+      const totalProdutos = dados.length;
+  
+      for (let v = 0; v < totalProdutos; v++) {
+        const verifyProduct = await useQueryProdutos.selectByCode(dados[v].codigo);
+        if (verifyProduct.length > 0) {
+          let data_recadastro = dados[v].data_recadastro; // Ajuste se necessário
+          if (data_recadastro > verifyProduct[0].data_recadastro) {
+            await useQueryProdutos.update(dados[v], dados[v].codigo);
+          }
+        } else {
+          await useQueryProdutos.createByCode(dados[v], dados[v].codigo );
+        }
+        const progressPercentage = Math.floor(((v + 1) / totalProdutos) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchFpgt = async () => {
+    setItem('formas de pagamento');
+
+    try {
+      const aux = await api.get('/offline/formas_pagamento');
+      const data = aux.data;
+
+      const totalFormas = data.length
+      for (let f =0; f <  data.length; f++ ) {
+        const verifiFpgt = await useQueryFpgt.selectByCode( data[f].codigo);
+
+              if (verifiFpgt.length > 0) {
+                await useQueryFpgt.update(data[f], data[f].codigo);
+              } else {
+                await useQueryFpgt.create(data[f]);
+              }
+        const progressPercentage = Math.floor(((f + 1) / totalFormas) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      }
+       
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchServices = async () => {
+    try {
+    setItem('serviços');
+
+      const aux = await api.get('/offline/servicos');
+      const dados = aux.data;
+        const totalServicos = dados.length;
+
+      for (let v = 0; v <  totalServicos; v++ ) {
+      
+        const verifyServices = await useQueryServices.selectByCode(dados[v].codigo);
+        if (verifyServices.length > 0) {
+          useQueryServices.update(dados[v])
+        }else{
+          await useQueryServices.create(dados[v], dados[v].codigo);
+
+        }
+      
+        const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const fetchTiposOs = async () => {
+    setItem('tipo de os');
+
+    try {
+      const aux = await api.get('/offline/tipos_os');
+      const data = aux.data;
+      
+      let totalTipos_os = data.length
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiTipOs:any = await useQueryTipoOs.selectByCode(data[i].codigo);
+        
+        if (verifiTipOs.length > 0) {
+          await useQueryTipoOs.update( data[i], data[i].codigo);
+        } else {
+          await useQueryTipoOs.create(data[i]);
+        }
+      
+        const progressPercentage = Math.floor(((i + 1) / totalTipos_os) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+
+      }        
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
+  const fetchVeiculos = async () => {
+    setItem('veiculos');
+
+    try {
+      const aux = await api.get('/offline/veiculos');
+      const data = aux.data;
+
+      const totalVeiculos = data.length
+
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiVeic = await useQueryVeiculos.selectByCode(data[i].codigo);
+        
+        if (verifiVeic.length > 0) {
+          await useQueryVeiculos.update( data[i] );
+        } else {
+          await useQueryVeiculos.create(data[i]);
+        }
+
+        const progressPercentage = Math.floor(((i + 1) / totalVeiculos) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      
+      } 
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+
+  const syncData = async () => {
+    setIsLoading(true);
+    setProgress(0);
+
+    try {
+      await fetchClientes();
+      await fetchProdutos();
+      await fetchFpgt();
+      await fetchServices();
+      await fetchTiposOs();
+      await fetchVeiculos();
+      setData([]); // Atualiza o estado para mostrar dados após a sincronização
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setProgress(0), 1000); // Reseta o progresso após 1 segundo
+    }
+  };
+
+
+
+
+  const handleSync = () => {
+    if (!connected) {
+      Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
+      return;
+    }
+    syncData();
+  };
 
 async function testeServices(){
   const result = await servicesPedidos.filterOrders() ;
 }
 
 
-    return (
-       <View>
-           <LoadingData />
-       <View style={{flexDirection:"row"}}>
- 
-          <Text>status api: </Text>{loading ? (
+      useEffect(  () => {
+        connect();
+       }, []);
 
-                <Text>Conectando...</Text>
-                        ) : (
-                            <>
-                                {error ? (
-                                    <Text>{error}</Text>
-                                ) : (
-                                    <View  >
-                                    {connected ? <Text style={{ color:'green' }}> Conectado! </Text> 
-                                    : <Text style={{ color:'red' }}> Não conectado!</Text>}
-                                    </View>
-                                )}
-                            </>
-                        )}
+  return (
+    <View style={{ flex: 1 }}>
+
+    <View style={{flexDirection:"row"}}>
+    
+    <Text>status api: </Text>{loading ? (
+
+          <Text>Conectando...</Text>
+                  ) : (
+                      <>
+                          {error ? (
+                              <Text>{error}</Text>
+                          ) : (
+                              <View  >
+                              {connected ? <Text style={{ color:'green' }}> Conectado! </Text> 
+                              : <Text style={{ color:'red' }}> Não conectado!</Text>}
+                              </View>
+                          )}
+                      </>
+                  )}
+    </View>
+    
+    
+    <LoadingData isLoading={isLoading} item={item} progress={progress} />
+
+
+     <View >
+           
+           <View style={{margin:5}} >
+             <Button title='teste conexao' onPress={() => connect() } />
+           </View >
+
+           <View style={{margin:5}} >
+            <Button title='cadastrar/atualizar cadastros' onPress={handleSync} />
+           </View >
+
+           <View style={{margin:5}} >
+            <Button title='enviar pedidos' onPress={() => testeServices()} />
+           </View >
+
+           <View style={{margin:5}} >
+            <Button title='restart database' onPress={() => useRestartService.restart()} />
+           </View >
+           
+
+
+       
+           
+          {/**  <View style={{margin:5}} >
+            <Button title='clean Clients' onPress={() => useQueryClientes.deleteAll()} />
+           </View >
+    
+          <View style={{margin:5}} >
+            <Button title='clean products' onPress={() => useQueryProdutos.deleteAll()} />
           </View>
+         */}
 
-            <View style={{margin:10 }}>
-            <Button title='teste' onPress={() => connect() } />
-              <Button title='Sync' onPress={() => setSync(true)} />
-                
-              <Button title='enviar dados' onPress={() => testeServices()} />
-
-                     <View style={{ margin:35 }}>
-                        <Button title='clean Clients' onPress={() => useQueryClientes.deleteAll()} />
-                        <Button title='clean products' onPress={() => useQueryProdutos.deleteAll()} />
-                        
-                        <Button title='clean database' onPress={() => useRestartService.restart()} />
-                        
-                        
-
-                   </View>
-
-              
-              
-
-              </View>
-        </View>
-    )
-}
+     </View>
  
+
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)' // Background color with opacity
-      },
-})
+  loadingText: {
+    fontSize: 18,
+    marginBottom: 10,
+    color:'#FFF'
+  },
+  progressBar: {
+    height: 10,
+    backgroundColor: '#007bff',
+    borderRadius: 5,
+    width: '100%', // Garantir que a barra de progresso tenha uma largura inicial
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.3)', // Cor de fundo com opacidade
+  },
+});

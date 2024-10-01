@@ -55,7 +55,7 @@ export const useServices = ()=>{
                         (
                         valor,
                         aplicacao,
-                        tipo_serv,
+                        tipo_serv
                         )
                        VALUES (
                         ${servico.valor},
@@ -64,7 +64,8 @@ export const useServices = ()=>{
                        );`
                     
                     );
-                  console.log(result);
+                //  console.log(result);
+                  console.log(`servico ${servico.codigo} cadastrado com sucesso! `)
                 }catch( e ) { 
                     console.log('erro ao cadastrar o servico ' , e )
                 }
@@ -106,6 +107,8 @@ export const useServices = ()=>{
                   aplicacao = '${aplicacao}',
                   tipo_serv = ${servico.tipo_serv} where codigo = ${servico.codigo} ` 
               )
+
+              console.log(`servico ${servico.codigo} cadastrado com sucesso !`)
               }catch(e){
                 console.log('erro ao atualizar o servico', servico.codigo );
               }

@@ -188,7 +188,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
     const isSelected = orcamento.produtos.find(i => i.codigo === item.codigo);
     const quantidade = isSelected ? isSelected.quantidade : 0;
     const desconto = isSelected ? isSelected.desconto : 0;
-    item.preco = 10;
+   // item.preco = 10;
     item.total = (quantidade * item.preco) - desconto;
 
     return (
@@ -321,7 +321,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
                         <View style={{ flexDirection: 'row' , justifyContent:"space-between", margin: 5}}>
                             <Cart/>
                               <Text style={{ fontSize:15 ,fontWeight:'bold'}}> 
-                                Total Produtos: { orcamento?.total_produtos}
+                                Total Produtos: { orcamento.total_produtos  ? orcamento.total_produtos.toFixed(2) : 0  }
                               </Text>
                       
                          </View>

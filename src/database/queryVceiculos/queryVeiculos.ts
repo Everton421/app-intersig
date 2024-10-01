@@ -66,7 +66,7 @@ async function update(veiculo   ){
 
         console.log(` atualizado veiculo codigo: ${veiculo.codigo} `  );
         console.log('')
-    }catch(e   ){ console.log( `erro ao atualizar produto ${ produto.codigo} do orcamento` , e )}
+    }catch(e   ){ console.log( `erro ao atualizar produto ${ veiculo.codigo} do orcamento` , e )}
 }
 
  
@@ -120,5 +120,5 @@ async function createVeiculo( veiculo:Veiculo ){
  }
 
 
-return { selectAll, selectByClient, selectByCode, update, createVeiculo, selectByDescription } 
+return { selectAll, create,selectByClient, selectByCode, update, createVeiculo, selectByDescription } 
 }

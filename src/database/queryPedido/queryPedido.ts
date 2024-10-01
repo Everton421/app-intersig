@@ -50,9 +50,11 @@ export const usePedidos = () =>{
     produtos:produto_pedido[],
     parcelas:parcela[], 
     data_cadastro:string,
+    data_recadastro:string,
     veiculo:number,
     tipo_os:number,
-    tipo:number
+    tipo:number,
+    contato:string
 }
 
 const getCurrentDate = () => {
@@ -76,6 +78,7 @@ const getCurrentDate = () => {
             (
             codigo,
             situacao,
+            contato,
             vendedor,
             descontos,
             forma_pagamento,
@@ -86,12 +89,14 @@ const getCurrentDate = () => {
             total_servicos,
             cliente,
             data_cadastro,
+            data_recadastro,
             veiculo,
             tipo_os,
               tipo  
             ) VALUES (
              ${ pedido.codigo}, 
             '${ pedido.situacao}',
+            '${ pedido.contato}',
              ${ pedido.vendedor},
              ${ pedido.descontos},
              ${ pedido.forma_pagamento},
@@ -102,6 +107,7 @@ const getCurrentDate = () => {
              ${ pedido.total_servicos},
              ${ pedido.cliente.codigo},
             '${ pedido.data_cadastro }',
+            '${ pedido.data_recadastro }',
              ${ pedido.veiculo},
              ${ pedido.tipo_os},
              ${ pedido.tipo}
@@ -122,6 +128,7 @@ const getCurrentDate = () => {
           `SELECT
           p.codigo,
           c.codigo as codigo_cliente,
+          p.contato,
           p.quantidade_parcelas,
           c.nome,
           p.situacao,
@@ -133,6 +140,7 @@ const getCurrentDate = () => {
           p.total_produtos,
           p.veiculo,
           strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
           p.tipo_os,
           p.tipo
           FROM pedidos p
@@ -148,6 +156,7 @@ const getCurrentDate = () => {
       let result = await db.getAllAsync(
         `SELECT
          codigo,
+         contato,
          quantidade_parcelas,
          situacao,
          descontos,
@@ -158,6 +167,8 @@ const getCurrentDate = () => {
          total_produtos,
           veiculo,
         strftime('%Y-%m-%d', data_cadastro) AS data_cadastro,
+          strftime('%Y-%m-%d %H-%M-%S',  data_recadastro) AS data_recadastro,
+
          tipo_os,
          tipo
         FROM pedidos  
@@ -173,6 +184,7 @@ const getCurrentDate = () => {
         let result = await db.getAllAsync(`SELECT 
            p.codigo,
           c.nome,
+          p.contato,
           c.codigo as codigo_cliente,
           p.situacao,
           p.descontos,
@@ -182,6 +194,7 @@ const getCurrentDate = () => {
           p.total_produtos, 
           p.veiculo,
           strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
           p.vendedor,
           p.tipo_os,
           p.tipo
@@ -198,6 +211,7 @@ const getCurrentDate = () => {
         let result = await db.getAllAsync(`SELECT 
           p.codigo,
           c.nome,
+          p.contato,
           c.codigo as codigo_cliente,
           p.situacao,
           p.observacoes,
@@ -208,6 +222,7 @@ const getCurrentDate = () => {
           p.data_cadastro,
           p.veiculo,
         strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
           p.vendedor,
           p.tipo_os,
           p.tipo
@@ -470,11 +485,27 @@ const getCurrentDate = () => {
     pedido.situacao = 'EA';
     try{
 
-  
+  console.log( ` UPDATE   pedidos SET
+    situacao  =  '${ pedido.situacao}', 
+    contato  =  '${ pedido.contato}', 
+    descontos =  ${ pedido.descontos},
+    forma_pagamento = ${pedido.forma_pagamento},
+    observacoes = '${ pedido.observacoes}', 
+    quantidade_parcelas = ${ pedido.quantidade_parcelas},
+    total_geral  =  ${ pedido.total_geral},
+    total_produtos =  ${ pedido.total_produtos}, 
+    cliente  =  ${ pedido.cliente.codigo},
+    data_cadastro = '${pedido.data_cadastro}',
+    data_recadastro = '${pedido.data_recadastro}',
+    veiculo = ${pedido.veiculo},
+    tipo_os = ${pedido.tipo_os}
+    WHERE codigo = ${ pedido.codigo}  
+     ` )
  
       let result = await db.runAsync(
           ` UPDATE   pedidos SET
           situacao  =  '${ pedido.situacao}', 
+          contato  =  '${ pedido.contato}', 
           descontos =  ${ pedido.descontos},
           forma_pagamento = ${pedido.forma_pagamento},
           observacoes = '${ pedido.observacoes}', 
@@ -483,6 +514,7 @@ const getCurrentDate = () => {
           total_produtos =  ${ pedido.total_produtos}, 
           cliente  =  ${ pedido.cliente.codigo},
           data_cadastro = '${pedido.data_cadastro}',
+          data_recadastro = '${pedido.data_recadastro}',
           veiculo = ${pedido.veiculo},
           tipo_os = ${pedido.tipo_os}
           WHERE codigo = ${ pedido.codigo}  

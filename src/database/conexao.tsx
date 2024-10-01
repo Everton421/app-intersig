@@ -14,16 +14,15 @@ export async function construtor(db: SQLiteDatabase) {
    --  DROP TABLE IF EXISTS tipos_os;
    --  DROP TABLE IF EXISTS veiculos;
    
-   --  DROP TABLE IF EXISTS pedidos;
-   --  DROP TABLE IF EXISTS produtos_pedido ;
-   --  DROP TABLE IF EXISTS servicos_pedido ;
-   --  DROP TABLE IF EXISTS parcelas ;
+    --  DROP TABLE IF EXISTS pedidos;
+    --  DROP TABLE IF EXISTS produtos_pedido ;
+    --  DROP TABLE IF EXISTS servicos_pedido ;
+    --  DROP TABLE IF EXISTS parcelas ;
     
-
 
      CREATE TABLE IF NOT EXISTS produtos (
       codigo          INTEGER PRIMARY KEY NOT NULL,
-      estoque         REAL DEFAULT 0 ,
+      estoque         REAL DEFAULT 0,
       preco           REAL DEFAULT 0,
       grupo           INTEGER DEFAULT 0,
       origem          TEXT,   
@@ -81,6 +80,7 @@ export async function construtor(db: SQLiteDatabase) {
       codigo INTEGER PRIMARY KEY AUTOINCREMENT,
       vendedor INTEGER NOT NULL DEFAULT 0,   
       situacao TEXT NOT NULL DEFAULT 'EA',
+      contato TEXT ,
       descontos REAL DEFAULT 0.00,
       forma_pagamento INTEGER DEFAULT 0,
       observacoes BLOB,
@@ -91,6 +91,7 @@ export async function construtor(db: SQLiteDatabase) {
       cliente INTEGER NOT NULL DEFAULT 0,
       veiculo INTEGER NOT NULL DEFAULT 0,
       data_cadastro TEXT NOT NULL,
+      data_recadastro TEXT NOT NULL,
       tipo_os INTEGER DEFAULT 0, 
       tipo INTEGER NOT NULL DEFAULT 1   --1 = Orçamento (gerado no sistema); 2 = Orçamento (gerado fora do sistema); 3 = Ordem de Serviço; 4 = Contrato de Prestação de Serviços; 5 = Devolução
     ); 

@@ -50,7 +50,7 @@ type produto_pedido = {
                                                         WHERE pp.pedido = ${codeOrder}`)
 
                 return result;
-            }catch(e){console.log(e)}
+            }catch(e){console.log( `Erro ao consultar os produtos do pedido codigo: ${codeOrder} `, e )}
         }
 
 

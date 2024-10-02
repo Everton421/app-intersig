@@ -19,7 +19,6 @@ import { Servico } from "./servico";
 import { useItemsPedido } from "../../../database/queryPedido/queryItems";
 import { useParcelas } from "../../../database/queryParcelas/queryParcelas";
 import { useServicosPedido } from "../../../database/queryPedido/queryServicosPedido";
-import { configMoment } from "../../../services/moment";
 
 export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
 
@@ -36,14 +35,15 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
     const [editavel, setEditavel] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [ dataAtual, setDataAtual ] = useState<any>();
-    const [ dataHoraAtual, setDataHoraAtual ] = useState<any>();
-
     const [ tipoOrcamento , setTipoOrcamento ] = useState<number>(1)
     const [ codigoOrcamento , setCodigoOrcamento ] = useState<number>()
 
-    const [selectedItem, setSelectedItem] = useState([]);
+/////
 
-    const { usuario } = useContext(AuthContext)
+  const [selectedItem, setSelectedItem] = useState([]);
+////
+
+const { usuario } = useContext(AuthContext)
 
     const { orcamento, setOrcamento } = useContext(OrcamentoContext);
     const { connected } = useContext(ConnectedContext)
@@ -51,7 +51,6 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
     const useQueryitems = useItemsPedido();
     const useQueryParcelas = useParcelas();
     const useQueryServicos =   useServicosPedido();
-    const useMoment = configMoment()
 
     const getCurrentDate = () => {
         const now = new Date();
@@ -62,24 +61,8 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
             setDataAtual( `${year}-${month}-${day}` )
         return `${year}-${month}-${day}`;
       };
-      
-      const getCurrentDateAndHours = () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-    
-        const hour = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-    
-        const formattedDateTime = `${year}-${month}-${day} ${hour}:${minutes}:${seconds}`;
-        
-        setDataHoraAtual(formattedDateTime);
-        console.log(formattedDateTime); // Verifique se o formato está correto
-    
-        return formattedDateTime;
-    };
+
+
  
 
 
@@ -92,9 +75,8 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
             
             async function init(){
         let data = getCurrentDate();
-        let dataHora = useMoment.dataHoraAtual();
-
-        if (!orcamentoEditavel || orcamentoEditavel === null) {
+            if (!orcamentoEditavel || orcamentoEditavel === null) {
+                
                   
                 let lastId = await  useQuerypedidos.selectLastId();                          
 
@@ -112,7 +94,6 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
                     ...prevOrcamento,
                     vendedor: usuario.codigo,
-                    contato: `react-native/mobile ${codigoDoOrcamento}`,
                     total_produtos: 0,
                     total_geral: 0,
                     descontos: 0,
@@ -124,7 +105,6 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
                     produtos:[],
                     servicos:[],
                     data_cadastro: data,
-                    data_recadastro :  dataHora ,
                     veiculo:0,
                     tipo_os:0,
                     tipo:tipo
@@ -133,10 +113,6 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
             } else {
                 setEditavel(true);
                 setCodigoOrcamento(orcamentoEditavel.codigo)
-                setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                    ...prevOrcamento,
-                    data_recadastro : dataHora,
-                }));
             }
         }
 
@@ -366,8 +342,8 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
 
             </ScrollView>
                        <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF', borderColor: '#ccc', borderWidth: 1, borderRadius: 5, elevation: 5, padding: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-           <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Total: R$ { orcamento.total_geral ?   orcamento.total_geral.toFixed(2) : 0 }</Text>
-                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {orcamento.descontos ? descontosGeral.toFixed(2) :  0 }</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Total: R$ {orcamento.total_geral?.toFixed(2)}</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 12 }}>Descontos: R$ {orcamento.descontos? descontosGeral.toFixed(2) :  0 }</Text>
 
                 <TouchableOpacity
                     style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
@@ -382,6 +358,15 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
                 >
                     <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Mostrar</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
+                    onPress={() => ver()}
+                >
+                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>dados</Text>
+                </TouchableOpacity>
+
+                
                
               
             </View>

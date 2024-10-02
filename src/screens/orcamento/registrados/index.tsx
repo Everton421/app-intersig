@@ -32,7 +32,12 @@ export const OrcamentosRegistrados = ({navigation, tipo })=>{
 
         async function busca(){
  
-            let aux:any = await useQuerypedidos.findByTipe(tipo ,usuario.codigo );
+            if ( !usuario.codigo || usuario.codigo === 0 ){
+                console.log("usuario invalido!")
+                return
+            }
+            
+            let aux:any = await useQuerypedidos.findByTipe(tipo , usuario.codigo );
             if(  aux?.length > 0 ){
                 setOrcamentosRegistrados(aux);
             }  

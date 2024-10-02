@@ -140,7 +140,7 @@ const getCurrentDate = () => {
           p.total_produtos,
           p.veiculo,
           strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
-          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
+          strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
           p.tipo_os,
           p.tipo
           FROM pedidos p
@@ -161,14 +161,13 @@ const getCurrentDate = () => {
          situacao,
          descontos,
          forma_pagamento,
-        observacoes,
+         observacoes,
          vendedor,
          total_geral,
          total_produtos,
-          veiculo,
-        strftime('%Y-%m-%d', data_cadastro) AS data_cadastro,
-          strftime('%Y-%m-%d %H-%M-%S',  data_recadastro) AS data_recadastro,
-
+         veiculo,
+         strftime('%Y-%m-%d', data_cadastro) AS data_cadastro,
+         strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro,
          tipo_os,
          tipo
         FROM pedidos  
@@ -182,7 +181,7 @@ const getCurrentDate = () => {
     async function selectAll(){
         try{ 
         let result = await db.getAllAsync(`SELECT 
-           p.codigo,
+          p.codigo,
           c.nome,
           p.contato,
           c.codigo as codigo_cliente,
@@ -194,7 +193,7 @@ const getCurrentDate = () => {
           p.total_produtos, 
           p.veiculo,
           strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
-          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
+          strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
           p.vendedor,
           p.tipo_os,
           p.tipo
@@ -221,14 +220,14 @@ const getCurrentDate = () => {
           p.total_produtos, 
           p.data_cadastro,
           p.veiculo,
-        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
-          strftime('%Y-%m-%d %H-%M-%S', p.data_recadastro) AS data_recadastro,
+          strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+          strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
           p.vendedor,
           p.tipo_os,
           p.tipo
           FROM pedidos p
           JOIN  clientes c on c.codigo = p.cliente
-          WHERE p.tipo = ${tipo} AND p.vendedor =  ${vendedor}         
+          WHERE p.tipo ='${tipo}' AND p.vendedor =  ${vendedor}         
           `);
       //   console.log(result);
           return result;

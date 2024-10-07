@@ -9,7 +9,7 @@ import { api } from "./api";
 
 
 
-export const enviarPedidos = ()=>{
+export const receberPedidos = ()=>{
 
     const useQuerypedidos = usePedidos();
     const useQueryItemsPedido = useItemsPedido();
@@ -21,7 +21,7 @@ export const enviarPedidos = ()=>{
   const { usuario } = useContext(AuthContext);
 
 
-    async function atualizacaoDePedidos(){
+    async function getPedidos(){
         let orcamentosSistema:any
     
            let data = useMoment.dataAtual();
@@ -150,5 +150,5 @@ export const enviarPedidos = ()=>{
        }
      
 
-    return  { atualizacaoDePedidos  } 
+    return  { getPedidos  } 
 }

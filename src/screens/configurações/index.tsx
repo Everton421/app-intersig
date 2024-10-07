@@ -17,8 +17,8 @@ import {    useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
 import { formatItem } from "../../services/formatStrings"
 import { restartDatabaseService } from "../../services/restartDatabase"
 import { configMoment } from "../../services/moment"
-import { buscaPedidos } from "../../services/sendOrders" 
-import { enviarPedidos } from "../../services/getOrders"   
+import { enviaPedidos } from "../../services/sendOrders"  
+import { receberPedidos } from "../../services/getOrders"
 
 
 const LoadingData = ({ isLoading, item , progress }) => (
@@ -55,9 +55,8 @@ export const Configurações = () => {
   const [conectado, setConectado] = useState<boolean>()
 
 
-  const useGetOrders = buscaPedidos();
-  const useSendOrders = enviarPedidos();
-
+  const useGetOrders = receberPedidos();
+  const useSendOrders = enviaPedidos();
 
   const formataDados =  formatItem();
 
@@ -289,8 +288,8 @@ export const Configurações = () => {
   };
 
 async function syncOrders(){
-    await useSendOrders.atualizacaoDePedidos();
-    await useGetOrders.filterOrders();
+  await useGetOrders.getPedidos();
+  await useSendOrders.postPedidos();
 
   } 
 

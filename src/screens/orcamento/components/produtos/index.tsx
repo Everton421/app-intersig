@@ -13,7 +13,7 @@ import { Cart } from '../Cart';
 
 
 export const ListaProdutos = ({ orcamentoEditavel }) => {
-  const [pesquisa, setPesquisa] = useState('');
+  const [pesquisa, setPesquisa] = useState<any>('');
   const [selectedItem, setSelectedItem] = useState([]);
   const [data, setData] = useState([]);
   const [totalItens, setTotalItens] = useState(0);
@@ -126,7 +126,10 @@ const { connected, setConnected } = useContext(ConnectedContext)
     },[])
 
 
-  const adiciona = (dado) => setPesquisa(dado);
+  const adiciona = (dado) => {
+     setPesquisa(dado  )
+     ;}
+
   const limpar = () => {
     setSelectedItem([]);
     setPesquisa('');
@@ -223,7 +226,7 @@ const { connected, setConnected } = useContext(ConnectedContext)
               <TextInput
                 style={{ backgroundColor: 'white', borderRadius: 5, elevation: 4, textAlign: 'center' }}
                 keyboardType='numeric'
-                value={desconto.toString()}
+                value={desconto}
                 onChangeText={(i) => handleDescontoChange(item, i)}
               />
             </View>
@@ -313,12 +316,12 @@ const { connected, setConnected } = useContext(ConnectedContext)
                 <FlatList
                   data={data}
                   renderItem={renderItem}
-                  keyExtractor={(item) => item.codigo}
+                  keyExtractor={(item) => item.codigo.toString()}
                 />
               )}
             </View>
           </View>
-        </Modal>
+        </Modal> 
 
 
   

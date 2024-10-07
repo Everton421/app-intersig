@@ -15,7 +15,6 @@ import { configMoment } from '../../services/moment';
 import { useItemsPedido } from '../../database/queryPedido/queryItems';
 import { useServicosPedido } from '../../database/queryPedido/queryServicosPedido';
 import { useParcelas } from '../../database/queryParcelas/queryParcelas';
-import { enviarPedidos } from '../../services/sendOrders';
 
 const LoadingData = ({ isLoading, item , progress }) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -52,7 +51,6 @@ export const Teste = () => {
   const formataDados =  formatItem();
   const useMoment = configMoment();  
 
-  const useEnviaPedidos = enviarPedidos();
 
    
   
@@ -63,7 +61,6 @@ export const Teste = () => {
      
       <Button
         title='press'
-        onPress={()=>   useEnviaPedidos.atualizacaoDePedidos() }
       />
 
     </View>

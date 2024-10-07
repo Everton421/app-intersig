@@ -13,7 +13,7 @@ import { configMoment } from "./moment";
 import { useContext } from "react";
 import { AuthContext } from "../contexts/auth";
 
-export const buscaPedidos = () => {
+export const enviaPedidos = () => {
 
     const useQueryProdutos = useProducts();
     const useQueryClientes = useClients();
@@ -34,7 +34,7 @@ export const buscaPedidos = () => {
 
 
  
-    async function filterOrders() {
+    async function postPedidos() {
 
         async function postItem(dados) {
             let aux = await api.post('/pedidos', dados);
@@ -62,5 +62,5 @@ export const buscaPedidos = () => {
         }
     }
 
-    return { filterOrders  };
+    return { postPedidos  };
 }

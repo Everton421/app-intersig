@@ -8,8 +8,13 @@ import { useProducts } from "../database/queryProdutos/queryProdutos";
 import { useTipoOs } from "../database/queryTipoOs/queryTipoOs";
 import { useVeiculos } from "../database/queryVceiculos/queryVeiculos";
 import { api } from "./api";
+import { useServicosPedido } from "../database/queryPedido/queryServicosPedido";
+import { configMoment } from "./moment";
+import { useContext } from "react";
+import { AuthContext } from "../contexts/auth";
 
-export const orderServices = () => {
+export const buscaPedidos = () => {
+
     const useQueryProdutos = useProducts();
     const useQueryClientes = useClients();
     const useQueryFpgt = useFormasDePagamentos();
@@ -19,14 +24,18 @@ export const orderServices = () => {
     const useQueryTipoOs = useTipoOs();
     const useQueryVeiculos = useVeiculos();
 
+    const useQueryItemsPedido = useItemsPedido();
+    const usequeryServicosPedido = useServicosPedido();
+    const useMoment = configMoment();  
+    const { usuario } = useContext(AuthContext);
 
-    async function atualizacaoDePedidos(){
 
-         
 
-    }
 
+
+ 
     async function filterOrders() {
+
         async function postItem(dados) {
             let aux = await api.post('/pedidos', dados);
             console.log(aux.data);
@@ -46,12 +55,12 @@ export const orderServices = () => {
             await Promise.all(promises);  
             
               postItem(obj)  
-          //  console.log(obj);
+           // console.log(obj[0]);
         } else {
             console.log('nenhum orcamento pronto para o envio');
             Alert.alert('nenhum orcamento pronto para o envio');
         }
     }
 
-    return { filterOrders };
+    return { filterOrders  };
 }

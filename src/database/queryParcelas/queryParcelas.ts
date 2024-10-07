@@ -34,6 +34,34 @@ export const useParcelas = ()=>{
     }
 
 
+    async function createByCode( parcela:parcela, code:number ){
+        
+        try{
+            let result = await db.runAsync(
+                ` INSERT INTO parcelas 
+                (
+                    pedido,
+                    parcela,
+                    valor,
+                    vencimento
+                ) VALUES (
+                    ${code},
+                    ${parcela.parcela},
+                    ${parcela.valor},
+                   '${parcela.vencimento}'
+                )
+                   
+                `
+            )
+            console.log(` parcela ${result.lastInsertRowId}  inserida com sucesso `,);
+            return result.lastInsertRowId;
+        }catch(e){ console.log(`erro ao gravar as parcelas ${e}` ) }
+    }
+
+
+
+
+
     async function selectByCodeOrder( code:number){
         try{
             let result = await db.getAllAsync(`SELECT * FROM parcelas where pedido = ${code}`);

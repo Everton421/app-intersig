@@ -39,7 +39,6 @@ export const OrcamentoContext = createContext({
                 "servicos":[],
                 "data_cadastro": "",
                 "data_recadastro": ""
-            
               } );
 
             return (

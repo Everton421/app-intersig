@@ -24,6 +24,11 @@ export const configMoment = ()=>{
         return data;
     }
 
+    function generatorDate(){
+        let data = now.format("YYYYMMDDHHmmss"); // Usa HH para 24 horas
+        return data;
+    }
+
     function dataAtual(){
         const formattedDate = now.format("YYYY-MM-DD"); // Usa HH para 24 horas
          return formattedDate;
@@ -35,5 +40,5 @@ export const configMoment = ()=>{
     }
 
 
-    return { dataAtual, dataHoraAtual, formatarData, formatarDataHora }
+    return { dataAtual, generatorDate, dataHoraAtual, formatarData, formatarDataHora }
 }

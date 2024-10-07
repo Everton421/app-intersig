@@ -19,6 +19,8 @@ import { Servico } from "./servico";
 import { useItemsPedido } from "../../../database/queryPedido/queryItems";
 import { useParcelas } from "../../../database/queryParcelas/queryParcelas";
 import { useServicosPedido } from "../../../database/queryPedido/queryServicosPedido";
+import { configMoment } from "../../../services/moment";
+import { generator } from "../../../services/generatorSecret";
 
 export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
 
@@ -35,6 +37,9 @@ export const Orcamento = ({orcamentoEditavel, navigation, tipo }) => {
     const [editavel, setEditavel] = useState(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [ dataAtual, setDataAtual ] = useState<any>();
+    
+    const [ dataHora, setDataHora  ] = useState<any>();
+
     const [ tipoOrcamento , setTipoOrcamento ] = useState<number>(1)
     const [ codigoOrcamento , setCodigoOrcamento ] = useState<number>()
 
@@ -47,23 +52,31 @@ const { usuario } = useContext(AuthContext)
 
     const { orcamento, setOrcamento } = useContext(OrcamentoContext);
     const { connected } = useContext(ConnectedContext)
-    const useQuerypedidos = usePedidos();
-    const useQueryitems = useItemsPedido();
-    const useQueryParcelas = useParcelas();
-    const useQueryServicos =   useServicosPedido();
 
+    const useQuerypedidos   = usePedidos();
+    const useQueryitems     = useItemsPedido();
+    const useQueryParcelas  = useParcelas();
+    const useQueryServicos  = useServicosPedido();
+    const useMoment         = configMoment();
+
+    
     const getCurrentDate = () => {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0'); // Adiciona zero à esquerda se o mês for menor que 10
         const day = String(now.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se o dia for menor que 10
-    
             setDataAtual( `${year}-${month}-${day}` )
         return `${year}-${month}-${day}`;
       };
 
 
- 
+      const gerarCodigo = ()=> {
+        let data = useMoment.generatorDate();
+        let secret = data + usuario.codigo
+        console.log(secret); 
+        const codigo =  parseInt(secret);
+        return codigo;
+      }
 
 
       const updateOrder = async ()=> {
@@ -73,22 +86,28 @@ const { usuario } = useContext(AuthContext)
     ////////////////////////////////////////////////////////////////////////////
       useEffect(() => {
             
+         let dataHora = useMoment.dataHoraAtual();
+
+        let data = useMoment.dataAtual();
+        setDataAtual(data);
+         setDataHora( dataHora);
             async function init(){
-        let data = getCurrentDate();
+       
+                //let data = getCurrentDate();
+    
             if (!orcamentoEditavel || orcamentoEditavel === null) {
                 
-                  
                 let lastId = await  useQuerypedidos.selectLastId();                          
 
                     let codigoDoOrcamento;
 
-                    if( lastId[0].codigo === 0 ){
-                        codigoDoOrcamento = 1
-                        setCodigoOrcamento(codigoDoOrcamento)
-                    }else{
-                        codigoDoOrcamento = lastId[0].codigo + 1 
-                        setCodigoOrcamento(codigoDoOrcamento)
-                    }
+                  //  if( lastId[0].codigo === 0 ){
+                  //      codigoDoOrcamento = 1
+                  //      setCodigoOrcamento(codigoDoOrcamento)
+                  //  }else{
+                  //      codigoDoOrcamento = lastId[0].codigo + 1 
+                  //      setCodigoOrcamento(codigoDoOrcamento)
+                  //  }
 
 
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
@@ -97,8 +116,8 @@ const { usuario } = useContext(AuthContext)
                     total_produtos: 0,
                     total_geral: 0,
                     descontos: 0,
+                    contato:`react-native `,
                     observacoes: observacoes || '',
-                    codigo:codigoDoOrcamento,
                     quantidade_parcelas:0,
                     cliente: {},
                     parcelas: [],
@@ -110,12 +129,15 @@ const { usuario } = useContext(AuthContext)
                     tipo:tipo
                 }));
 
+             
             } else {
                 setEditavel(true);
                 setCodigoOrcamento(orcamentoEditavel.codigo)
-            }
-        }
 
+              
+
+             }
+           }
         init();
 
 
@@ -177,7 +199,6 @@ const { usuario } = useContext(AuthContext)
                          totalValorProdutos += i.preco * i.quantidade;
                      });
                  setTotalProdutos(totalValorProdutos);
-                 setTotalGeral(novoTotalGeralProdutos);
                  setDescontosGeral(totaDescontosProdutos);
                 } 
     
@@ -189,13 +210,17 @@ const { usuario } = useContext(AuthContext)
                 });
                }
                 totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos
+                setTotalGeral(totalGeralOrcamento);
                
+
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
                     ...prevOrcamento,
                     total_produtos: totalValorProdutos,
                     total_servicos: totalValorServicos, 
+                    contato:`react-native `,
                     total_geral: totalGeralOrcamento,
                     descontos: totaDescontosProdutos,
+                    data_recadastro: dataHora
                    }));
                
                  //  updateOrder()
@@ -207,22 +232,7 @@ const { usuario } = useContext(AuthContext)
 
 
  
-    /////////////////////////////
-    const ver = async ()=>{
-        let produtos = await useQueryitems.selectByCodeOrder(codigoOrcamento);
-            console.log('produtos :',produtos )
-    
-        let dados = await useQuerypedidos.selectByCode(codigoOrcamento);
-        console.log('dados :',dados )
-        let parc = await useQueryParcelas.selectByCodeOrder(codigoOrcamento);
-
-        console.log('parcelas :',parc )
-        
-        let servicos = await useQueryServicos.selectByCodeOrder(codigoOrcamento);
-        console.log('servicos :',servicos )
-        }
-    /////////////////////////////
-
+ 
         
 
     const gravar = async () => {
@@ -262,13 +272,13 @@ const { usuario } = useContext(AuthContext)
             }
 
 
+            let codigoGerado = gerarCodigo();
                     try{
-                       let response =  await  useQuerypedidos.createOrder(orcamento);
-                       
+                       let response =  await  useQuerypedidos.createOrder(orcamento, codigoGerado );
                        
                        if(response > 0 ){
                         console.log('')
-                        console.log('codigo oracamento resgistrado : ',response)
+                        console.log('codigo orcamento resgistrado : ',response)
                         console.log('')
                         setStatus(200)
                         setResponse('Orçamento registrado com sucesso!')
@@ -295,10 +305,10 @@ const { usuario } = useContext(AuthContext)
   {/** *** separador ***/} 
   <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
 
-                    <Text>
+               {/*     <Text>
                        codigo: {codigoOrcamento}
                     </Text>
-
+                */}
               <View style={{ flexDirection: 'row' }}>
                     <ListaClientes orcamentoEditavel={orcamentoEditavel} />
                 </View>
@@ -314,14 +324,18 @@ const { usuario } = useContext(AuthContext)
 
         {/*//////////////// components serviços  ////////////////////////*/    }  
       
-                            { orcamento.tipo === 3 ?
+                       {/*     { orcamento.tipo === 3 ?
                                     <View> 
                                             <Servico orcamentoEditavel={orcamentoEditavel}  />
                                         </View>
                          :  <View style={{ borderWidth: 0.4, margin: 10 }}></View>
-       
-                             }    
-                  
+                             } 
+                        */}
+                                        <View> 
+                                            <Servico orcamentoEditavel={orcamentoEditavel}  />
+                                        </View>
+
+
       {/*//////////////// components produtos  ////////////////////////*/    }  
                 <View style={{ flexDirection: 'row' , margin: 5}}>
                           <ListaProdutos orcamentoEditavel={orcamentoEditavel} />
@@ -358,13 +372,7 @@ const { usuario } = useContext(AuthContext)
                 >
                     <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Mostrar</Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
-                    onPress={() => ver()}
-                >
-                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>dados</Text>
-                </TouchableOpacity>
+ 
 
                 
                

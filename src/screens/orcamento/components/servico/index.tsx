@@ -96,10 +96,10 @@ useEffect(() => {
   });
   setTotalItens(aux);
   
-  setOrcamento((prevOrcamento: OrcamentoModel) => ({
-    ...prevOrcamento,
-    servicos: servicosSelecionado,
-}));
+    setOrcamento((prevOrcamento: OrcamentoModel) => ({
+      ...prevOrcamento,
+      servicos: servicosSelecionado,
+  }));
  
 }, [ servicosSelecionado ]);
   //////////////////////////////////////////////      
@@ -109,36 +109,37 @@ useEffect(() => {
       async function init(){
 
         if(orcamentoEditavel !== null  ){
-              setServicosSelecionado(orcamentoEditavel.servicos)
-              setOrcamento((prevOrcamento: OrcamentoModel) => ({
-                ...prevOrcamento,
-                servicos: orcamentoEditavel.servicos,
-                veiculo: orcamentoEditavel.veiculo
-            }));
 
- 
+          //     let servicos:any = await useServicosDoPedido.selectByCodeOrder(orcamento.codigo);
+          //     setServicosSelecionado(servicos)
+//
+          //    setOrcamento((prevOrcamento: OrcamentoModel) => ({
+          //      ...prevOrcamento,
+          //      servicos:  servicos,
+          //      veiculo: orcamentoEditavel.veiculo
+          //  }));
 
 
-            const responseVeic:any = await useQueryVeiculos.selectByCode( orcamentoEditavel.veiculo );
-            setSelectedVeiculo(  responseVeic[0]  );
+              if( orcamentoEditavel.veiculo > 0 ){
+              const responseVeic:any = await useQueryVeiculos.selectByCode( orcamentoEditavel.veiculo );
+              setSelectedVeiculo(  responseVeic[0]  );
+                }
              
             const response:any = await useQueryTipoOs.selectAll();
-              if( response.length > 0  ){
-
+             
+            if( response.length > 0  ){
                 setTipoOs(response);
                 let aux = response.find( i => i.codigo === orcamentoEditavel.tipo_os)
                 setSelectedTipo(aux)
               }
 
             }  
-
-
         //if( orcamento.cliente.codigo  ){
         //  const response:any = await useQueryVeiculos.selectByClient(  orcamento.cliente.codigo ) ;
         //  setDadosVeiculos(response); 
         //}
 
-      }
+      } 
 
       init()
     },[])
@@ -243,7 +244,7 @@ const handleDecrement = (item) => {
 
 
     function renderItemServico(item  ){
-    const isSelected = servicosSelecionado.find(i => i.codigo === item.codigo);
+    const isSelected = orcamento.servicos.find(i => i.codigo === item.codigo);
     const quantidade = isSelected ? isSelected.quantidade : 0;
 
       return ( 
@@ -541,10 +542,10 @@ const handleDecrement = (item) => {
             </Modal>
 
                 {  
-                    servicosSelecionado &&
+                    orcamento.servicos &&
                     <View style={{marginTop:5, marginBottom:5}}>
                       <FlatList
-                        data={servicosSelecionado}
+                        data={orcamento.servicos}
                         horizontal={true}
                         renderItem={({ item }) => renderServicoSelecionado(item) } 
                         keyExtractor={ (item)=> item.codigo.toString()}
@@ -554,7 +555,7 @@ const handleDecrement = (item) => {
                      }
 
           <View style={{ flexDirection:'row', justifyContent:'space-between', margin:10}}>
-            { servicosSelecionado.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens.toFixed(2)}  </Text>): null }
+            { orcamento.servicos.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens.toFixed(2)}  </Text>): null }
                       {
                         selectedVeiculo ? ( <Text style={{fontWeight:'bold'}}> placa: {selectedVeiculo.placa } </Text>) : null
                       } 

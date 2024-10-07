@@ -15,26 +15,27 @@ export const Home = ({navigation}:any) => {
   
 
   const data = [
-    { "nome":"vendas",
-      "icon":<MaterialCommunityIcons name="cart-variant" size={30} color="#009de2" />
+      { "nome":"vendas",
+       "icon":<MaterialCommunityIcons name="cart-variant" size={30} color="#009de2" />
+       },
+       { "nome":"OS",
+         "icon": <FontAwesome5 name="tools" size={24} color="#009de2" />
+         },
+ 
+      { "nome": "Acerto",
+      "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
       },
-      { "nome":"OS",
-        "icon": <FontAwesome5 name="tools" size={24} color="#009de2" />
-        },
+      { "nome": "acertoProduto",
+      "icon":<AntDesign name="calculator" size={30} color="#009de2" />
+       },
+ 
+       { "nome":"Produtos",
+       "icon": <Foundation name="book" size={30} color="#009de2" />
+       },
+       { "nome":"configurações",
+       "icon":<Feather name="settings" size={30} color="#009de2" />
+       }, 
 
-    { "nome": "Acerto",
-    "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
-     },
-     { "nome": "acertoProduto",
-     "icon":<AntDesign name="calculator" size={30} color="#009de2" />
-      },
-
-      { "nome":"Produtos",
-      "icon": <Foundation name="book" size={30} color="#009de2" />
-      },
-      { "nome":"configurações",
-      "icon":<Feather name="settings" size={30} color="#009de2" />
-      }, 
       { "nome":"Teste",
         "icon":<Feather name="settings" size={30} color="#009de2" />
         },

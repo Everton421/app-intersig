@@ -10,7 +10,7 @@ import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
 import { AuthContext } from "../../../contexts/auth";
 import AntDesign from '@expo/vector-icons/AntDesign';
-
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export const OrcamentosRegistrados = ({navigation, tipo })=>{
 
@@ -96,11 +96,11 @@ const ServiceOrcamento = ( { item } )=>{
                         </Text>
                         
                          <Text style={{ fontWeight:"bold"}}>
-                            unitario: {item.valor.toFixed(2)}
+                            unitario: {item?.valor.toFixed(2)}
                         </Text>
                         <Text style={{ fontWeight:"bold"}}>
 
-                            total: {item.total.toFixed(2)}
+                            total: {item?.total.toFixed(2)}
                         </Text>
                     </View>  
 
@@ -196,9 +196,9 @@ const ServiceOrcamento = ( { item } )=>{
             <View   >      
                 <View style={ stiloItem(item) }>
                         
-                        
-                <TouchableOpacity     onPress={ ()=> selecionaOrcamentoModal(item)}>
-                        <Feather name="eye" size={24} color="#FFF" />
+                <TouchableOpacity style={{   backgroundColor: '#FFF', padding: 4, borderRadius: 5, width: '10%', elevation: 5, alignItems:"center" }} 
+                    onPress={ ()=> selecionaOrcamentoModal(item)}>
+                        <Feather name="eye" size={24} color="#009de2" />
                 </TouchableOpacity>
 
   
@@ -216,7 +216,7 @@ const ServiceOrcamento = ( { item } )=>{
                                 orçamento :{ item?.codigo}  
                             </Text>
                             <Text style={{fontWeight:"bold", color:'white'}}>
-                                   Total R$: {item?.total_geral }
+                                   Total R$: {item?.total_geral.toFixed(2)}
                             </Text>
                             <TouchableOpacity 
                             onPress={()=>  deleteOrder(item)  }
@@ -227,9 +227,11 @@ const ServiceOrcamento = ( { item } )=>{
 
                         </View>
 
-                        <Text style={{fontWeight:"bold", color:'white'}}>
+                        <Text style={{fontWeight:"bold", color:'white', fontSize:20}}>
                         {item?.nome}
                         </Text>
+                        
+                        
                 
                 { item?.situacao !== 'RE' && item.situacao !== 'FI' ? 
                 <TouchableOpacity onPress={( )=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
@@ -238,9 +240,11 @@ const ServiceOrcamento = ( { item } )=>{
                     : null     
                 }
                       <Text style={{fontWeight:"bold", color:'white'}}>
-                        {item?.data_cadastro}
-                        </Text>
-                </View>
+                          Data Cadastro: {item?.data_cadastro}
+                      </Text>
+                    
+                      <MaterialCommunityIcons name="send-circle" size={24} color="black" />
+                      </View>
             </View>
         )
     }
@@ -318,21 +322,23 @@ const ServiceOrcamento = ( { item } )=>{
                        <View style={{   padding:3}}>   
                             <View style={{ flexDirection:"row" , justifyContent:'space-between'}}>
                                     <Text style={{ fontWeight:"bold"}}>
-                                        Total: {orcamentoModal?.total_geral}
+                                        Total: { orcamentoModal?.total_geral ? orcamentoModal.total_geral.toFixed(2) : 0  }
                                     </Text>
                                     
                                     <Text style={{ fontWeight:"bold"}}>
-                                        Descontos: {orcamentoModal?.descontos}
+                                        Descontos: {orcamentoModal?.descontos ? orcamentoModal.descontos.toFixed(2) : 0}
                                     </Text>
                             </View>
 
                             <View style={{ flexDirection:"row" , justifyContent:'space-between' }}>
-                                <Text style={{ fontWeight:"bold"}}>
-                                    Total Servicos: {orcamentoModal?.total_servicos}
+                              
+                               <Text style={{ fontWeight:"bold"}}>
+                                    Total Servicos: {  orcamentoModal?.total_servicos ?  orcamentoModal?.total_servicos.toFixed(2) : 0  }
                                 </Text>
                                 <Text style={{ fontWeight:"bold"}}>
-                                    Total Produtos: {orcamentoModal?.total_produtos}
+                                    Total Produtos: {  orcamentoModal?.total_produtos ? orcamentoModal?.total_produtos.toFixed(2) : 0  }
                                 </Text>
+                            
                             </View>
                         </View>  
 

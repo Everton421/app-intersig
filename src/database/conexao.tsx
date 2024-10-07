@@ -77,7 +77,7 @@ export async function construtor(db: SQLiteDatabase) {
   
        -- Create the orders table 
     CREATE TABLE IF NOT EXISTS pedidos (
-      codigo INTEGER PRIMARY KEY AUTOINCREMENT,
+      codigo INTEGER PRIMARY KEY ,
       vendedor INTEGER NOT NULL DEFAULT 0,   
       situacao TEXT NOT NULL DEFAULT 'EA',
       contato TEXT ,
@@ -103,8 +103,8 @@ export async function construtor(db: SQLiteDatabase) {
       desconto REAL DEFAULT 0.00,
       quantidade REAL DEFAULT 0.00,
       preco REAL DEFAULT 0.00,
-      total REAL DEFAULT 0.00,
-      FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
+      total REAL DEFAULT 0.00 
+     -- FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
     );
       
      
@@ -113,9 +113,9 @@ export async function construtor(db: SQLiteDatabase) {
       codigo INTEGER NOT NULL,
       desconto REAL DEFAULT 0.00,
       quantidade REAL DEFAULT 0.00,
-      valor REAL DEFAULT 0.00,
-      total REAL DEFAULT 0.00,
-      FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
+      valor REAL DEFAULT 0.00 ,
+      total REAL DEFAULT 0.00  
+    -- FOREIGN KEY (pedido) REFERENCES pedidos(codigo) -- Add a foreign key constraint
     );
 
 
@@ -124,8 +124,8 @@ export async function construtor(db: SQLiteDatabase) {
       pedido INTEGER NOT NULL,
       parcela INTEGER NOT NULL,
       valor REAL NOT NULL DEFAULT 0.00,
-      vencimento TEXT NOT NULL DEFAULT '0000-00-00',
-       FOREIGN KEY (pedido) REFERENCES pedidos(codigo)
+      vencimento TEXT NOT NULL DEFAULT '0000-00-00' 
+     -- FOREIGN KEY (pedido) REFERENCES pedidos(codigo)
     );
 
     CREATE TABLE IF NOT EXISTS usuarios (

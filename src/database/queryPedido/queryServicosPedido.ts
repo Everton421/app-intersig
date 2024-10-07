@@ -64,12 +64,14 @@ type servico_pedido = {
 
         async function selectByCodeOrder( codeOrder:number ){
             try{
+
+                let code = parseInt(codeOrder)
                 const result = await db.getAllAsync(` SELECT sp.codigo , sp.pedido, sp.desconto, sp.valor, sp.quantidade, sp.total,
                                                         s.aplicacao
 
                                                         FROM servicos_pedido as sp
                                                         JOIN servicos as s on s.codigo = sp.codigo
-                                                        WHERE sp.pedido = ${codeOrder}`)
+                                                        WHERE sp.pedido = ${code}`)
 
                 return result;
             }catch(e){console.log(e)}
@@ -77,14 +79,17 @@ type servico_pedido = {
 
 
         async function selectServiceByCodeOrder(codeService:number,  codeOrder:number ){
+
             try{
+                let code = parseInt(codeOrder)
+            
                 const result = await db.getAllAsync(` SELECT sp.codigo , sp.pedido, sp.desconto, sp.valor, sp.quantidade, sp.total,
                                                         s.aplicacao
 
                                                         FROM servicos_pedido as sp
                                                         JOIN servicos as s on s.codigo = sp.codigo
                                                         WHERE 
-                                                        sp.pedido = ${codeOrder} AND 
+                                                        sp.pedido = ${code} AND 
                                                         sp.codigo = ${codeService}
                                                         `)
 
@@ -110,8 +115,10 @@ type servico_pedido = {
 
         async function deleteByCodeOrder( code:number){
                try{
-                   await db.runAsync(` DELETE from servicos_pedido where pedido = ${code}`)
-                   console.log(`deletado servico do orcamento codigo: ${code}`)
+                let codeOrder = parseInt(code)
+
+                   await db.runAsync(` DELETE from servicos_pedido where pedido = ${codeOrder}`)
+                   console.log(`deletado servico do orcamento codigo: ${codeOrder}`)
                     return true;
                 }catch(e){
                     console.log(e)
@@ -124,10 +131,12 @@ type servico_pedido = {
 
             async function deleteServiceByCodeOrder(codeService:number,  codeOrder:number ){
                 try{
+                let code = parseInt(codeOrder)
+
                     const result = await db.getAllAsync(` DELETE 
                                                             FROM servicos_pedido  
                                                             WHERE 
-                                                             pedido = ${codeOrder} AND 
+                                                             pedido = ${code} AND 
                                                              codigo = ${codeService}
                                                             `)
                         console.log(`deletado servico ${codeService} do orcamento codigo: ${codeOrder}`)

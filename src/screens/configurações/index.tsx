@@ -14,9 +14,11 @@ import { AuthContext } from "../../contexts/auth"
 import { useServices } from "../../database/queryServicos/queryServicos"
 import { useTipoOs } from "../../database/queryTipoOs/queryTipoOs"
 import {    useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
-import { orderServices    } from "../../services/sync"
 import { formatItem } from "../../services/formatStrings"
 import { restartDatabaseService } from "../../services/restartDatabase"
+import { configMoment } from "../../services/moment"
+import { buscaPedidos } from "../../services/sendOrders" 
+import { enviarPedidos } from "../../services/getOrders"   
 
 
 const LoadingData = ({ isLoading, item , progress }) => (
@@ -40,8 +42,9 @@ export const Configurações = () => {
   const useQueryServices = useServices();
   const useQueryVeiculos = useVeiculos();
   const useQueryPedidos = usePedidos();
-  const servicesPedidos= orderServices();
   const  useRestartService = restartDatabaseService();
+  const useMoment = configMoment();
+
 
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -51,6 +54,9 @@ export const Configurações = () => {
   const [error, setError] = useState<string>()
   const [conectado, setConectado] = useState<boolean>()
 
+
+  const useGetOrders = buscaPedidos();
+  const useSendOrders = enviarPedidos();
 
 
   const formataDados =  formatItem();
@@ -92,7 +98,8 @@ export const Configurações = () => {
                 
                     if(result?.length > 0  ){
 
-                      const data_recadastro =   formataDados.formatDate(dados[v].data_recadastro)
+                      const data_recadastro =   useMoment.formatarDataHora(dados[v].data_recadastro)
+
                         if(   data_recadastro > result[0].data_recadastro ){
                           await useQueryClientes.update(dados[v],dados[v].codigo)
                         }else{
@@ -121,8 +128,15 @@ export const Configurações = () => {
       for (let v = 0; v < totalProdutos; v++) {
         const verifyProduct = await useQueryProdutos.selectByCode(dados[v].codigo);
         if (verifyProduct.length > 0) {
-          let data_recadastro = dados[v].data_recadastro; // Ajuste se necessário
-          if (data_recadastro > verifyProduct[0].data_recadastro) {
+          let data_recadastro = useMoment.formatarDataHora( dados[v].data_recadastro ); // Ajuste se necessário
+          
+
+          
+          console.log(`${data_recadastro } > ${verifyProduct[0].data_recadastro}` )
+
+
+          if (data_recadastro > verifyProduct[0].data_recadastro ) {
+
             await useQueryProdutos.update(dados[v], dados[v].codigo);
           }
         } else {
@@ -274,10 +288,11 @@ export const Configurações = () => {
     syncData();
   };
 
-async function testeServices(){
-  const result = await servicesPedidos.filterOrders() ;
-}
+async function syncOrders(){
+    await useSendOrders.atualizacaoDePedidos();
+    await useGetOrders.filterOrders();
 
+  } 
 
       useEffect(  () => {
         connect();
@@ -320,7 +335,7 @@ async function testeServices(){
            </View >
 
            <View style={{margin:5}} >
-            <Button title='enviar pedidos' onPress={() => testeServices()} />
+            <Button title='enviar pedidos' onPress={() => syncOrders()} />
            </View >
 
            <View style={{margin:5}} >

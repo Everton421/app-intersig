@@ -323,7 +323,9 @@ const { connected, setConnected } = useContext(ConnectedContext)
 
   
                         <View style={{ flexDirection: 'row' , justifyContent:"space-between", margin: 5}}>
+                            {/** 
                             <Cart/>
+                        */}
                               <Text style={{ fontSize:15 ,fontWeight:'bold'}}> 
                                 Total Produtos: { orcamento.total_produtos  ? orcamento.total_produtos.toFixed(2) : 0  }
                               </Text>

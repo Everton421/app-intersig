@@ -22,17 +22,17 @@ export const Home = ({navigation}:any) => {
          "icon": <FontAwesome5 name="tools" size={24} color="#009de2" />
          },
  
-      { "nome": "Acerto",
-      "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
-      },
-      { "nome": "acertoProduto",
-      "icon":<AntDesign name="calculator" size={30} color="#009de2" />
-       },
- 
-       { "nome":"Produtos",
-       "icon": <Foundation name="book" size={30} color="#009de2" />
-       },
-       { "nome":"configurações",
+     // { "nome": "Acerto",
+     // "icon":<MaterialCommunityIcons name="barcode-scan" size={30} color="#009de2" />
+     // },
+     // { "nome": "acertoProduto",
+     // "icon":<AntDesign name="calculator" size={30} color="#009de2" />
+     //  },
+ //
+     //  { "nome":"Produtos",
+     //  "icon": <Foundation name="book" size={30} color="#009de2" />
+     //  },
+       { "nome":"settings",
        "icon":<Feather name="settings" size={30} color="#009de2" />
        }, 
 

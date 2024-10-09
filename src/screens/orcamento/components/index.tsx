@@ -97,18 +97,6 @@ const { usuario } = useContext(AuthContext)
     
             if (!orcamentoEditavel || orcamentoEditavel === null) {
                 
-                let lastId = await  useQuerypedidos.selectLastId();                          
-
-                    let codigoDoOrcamento;
-
-                  //  if( lastId[0].codigo === 0 ){
-                  //      codigoDoOrcamento = 1
-                  //      setCodigoOrcamento(codigoDoOrcamento)
-                  //  }else{
-                  //      codigoDoOrcamento = lastId[0].codigo + 1 
-                  //      setCodigoOrcamento(codigoDoOrcamento)
-                  //  }
-
 
                 setOrcamento((prevOrcamento: OrcamentoModel) => ({
                     ...prevOrcamento,
@@ -120,6 +108,7 @@ const { usuario } = useContext(AuthContext)
                     observacoes: observacoes || '',
                     quantidade_parcelas:0,
                     cliente: {},
+                    situacao:'EA',
                     parcelas: [],
                     produtos:[],
                     servicos:[],
@@ -133,9 +122,6 @@ const { usuario } = useContext(AuthContext)
             } else {
                 setEditavel(true);
                 setCodigoOrcamento(orcamentoEditavel.codigo)
-
-              
-
              }
            }
         init();
@@ -152,6 +138,7 @@ const { usuario } = useContext(AuthContext)
                 produtos: [],
                 parcelas: [],
                 vendedor:0,
+                situacao:'EA',
                 tipo:tipo
             }));
             setTotalGeral(0);
@@ -167,6 +154,7 @@ const { usuario } = useContext(AuthContext)
                 cliente: null,
                 produtos: [],
                 parcelas: [],
+                situacao:'EA',
                 vendedor:0,
                 tipo:tipo
             }));
@@ -226,7 +214,7 @@ const { usuario } = useContext(AuthContext)
                  //  updateOrder()
            
           
-      }, [   orcamento.produtos, orcamento.parcelas, observacoes,   orcamento.descontos ,orcamento.servicos   ]);
+      }, [   orcamento.produtos, orcamento.parcelas,     orcamento.descontos ,orcamento.servicos   ]);
     ////////////////////////////////////////////////////////////////////////////
      
 
@@ -369,14 +357,10 @@ const { usuario } = useContext(AuthContext)
                 <TouchableOpacity
                     style={{ padding: 7, backgroundColor: 'green', elevation: 5, margin: 3, borderRadius: 5 }}
                     onPress={() => console.log(orcamento)}
-                >
-                    <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Mostrar</Text>
-                </TouchableOpacity>
- 
-
-                
-               
-              
+                        >
+                     <Text style={{ fontWeight: 'bold', fontSize: 12, color: 'white' }}>Mostrar</Text>
+                    </TouchableOpacity>
+            
             </View>
 
             {loading && (

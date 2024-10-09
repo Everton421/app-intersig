@@ -212,19 +212,22 @@ const ServiceOrcamento = ( { item } )=>{
             </Modal>
 
                         <View style={{ flexDirection:'row', justifyContent:'space-between'}}>
-                            <Text style={{fontWeight:"bold", color:'white'}}>
+                           { /* <Text style={{fontWeight:"bold", color:'white'}}>
                                 orçamento :{ item?.codigo}  
                             </Text>
+                            */}
                             <Text style={{fontWeight:"bold", color:'white'}}>
                                    Total R$: {item?.total_geral.toFixed(2)}
                             </Text>
+                            
+                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI'  ? 
                             <TouchableOpacity 
                             onPress={()=>  deleteOrder(item)  }
                             >
-                                 
                                 <AntDesign name="closecircle" size={24} color="red" />
                             </TouchableOpacity>
-
+                    : null
+                    }
                         </View>
 
                         <Text style={{fontWeight:"bold", color:'white', fontSize:20}}>
@@ -233,7 +236,7 @@ const ServiceOrcamento = ( { item } )=>{
                         
                         
                 
-                { item?.situacao !== 'RE' && item.situacao !== 'FI' ? 
+                { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
                 <TouchableOpacity onPress={( )=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
                         <Feather name="edit" size={24} color="#009de2" />
                 </TouchableOpacity>
@@ -243,7 +246,6 @@ const ServiceOrcamento = ( { item } )=>{
                           Data Cadastro: {item?.data_cadastro}
                       </Text>
                     
-                      <MaterialCommunityIcons name="send-circle" size={24} color="black" />
                       </View>
             </View>
         )
@@ -259,13 +261,12 @@ const ServiceOrcamento = ( { item } )=>{
         /> 
         {/*********    lista de status dos pedidos  */}
         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-around', margin:3  }}>
-         <View style={{flexDirection:"row", alignItems:"center"}}>
-                <View style={{padding:4,    backgroundColor:'green' , borderRadius:4}}>
-                </View>
-                <Text style={{ fontWeight:'bold',fontSize:12, marginLeft:2, color:'green'}}>
-                    orcamento
-                </Text>
-            </View>
+             <View style={{flexDirection:"row", alignItems:"center"}}>
+                    <View style={{padding:4,    backgroundColor:'green' , borderRadius:4}}></View>
+                    <Text style={{ fontWeight:'bold',fontSize:12, marginLeft:2, color:'green'}}>
+                        orcamento
+                    </Text>
+              </View>
 
               <View style={{flexDirection:"row", alignItems:"center"}}>
                 <View style={{ padding:4,     backgroundColor:'#009de2' , borderRadius:4}}>
@@ -274,8 +275,6 @@ const ServiceOrcamento = ( { item } )=>{
                     pedido
                 </Text>
               </View>
-
-          
 
               <View style={{flexDirection:"row", alignItems:"center"}}>
                 <View style={{ padding:4,     backgroundColor:'#ffc107' , borderRadius:4}}>
@@ -296,21 +295,18 @@ const ServiceOrcamento = ( { item } )=>{
         
         <Modal transparent={true}  visible={ visibleModal }>
             <View style={{ flex:1, backgroundColor:'rgba( 50 , 50, 50 , 0.5)', alignItems:'center', justifyContent:"center" }}>
-
-                    <View style={{ backgroundColor:'#FFF', width:'97%', height:'97%', borderRadius:10}}>
-
-                 <View style={{ padding:5 , justifyContent:"space-between", flexDirection:"row"  }} >
+                  <View style={{ backgroundColor:'#FFF', width:'97%', height:'97%', borderRadius:10}}>
+                     <View style={{ padding:5 , justifyContent:"space-between", flexDirection:"row"  }} >
                         <Text>  
                             { orcamento?.tipo === 1 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}> Orçamento: {orcamentoModal?.codigo} </Text> ) : 
                             orcamento?.tipo === 3 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}>  OS: {orcamentoModal?.codigo} </Text> ) : null
                             }
                         </Text>
-                        <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                                {orcamento.data_cadastro}
-                         </Text>
-                 </View>
-
-                  <View style={{ padding:5 }}>          
+                      </View>
+                  <View style={{ padding:5 }}>   
+                         <Text style={{ fontSize:15, fontWeight:"bold"}}>
+                               Data Cadastro: {orcamento.data_cadastro}
+                         </Text>      
                         <Text style={{  fontWeight:"bold"}} >
                             cliente: {orcamentoModal?.cliente.codigo}
                         </Text>
@@ -319,7 +315,7 @@ const ServiceOrcamento = ( { item } )=>{
                         </Text>
                  </View>
 
-                       <View style={{   padding:3}}>   
+                 <View style={{   padding:3}}>   
                             <View style={{ flexDirection:"row" , justifyContent:'space-between'}}>
                                     <Text style={{ fontWeight:"bold"}}>
                                         Total: { orcamentoModal?.total_geral ? orcamentoModal.total_geral.toFixed(2) : 0  }
@@ -331,8 +327,7 @@ const ServiceOrcamento = ( { item } )=>{
                             </View>
 
                             <View style={{ flexDirection:"row" , justifyContent:'space-between' }}>
-                              
-                               <Text style={{ fontWeight:"bold"}}>
+                                <Text style={{ fontWeight:"bold"}}>
                                     Total Servicos: {  orcamentoModal?.total_servicos ?  orcamentoModal?.total_servicos.toFixed(2) : 0  }
                                 </Text>
                                 <Text style={{ fontWeight:"bold"}}>
@@ -340,10 +335,10 @@ const ServiceOrcamento = ( { item } )=>{
                                 </Text>
                             
                             </View>
-                        </View>  
+                 </View>  
 
                   {/** *** separador ***/} 
-            <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
+               <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
                                     <View style={{ alignItems:"center"}}>
                                             <Text>
                                                 PRODUTOS
@@ -355,7 +350,7 @@ const ServiceOrcamento = ( { item } )=>{
                                         renderItem={ ({item})=> <ProdOrcamento item={item} /> }
                                         />
                             {/** *** separador ***/} 
-            <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
+                  <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
                             <View style={{ alignItems:"center"}}>
                                             <Text>
                                                 SERVIÇOS
@@ -367,7 +362,10 @@ const ServiceOrcamento = ( { item } )=>{
                                         renderItem={ ({item})=> <ServiceOrcamento item={item} /> }
                                         />
 
-                <Button title="Voltar" onPress={()=> setVisibleModal(false)}/>
+                             <Button
+                                title="voltar"
+                                onPress={() => {setVisibleModal(false)  }}
+                            />
                 </View>
 
             </View>

@@ -74,7 +74,7 @@ export async function construtor(db: SQLiteDatabase) {
         intervalo INTEGER DEFAULT 0,  
         recebimento INTEGER DEFAULT 0  
       );
-  
+   
        -- Create the orders table 
     CREATE TABLE IF NOT EXISTS pedidos (
       codigo INTEGER PRIMARY KEY ,
@@ -150,7 +150,12 @@ export async function construtor(db: SQLiteDatabase) {
        combustivel TEXT NOT NULL 
       );
  
-      
+      CREATE TABLE IF NOT EXISTS api_config (
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       url TEXT NOT NULL,
+       porta INTEGER  NOT NULL DEFAULT 3000,
+       token TEXT NOT NULL 
+      );
 
      `); 
  

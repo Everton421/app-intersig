@@ -4,10 +4,10 @@
     "slug": "myapp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon-intersig.jpg",
+    "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon-intersig.png",
+      "image": "./assets/splash-intersig.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

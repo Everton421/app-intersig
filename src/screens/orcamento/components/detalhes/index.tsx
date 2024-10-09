@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { Text, TextInput, Touchable, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Fontisto from '@expo/vector-icons/Fontisto';
@@ -9,6 +9,8 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
   const [observacoes, setObservacoes] = useState('');
+
+  const [situacao, setSituacao] = useState('EA');
 
   const { orcamento, setOrcamento } = useContext(OrcamentoContext);
 
@@ -40,8 +42,9 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   ()=>{
     if( orcamentoEditavel !== null ){
        setObservacoes(orcamentoEditavel.observacoes)
+       setSituacao(orcamentoEditavel.situacao)
    //   console.log(orcamentoEditavel.observacoes)
-    }
+    } 
 
   },[]
  )
@@ -55,7 +58,19 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   
      },[ observacoes ]
    )
+
+
+   useEffect(
+    ()=>{
+      setOrcamento((prevOrcamento) => ({
+        ...prevOrcamento,
+        situacao:situacao
+      }));
  
+    },[ situacao ]
+  )
+ 
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -90,6 +105,31 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
           )
           }
         </View>
+
+        <View style={{ margin: 5 }}>
+          <Text style={{ fontWeight:'bold'}}>
+             Situação :
+              {  orcamento?.situacao === 'EA' && 'Em Aberto' }
+              {  orcamento?.situacao === 'AI' && 'Aprovado Integralmente' }
+           </Text>
+
+              <View style={{ flexDirection:'row', justifyContent:'space-between' }} >
+                <TouchableOpacity style={  [     situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#CCC'}    ,{padding:5 , borderRadius:5 , elevation:5}  ] } 
+                  onPress={ ()=> setSituacao('EA') }
+                 >
+                    <Text  style={  [ situacao  === 'EA' && { color:'#FFF'} ] } >  Orçamento </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={  [  orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#CCC'}  ,{padding:5 , borderRadius:5 , elevation:5}  ] }
+                    onPress={ ()=> setSituacao('AI') }
+                   >
+                   <Text  style={  [  orcamento?.situacao  === 'AI' && { color:'#FFF'} ] } > Pedido </Text>
+                </TouchableOpacity>
+              </View>
+
+        </View>
+        <View style={{ borderWidth: 0.2 }}></View>
+
 
         <View style={{ margin: 5 }}>
           <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Observações</Text>

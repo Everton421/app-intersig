@@ -69,7 +69,6 @@ const getCurrentDate = () => {
     async function create( pedido:pedido ){
 
       let data = getCurrentDate();
-      pedido.situacao = 'EA';
       try{
       
  
@@ -95,7 +94,7 @@ const getCurrentDate = () => {
               tipo  
             ) VALUES (
              ${ pedido.codigo}, 
-            '${ pedido.situacao}',
+            '${pedido.situacao}',
             '${ pedido.contato}',
              ${ pedido.vendedor},
              ${ pedido.descontos},
@@ -125,7 +124,6 @@ const getCurrentDate = () => {
       async function createByCode( pedido:pedido , code:number){
 
         let data = getCurrentDate();
-        pedido.situacao = 'EA';
         try{
         
    
@@ -151,7 +149,7 @@ const getCurrentDate = () => {
                 tipo  
               ) VALUES (
                ${ code}, 
-              '${ pedido.situacao}',
+              '${pedido.situacao}',
               '${ pedido.contato}',
                ${ pedido.vendedor},
                ${ pedido.descontos},
@@ -573,9 +571,7 @@ const getCurrentDate = () => {
   } 
 
   async function update( pedido:pedido ){
-    pedido.situacao = 'EA';
     try{
-
       let result = await db.runAsync(
           ` UPDATE   pedidos SET
           situacao  =  '${ pedido.situacao}', 
@@ -609,9 +605,9 @@ const getCurrentDate = () => {
   
         let result = await db.runAsync(
             ` UPDATE   pedidos SET
-            situacao  =  '${ pedido.situacao}', 
-            contato  =  '${ pedido.contato}', 
-            descontos =  ${ pedido.descontos},
+            situacao  =  '${pedido.situacao}', 
+            contato  =  '${pedido.contato}', 
+            descontos =  ${pedido.descontos},
             forma_pagamento = ${pedido.forma_pagamento},
             observacoes = '${ pedido.observacoes}', 
             quantidade_parcelas = ${ pedido.quantidade_parcelas},

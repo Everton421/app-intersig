@@ -7,10 +7,10 @@ import { Home } from "../../screens/home";
 import AcertoCamera from "../../screens/acertoCodigoBarras/acertoCamera";
 import { Configurações } from "../../screens/configurações";
 
-import { Produtos } from "../../screens/Produtos";
+import { Produtos } from "../../screens/Produtos_old";
 import { EnviaProduto } from "../../screens/enviaProdutos";
 import { EnviaProdutoAntigo } from "../../screens/enviaProdutos/enviaProdutosAntigo";
-import { AcertoProduto } from "../../screens/acerto/acertoProduto";
+import { AcertoProduto } from "../../screens/acerto_old/acertoProduto";
 import { ListaProdutos } from "../../screens/orcamento/components/produtos";
 import { useContext } from "react";
 import ProdutosProvider, { ProdutosContext } from "../../contexts/produtosDoOrcamento";
@@ -45,12 +45,13 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="editarOrcamento" component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="editarOS" component={EditarOS}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
 
-                    <Stack.Screen name="novoOrcamento" component={NovoOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="orçamentos" component={OrcamentosRegistrados}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="vendas" component={Vendas}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="novoOrcamento" component={NovoOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}}  />
+                    <Stack.Screen name="orçamentos" component={OrcamentosRegistrados}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}}  />
+                    
+                    <Stack.Screen name="vendas" component={Vendas} options={{headerShown:false}}/>
                     <Stack.Screen name="NovaOs" component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                    
-                    <Stack.Screen name="OS" component={Tela_os}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="OS" component={Tela_os}  options={{headerShown:false}} />
                    
                     <Stack.Screen name="Teste" component={Teste}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
 

@@ -291,6 +291,98 @@ const getCurrentDate = () => {
           }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${vendedor}  `,e) }
     }
 
+    async function findByTipeAndDate( tipo:number, vendedor:number, data:any ){
+      try{ 
+
+console.log(`SELECT 
+        p.codigo,
+        c.nome,
+        p.contato,
+        c.codigo as codigo_cliente,
+        p.situacao,
+        p.observacoes,
+        p.descontos,
+        p.forma_pagamento,
+        p.total_geral,
+        p.total_produtos, 
+        p.total_servicos,
+        p.data_cadastro,
+        p.veiculo,
+        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+        strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
+        p.vendedor,
+        p.tipo_os,
+        p.tipo
+        FROM pedidos p
+        JOIN  clientes c on c.codigo = p.cliente
+        WHERE p.tipo ='${tipo}' AND p.vendedor =  ${vendedor} 
+        AND p.data_cadastro = '${data}'  `
+       )
+
+      let result = await db.getAllAsync(`SELECT 
+        p.codigo,
+        c.nome,
+        p.contato,
+        c.codigo as codigo_cliente,
+        p.situacao,
+        p.observacoes,
+        p.descontos,
+        p.forma_pagamento,
+        p.total_geral,
+        p.total_produtos, 
+        p.total_servicos,
+        p.data_cadastro,
+        p.veiculo,
+        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+        strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
+        p.vendedor,
+        p.tipo_os,
+        p.tipo
+        FROM pedidos p
+        JOIN  clientes c on c.codigo = p.cliente
+        WHERE p.tipo ='${tipo}' AND p.vendedor =  ${vendedor} 
+        AND p.data_cadastro = '${data}'        
+        `);
+    //   console.log(result);
+        return result;
+        }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${vendedor}  `,e) }
+  }
+
+
+    async function findByTipeAndClient( tipo:number, vendedor:number , nome:any){
+      try{ 
+      let result = await db.getAllAsync(`SELECT 
+        p.codigo,
+        c.nome,
+        p.contato,
+        c.codigo as codigo_cliente,
+        p.situacao,
+        p.observacoes,
+        p.descontos,
+        p.forma_pagamento,
+        p.total_geral,
+        p.total_produtos, 
+        p.total_servicos,
+        p.data_cadastro,
+        p.veiculo,
+        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+        strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
+        p.vendedor,
+        p.tipo_os,
+        p.tipo
+        FROM pedidos p
+        JOIN  clientes c on c.codigo = p.cliente
+        WHERE 
+         p.tipo ='${tipo}'
+          AND p.vendedor =  ${vendedor} 
+          AND
+           c.nome like '%${nome}%'
+        `);
+    //   console.log(result);
+        return result;
+        }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${vendedor}  `,e) }
+  }
+ 
 
 
     async function selectCompleteOrderByCode( code:number )  {
@@ -482,6 +574,7 @@ const getCurrentDate = () => {
       }else{
         
         console.log('nao foi encontrado orcamento com o codigo ', order.codigo)
+        return;
       //  let aux:any =  await create(order);
         //codigoRgistrado = aux 
       }
@@ -634,6 +727,6 @@ const getCurrentDate = () => {
       
 
     return {
-      update,createOrderByCode, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
+      update,createOrderByCode,findByTipeAndDate, findByTipeAndClient, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
 
 }

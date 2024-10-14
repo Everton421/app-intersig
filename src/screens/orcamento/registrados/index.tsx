@@ -9,8 +9,12 @@ import { blue, green } from "react-native-reanimated/lib/typescript/reanimated2/
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
 import { AuthContext } from "../../../contexts/auth";
-import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import { configMoment } from "../../../services/moment";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export const OrcamentosRegistrados = ({navigation, tipo })=>{
 
@@ -20,6 +24,7 @@ export const OrcamentosRegistrados = ({navigation, tipo })=>{
     const { usuario } = useContext(AuthContext);
 
     const useQuerypedidos = usePedidos();
+    const useMoment = configMoment();
 
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visible, setVisible ] = useState<boolean>(false);
@@ -27,34 +32,65 @@ export const OrcamentosRegistrados = ({navigation, tipo })=>{
         const [ selecionado, setSelecionado ] = useState();
         const [ dados , setDados ] = useState();
         const [ pesquisa, setPesquisa ] =  useState('*');
+        const [showPicker, setShowPicker] = useState(false);
 
+        const [showPesquisa, setShowPesquisa] = useState(false);
+
+
+        const [date , setDate ] = useState( new Date() );
+
+            const [data_cadastro , setData_cadastro] = useState( useMoment.dataAtual())
         const [ orcamentoModal,setOrcamentoModal] = useState();
 
+       
+
+
         async function busca(){
- 
             if ( !usuario.codigo || usuario.codigo === 0 ){
                 console.log("usuario invalido!")
                 return
             }
-            
-            let aux:any = await useQuerypedidos.findByTipe(tipo , usuario.codigo );
+            //let aux:any = await useQuerypedidos.findByTipeAndDate(tipo , usuario.codigo, data_cadastro );
+            let aux:any = await useQuerypedidos.findByTipe(tipo , usuario.codigo  );
+
+            if(  aux?.length > 0 ){
+                console.log(aux)
+                setOrcamentosRegistrados(aux);
+            }  
+        }
+
+        async function busca2(){
+            if ( !usuario.codigo || usuario.codigo === 0 ){
+                console.log("usuario invalido!")
+                return
+            }
+            let aux:any = await useQuerypedidos.findByTipeAndClient(tipo , usuario.codigo, pesquisa );
             if(  aux?.length > 0 ){
                 setOrcamentosRegistrados(aux);
             }  
-     
         }
 
 
     /////////////////////////////////////////////////
         useEffect(()=>{
          busca()
-        },[ orcamento, pesquisa , connected ])
+        },[  ])
     /////////////////////////////////////////////////
 
-/////////////////////////////////////////////////
- 
-/////////////////////////////////////////////////
-const ProdOrcamento = ( {item} )=>{
+
+    /////////////////////////////////////////////////
+        useEffect(()=>{
+            busca()
+           },[ data_cadastro  ])
+    /////////////////////////////////////////////////
+        useEffect(()=>{
+             console.log(pesquisa)
+            busca2()
+        },[ pesquisa]
+    )
+
+    /////////////////////////////////////////////////
+const ProdOrcamento = ( {item}:any )=>{
     return(
         <View style={{backgroundColor:'#3335' , borderRadius:5 , margin: 3 }}>
                 <Text style={{ fontWeight:"bold"}}>
@@ -79,7 +115,7 @@ const ProdOrcamento = ( {item} )=>{
         </View>
     )
 }
-const ServiceOrcamento = ( { item } )=>{
+const ServiceOrcamento = ( { item }:any )=>{
     return(
         <View style={{backgroundColor:'#3335' , borderRadius:5 , margin: 3 }}>
                 <Text style={{ fontWeight:"bold"}}>
@@ -131,7 +167,7 @@ const ServiceOrcamento = ( { item } )=>{
     busca()
     },[selecionado])
 
-    async function deleteOrder (item){
+    async function deleteOrder (item:any){
 
         Alert.alert('', `Deseja excluir o orcamento : ${item.codigo} ?`,[
             { text:'Não',
@@ -142,7 +178,7 @@ const ServiceOrcamento = ( { item } )=>{
                 text: 'Sim', onPress: async ()=>{ 
                           await useQuerypedidos.deleteOrder(item.codigo)
                           setOrcamentosRegistrados(
-                            orcamentosRegistrados.filter( (i) => i.codigo !== item.codigo)
+                            orcamentosRegistrados.filter( (i:any) => i.codigo !== item.codigo)
                         )
                           ;
                 }
@@ -238,27 +274,81 @@ const ServiceOrcamento = ( { item } )=>{
                 
                 { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
                 <TouchableOpacity onPress={( )=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
-                        <Feather name="edit" size={24} color="#009de2" />
+                        <Feather name="edit" size={24} color="#7A7476" />
                 </TouchableOpacity>
                     : null     
                 }
                       <Text style={{fontWeight:"bold", color:'white'}}>
-                          Data Cadastro: {item?.data_cadastro}
+                          Data Cadastro: {item?.data_cadastro} 
+                          
                       </Text>
-                    
                       </View>
             </View>
         )
     }
 
+    const handleEvent = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        const dia = String(currentDate.getDate()).padStart(2,'0');
+        const mes = String( currentDate.getMonth()).padStart(2,'0');
+        const ano = currentDate.getFullYear();
+        const data = `${ano}-${mes}-${dia}`;
+
+        setShowPicker(false);
+        setData_cadastro(data)
+    };
+    
+    
     return (
         <View style={{ flex:1}} >
 
-        < TextInput 
-            style={{  margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-            onChangeText={(value)=>setPesquisa(value)}
-            placeholder="pesquisar"
-        /> 
+      <View style={{  padding:5, backgroundColor:'#3339', flexDirection:"row", justifyContent:"space-between"}}>
+         <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
+             <Ionicons name="arrow-back" size={25} color="#FFF" />
+          </TouchableOpacity>
+
+      
+     
+          { showPesquisa ?  (  
+          <View style={{ flexDirection:"row", gap:2, width:'100%', alignItems:"center"}}>
+             < TextInput 
+                 style={{  width:'80%',padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
+                 onChangeText={(value)=>setPesquisa(value)}
+                 placeholder="pesquisar"
+             /> 
+            <TouchableOpacity onPress={ ()=> setShowPesquisa(false) }   >
+                <AntDesign name="closecircle" size={24} color="red" />
+            </TouchableOpacity>
+
+            </View>
+                 )
+                 : (
+
+                  <TouchableOpacity    style={{ margin:5 }} onPress={()=> setShowPesquisa(true)}>
+                    <AntDesign name="filter" size={30} color="#FFF" />
+                 </TouchableOpacity>
+                 )
+              }
+        
+      
+         {/** componente de alterar a data */ }
+        
+           <TouchableOpacity onPress={  ()=> setShowPicker(true)  } style={{ margin:5 }}>
+            <Fontisto name="date" size={35} color="#FFF" />
+        </TouchableOpacity>
+             
+        {showPicker && (
+                        <DateTimePicker
+                        value={ date  }
+                        display="calendar"
+                        mode="date"
+                        onChange={handleEvent}
+                        accessibilityLanguage='português'
+                        />
+                    )}
+        </View>
+       
+       
         {/*********    lista de status dos pedidos  */}
         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-around', margin:3  }}>
              <View style={{flexDirection:"row", alignItems:"center"}}>

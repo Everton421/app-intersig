@@ -10,7 +10,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   const [showPicker, setShowPicker] = useState(false);
   const [observacoes, setObservacoes] = useState('');
 
-  const [situacao, setSituacao] = useState('EA');
+  const [situacao, setSituacao] = useState<String>();
 
   const { orcamento, setOrcamento } = useContext(OrcamentoContext);
 
@@ -22,7 +22,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
 
   };
 
-  const handleEvent = (event, selectedDate) => {
+  const handleEvent = (event:any, selectedDate:any) => {
     const currentDate = selectedDate || date;
     setShowPicker(false);
     setDate(currentDate);
@@ -31,7 +31,6 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
     setOrcamento((prevOrcamento) => ({
       ...prevOrcamento,
        data_cadastro: data_cadastro,
-
     }));
 
     // console.log(`Data selecionada: ${currentDate}`);
@@ -42,7 +41,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   ()=>{
     if( orcamentoEditavel !== null ){
        setObservacoes(orcamentoEditavel.observacoes)
-       setSituacao(orcamentoEditavel.situacao)
+       setSituacao(orcamentoEditavel.situacao) 
    //   console.log(orcamentoEditavel.observacoes)
     } 
 
@@ -59,7 +58,6 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
      },[ observacoes ]
    )
 
-
    useEffect(
     ()=>{
       setOrcamento((prevOrcamento) => ({
@@ -69,6 +67,8 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
  
     },[ situacao ]
   )
+
+    
  
 
 
@@ -109,18 +109,18 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
         <View style={{ margin: 5 }}>
           <Text style={{ fontWeight:'bold'}}>
              Situação :
-              {  orcamento?.situacao === 'EA' && 'Em Aberto' }
-              {  orcamento?.situacao === 'AI' && 'Aprovado Integralmente' }
+              {   orcamento?.situacao === 'EA' && 'Em Aberto' }
+              {   orcamento?.situacao === 'AI' && 'Aprovado Integralmente' }
            </Text>
 
               <View style={{ flexDirection:'row', justifyContent:'space-between' }} >
-                <TouchableOpacity style={  [     situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#CCC'}    ,{padding:5 , borderRadius:5 , elevation:5}  ] } 
+                <TouchableOpacity style={  [     orcamento?.situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#CCC'}    ,{padding:5 , borderRadius:5 , elevation:5}  ] } 
                   onPress={ ()=> setSituacao('EA') }
                  >
-                    <Text  style={  [ situacao  === 'EA' && { color:'#FFF'} ] } >  Orçamento </Text>
+                    <Text  style={  [ orcamento?.situacao  === 'EA' && { color:'#FFF'} ] } >  Orçamento </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={  [  orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#CCC'}  ,{padding:5 , borderRadius:5 , elevation:5}  ] }
+                <TouchableOpacity style={  [    orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#CCC'}  ,{padding:5 , borderRadius:5 , elevation:5}  ] }
                     onPress={ ()=> setSituacao('AI') }
                    >
                    <Text  style={  [  orcamento?.situacao  === 'AI' && { color:'#FFF'} ] } > Pedido </Text>

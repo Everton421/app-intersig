@@ -109,37 +109,29 @@ useEffect(() => {
       async function init(){
 
         if(orcamentoEditavel !== null  ){
-
-          //     let servicos:any = await useServicosDoPedido.selectByCodeOrder(orcamento.codigo);
-          //     setServicosSelecionado(servicos)
-//
-          //    setOrcamento((prevOrcamento: OrcamentoModel) => ({
-          //      ...prevOrcamento,
-          //      servicos:  servicos,
-          //      veiculo: orcamentoEditavel.veiculo
-          //  }));
-
-
-              if( orcamentoEditavel.veiculo > 0 ){
+ 
+              if( orcamentoEditavel.veiculo !== 0 ){
               const responseVeic:any = await useQueryVeiculos.selectByCode( orcamentoEditavel.veiculo );
               setSelectedVeiculo(  responseVeic[0]  );
+                }else{
+                  setSelectedVeiculo(null)
                 }
              
             const response:any = await useQueryTipoOs.selectAll();
              
-            if( response.length > 0  ){
-                setTipoOs(response);
-                let aux = response.find( i => i.codigo === orcamentoEditavel.tipo_os)
-                setSelectedTipo(aux)
-              }
+              if( response.length > 0  ){
+                  setTipoOs(response);
+                  let aux = response.find( i => i.codigo === orcamentoEditavel.tipo_os)
+                  setSelectedTipo(aux)
+                }
 
+              let servicos = await useServicosDoPedido.selectByCodeOrder(orcamentoEditavel.codigo)
+              setServicosSelecionado( servicos)
+   
+            }else{
+              setSelectedVeiculo( null)
             }  
-        //if( orcamento.cliente.codigo  ){
-        //  const response:any = await useQueryVeiculos.selectByClient(  orcamento.cliente.codigo ) ;
-        //  setDadosVeiculos(response); 
-        //}
-
-      } 
+       } 
 
       init()
     },[])
@@ -194,7 +186,7 @@ const handleDecrement = (item) => {
       setSelectedVeiculo(item),
       setOrcamento((prevOrcamento: OrcamentoModel) => ({
         ...prevOrcamento,
-        veiculo: item.codigo,
+        veiculo: item.codigo ,
     }));
      // console.log(selectedVeiculo)
       setVerVeiculos(false)
@@ -415,7 +407,7 @@ const handleDecrement = (item) => {
                 
                 <TouchableOpacity style={{backgroundColor:'#009de2',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
                             onPress={ ()=>    setVerVeiculos(true) } >
-                          < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Veiculo</Text>
+                          { !selectedVeiculo && <Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}>Veiculo</Text> }
 
                               {
                                 selectedVeiculo &&  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold' }}> {selectedVeiculo.codigo}</Text>

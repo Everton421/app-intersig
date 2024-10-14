@@ -16,7 +16,7 @@ import { useItemsPedido } from '../../database/queryPedido/queryItems';
 import { useServicosPedido } from '../../database/queryPedido/queryServicosPedido';
 import { useParcelas } from '../../database/queryParcelas/queryParcelas';
 
-import { VictoryBar, VictoryChart,VictoryPie, VictoryTheme } from "victory-native";
+import { VictoryBar, VictoryChart,VictoryPie, VictoryTheme, Bar, CartesianChart } from "victory-native";
 
 const LoadingData = ({ isLoading, item , progress }) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -62,7 +62,8 @@ export const Teste = () => {
     { x: 4,  y: 19000 }
   ];
   
-
+ 
+    
 
   return (
     <View style={{ flex: 1, justifyContent: "center",
@@ -73,10 +74,12 @@ export const Teste = () => {
       width={250}
        theme={VictoryTheme.material}
       />
+
+
+
+      
+
    
-      <Button
-        title='press'
-      />
 
     </View>
   );

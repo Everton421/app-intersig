@@ -49,7 +49,7 @@ export async function construtor(db: SQLiteDatabase) {
       aplicacao TEXT NOT NULL,
       tipo_serv INTEGER DEFAULT 0 
        );
-    
+     
 
     CREATE TABLE IF NOT EXISTS clientes (
       codigo INTEGER PRIMARY KEY NOT NULL,

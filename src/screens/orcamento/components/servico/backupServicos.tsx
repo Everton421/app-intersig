@@ -1,8 +1,13 @@
 import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { useContext, useEffect, useState } from 'react';
 import { TextInput, ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+ 
 import { api } from '../../../../services/api'; 
+ 
+import Feather from '@expo/vector-icons/Feather';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { ItensServicoListaHorizontal } from '../itens_Servico_lista';
 import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
 import { ConnectedContext } from '../../../../contexts/conectedContext';
 import { useServices } from '../../../../database/queryServicos/queryServicos';
@@ -13,19 +18,19 @@ import { useServicosPedido } from '../../../../database/queryPedido/queryServico
 import { useVeiculos } from '../../../../database/queryVceiculos/queryVeiculos';
 
 export const Servico = ( { orcamentoEditavel } )=>{
-
     const [ selectedTipo , setSelectedTipo  ] = useState(null);
     const [presstipoOs,    setPresstipoOS   ] = useState(false); 
     const [ verServicos ,  setVerServicos   ] = useState(false);
     const [ verVeiculos ,  setVerVeiculos   ] = useState(false);
     const [ selectedVeiculo , setSelectedVeiculo  ] = useState( );
 
-    const [ pesquisa,      setPesquisa      ] = useState('1');
+    const [ pesquisa,      setPesquisa      ] = useState();
     const [ pesquisaVeiculo,   setPesquisaVeiculo    ] = useState();
 
     const [ tipoOs , setTipoOs] = useState([]);
-    const [ dadosServicos , setDadosServicos ] = useState([]);
-    const [ dadosVeiculos , setDadosVeiculos ] = useState([]);
+     const [ dadosServicos , setDadosServicos ] = useState([]);
+     const [ dadosVeiculos , setDadosVeiculos ] = useState([]);
+
 
     const [ servicosSelecionado, setServicosSelecionado ] = useState([]);
     const [totalItens, setTotalItens ]= useState(0);
@@ -33,11 +38,11 @@ export const Servico = ( { orcamentoEditavel } )=>{
       const { orcamento, setOrcamento } = useContext( OrcamentoContext )
       const { connected, setConnected } = useContext(ConnectedContext)
 
-      const useQueryServicos    = useServices();
-      const useQueryFpgt        = useFormasDePagamentos();
-      const useQueryTipoOs      = useTipoOs();
+        const useQueryServicos = useServices();
+        const useQueryFpgt =  useFormasDePagamentos();
+        const useQueryTipoOs = useTipoOs();
       const useServicosDoPedido = useServicosPedido();
-      const useQueryVeiculos    = useVeiculos();
+      const useQueryVeiculos = useVeiculos();
 
   //////////////////////////////////////////////      
     useEffect(
@@ -102,15 +107,55 @@ useEffect(() => {
 
   useEffect(
     ()=>{
-      async function init(){
-    
- 
-      } 
       
-      init(); 
+      async function init2(){
+        if(orcamentoEditavel !== null  && orcamentoEditavel.codigo !== undefined  && orcamentoEditavel.servicos){
+          console.log('aaaaaaaaa')
+        }else{
+           
+        }
+      }
+      init2();
 
-    },[ orcamentoEditavel ])
+      async function init(){
 
+        if(orcamentoEditavel !== null  && orcamentoEditavel.codigo !== undefined  && orcamentoEditavel.servicos){
+          console.log( '');
+          console.log( '');
+          console.log( `editando :`,orcamentoEditavel);
+          console.log( '');
+
+               if( orcamentoEditavel.veiculo === undefined ){
+                 orcamentoEditavel.veiculo = 0 
+               }
+ 
+               if( orcamentoEditavel.veiculo !== 0 ){
+               const responseVeic:any = await useQueryVeiculos.selectByCode( orcamentoEditavel.veiculo );
+               setSelectedVeiculo(  responseVeic[0]  );
+                 }else{
+                   setSelectedVeiculo(null)
+                 }
+              
+            // const response:any = await useQueryTipoOs.selectAll();
+              
+               if( response.length > 0  ){
+                   setTipoOs(response);
+                   let aux = response.find( i => i.codigo === orcamentoEditavel.tipo_os)
+                   setSelectedTipo(aux)
+                 }
+ 
+                 let servicos:any  = await useServicosDoPedido.selectByCodeOrder(orcamentoEditavel.codigo)
+                   if( servicos.length > 0 || servicos !== undefined  ){
+                     setServicosSelecionado( servicos)
+                   }
+   
+            }else{
+              setSelectedVeiculo(0)
+            }  
+       } 
+
+   //   init()
+    },[])
 
          useEffect(()=>{
            async function filter(){
@@ -125,34 +170,36 @@ useEffect(() => {
          },[ verVeiculos ])
     
 
-    const handleIncrement = (item) => {
-      setServicosSelecionado((prevSelectedItems) => {
-        return prevSelectedItems.map((i) => {
-          if (i.codigo === item.codigo) {
-            return { ...i, quantidade: i.quantidade + 1 };
-          } 
-          return i;
-        });
-      });
-    };
+const handleIncrement = (item) => {
+  setServicosSelecionado((prevSelectedItems) => {
+    return prevSelectedItems.map((i) => {
+      if (i.codigo === item.codigo) {
+        return { ...i, quantidade: i.quantidade + 1 };
+      } 
+      return i;
+    });
+  });
+};
 
-      const handleDecrement = (item) => {
-        setServicosSelecionado((prevSelectedItems) => {
-          return prevSelectedItems.map((i) => {
-            if (i.codigo === item.codigo) {
-              return { ...i, quantidade: Math.max(i.quantidade - 1, 1) };
-            }
-            return i;
-          });
-        });
-      };
+const handleDecrement = (item) => {
+  setServicosSelecionado((prevSelectedItems) => {
+    return prevSelectedItems.map((i) => {
+      if (i.codigo === item.codigo) {
+        return { ...i, quantidade: Math.max(i.quantidade - 1, 1) };
+      }
+      return i;
+    });
+  });
+};
 
     function handleSelectOS (item) {
       setSelectedTipo(item),
+
       setOrcamento((prevOrcamento: OrcamentoModel) => ({
         ...prevOrcamento,
         tipo_os: item.codigo,
     }));
+      // console.log(selectedTipo)
       setPresstipoOS(false)
     }
 

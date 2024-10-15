@@ -149,7 +149,7 @@ const ServiceOrcamento = ( { item }:any )=>{
        
         async function busca(){
    
-                console.log(selecionado)
+               // console.log(selecionado)
 
             if( selecionado !== undefined ){
                 let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);

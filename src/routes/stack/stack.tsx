@@ -7,7 +7,7 @@ import { Home } from "../../screens/home";
 import AcertoCamera from "../../screens/acertoCodigoBarras/acertoCamera";
 import { Configurações } from "../../screens/configurações";
 
-import { Produtos } from "../../screens/Produtos_old";
+import { Produtos } from "../../screens/produtos";
 import { EnviaProduto } from "../../screens/enviaProdutos";
 import { EnviaProdutoAntigo } from "../../screens/enviaProdutos/enviaProdutosAntigo";
 import { AcertoProduto } from "../../screens/acerto_old/acertoProduto";
@@ -20,11 +20,13 @@ import OrcamentoProvider from "../../contexts/orcamentoContext";
 import { NovoOrcamento } from "../../screens/novo_orcamento";
 import { OrcamentosRegistrados } from "../../screens/orcamento/registrados";   
 import { Vendas } from "../../screens/tela_orcamentos";
-import {   Teste } from '../../components/teste/index'
+ 
 import { NovaOs } from "../../screens/nova_os";
 import { Tela_os } from "../../screens/tela_os";
 import { EditarOS } from "../../screens/editar_os";
 import { Api_config } from "../../screens/api_config";
+import { Clientes } from "../../screens/clientes";
+import { Servicos } from "../../screens/servicos";
 
 const Stack = createStackNavigator();
 
@@ -39,7 +41,9 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="home" component={Home} options={{headerShown:false}} />
                     <Stack.Screen name="Acerto" component={AcertoCamera} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}}/>
                     <Stack.Screen name="acertoProduto" component={AcertoProduto} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="Produtos" component={Produtos} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="produtos" component={Produtos} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="serviços" component={Servicos} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="clientes" component={Clientes} options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="settings" component={Configurações}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
                  
                     <Stack.Screen name="editarOrcamento" component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
@@ -53,8 +57,6 @@ const Stack = createStackNavigator();
                    
                     <Stack.Screen name="OS" component={Tela_os}  options={{headerShown:false}} />
                    
-                    <Stack.Screen name="Teste" component={Teste}  options={{ headerStyle:{ backgroundColor:'#3339'}, headerTintColor:'#FFF', title:"voltar"}} />
-
 
                     
                 </Stack.Navigator>

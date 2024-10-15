@@ -42,6 +42,7 @@ type produto_pedido = {
 
         async function selectByCodeOrder( codeOrder:number ){
             try{
+
                 const result = await db.getAllAsync(` SELECT pp.codigo , pp.pedido, pp.desconto, pp.preco, pp.quantidade, pp.total,
                                                         p.descricao
 

@@ -9,6 +9,9 @@ import { Foundation } from '@expo/vector-icons';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
+import { Grafico } from "../../components/grafico";
+
+
 export const Home = ({navigation}:any) => {
   const { setLogado , setUsuario}: any = useContext(AuthContext);
 
@@ -28,17 +31,22 @@ export const Home = ({navigation}:any) => {
      // { "nome": "acertoProduto",
      // "icon":<AntDesign name="calculator" size={30} color="#009de2" />
      //  },
- //
-     //  { "nome":"Produtos",
-     //  "icon": <Foundation name="book" size={30} color="#009de2" />
-     //  },
+
+       
+        { "nome":"produtos",
+        "icon": <Foundation name="book" size={30} color="#009de2" />
+        }, 
+        { "nome":"serviços",
+          "icon":<FontAwesome5 name="tools" size={24} color="#009de2" />
+        },
+        { "nome": "clientes",
+          "icon":  <Feather name="users" size={30} color="#009de2" />
+           },
        { "nome":"settings",
        "icon":<Feather name="settings" size={30} color="#009de2" />
        }, 
 
-      { "nome":"Teste",
-        "icon":<Feather name="settings" size={30} color="#009de2" />
-        },
+     
     ];
 
   const Item = ({ value }: any) => {
@@ -83,6 +91,9 @@ export const Home = ({navigation}:any) => {
         showsHorizontalScrollIndicator={false}
       />
       </View>
+
+      <Grafico/>
+
     </View>
   );
 };

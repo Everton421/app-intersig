@@ -112,12 +112,12 @@ const { connected, setConnected } = useContext(ConnectedContext)
     ()=>{
       async function init(){
         if(orcamentoEditavel !== null  && orcamentoEditavel.codigo !== undefined ){
+          console.log("editando")
+          
+          console.log(orcamentoEditavel)
+          console.log(orcamentoEditavel)
 
             let data = await useQueryItemsPedido.selectByCodeOrder(orcamentoEditavel.codigo);
-            //  console.log('');
-            //  console.log('editando: ',orcamentoEditavel);
-            //  console.log('');
-
             setSelectedItem(data)
         } 
       }

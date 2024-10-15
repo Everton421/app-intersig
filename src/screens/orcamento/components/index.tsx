@@ -216,10 +216,6 @@ const { usuario } = useContext(AuthContext)
           
       }, [   orcamento.produtos, orcamento.parcelas,     orcamento.descontos ,orcamento.servicos   ]);
     ////////////////////////////////////////////////////////////////////////////
-     
-
-
- 
  
         
 
@@ -293,10 +289,11 @@ const { usuario } = useContext(AuthContext)
   {/** *** separador ***/} 
   <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
 
-               {/*     <Text>
-                       codigo: {codigoOrcamento}
+                { orcamentoEditavel && 
+                    <Text>
+                       codigo: {orcamentoEditavel.codigo}
                     </Text>
-                */}
+                 }
               <View style={{ flexDirection: 'row' }}>
                     <ListaClientes orcamentoEditavel={orcamentoEditavel} />
                 </View>

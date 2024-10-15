@@ -62,19 +62,28 @@ type servico_pedido = {
             }catch(e   ){ console.log( `erro ao atualizar servico do orcamento` , e )}
         }
 
-        async function selectByCodeOrder( codeOrder:number ){
+        async function selectByCodeOrder( codeOrder:any ){
+            let code = parseInt(codeOrder)
+
             try{
 
-                let code = parseInt(codeOrder)
                 const result = await db.getAllAsync(` SELECT sp.codigo , sp.pedido, sp.desconto, sp.valor, sp.quantidade, sp.total,
                                                         s.aplicacao
 
                                                         FROM servicos_pedido as sp
                                                         JOIN servicos as s on s.codigo = sp.codigo
-                                                        WHERE sp.pedido = ${code}`)
+                                                        WHERE sp.pedido = ${codeOrder}`)
 
                 return result;
-            }catch(e){console.log(e)}
+            }catch(e){
+                console.log(`Erro ao consultar os servicos do pedido codigo: ${codeOrder}`, e)
+                console.log(` SELECT sp.codigo , sp.pedido, sp.desconto, sp.valor, sp.quantidade, sp.total,
+                                                        s.aplicacao
+
+                                                        FROM servicos_pedido as sp
+                                                        JOIN servicos as s on s.codigo = sp.codigo
+                                                        WHERE sp.pedido = ${codeOrder}`)
+            }
         }
 
 

@@ -28,7 +28,7 @@ const LoadingData = ({ isLoading, item , progress }) => (
   </Modal>
 );
 
-export const Teste = () => {
+export const Grafico = () => {
   const { connected } = useContext(ConnectedContext);
   const { usuario } = useContext(AuthContext);
 

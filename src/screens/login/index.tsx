@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Image, Modal, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Button, Image, Modal, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { api } from "../../services/api";
 import { useContext } from "react";
 import { AuthContext } from '../../contexts/auth'
@@ -49,6 +49,41 @@ const { setLogado ,usuario , setUsuario }:any = useContext(AuthContext)
             senha: String,
         }
 
+        async function   buscaUsuariosDosistema(){
+
+            try{
+             const response = await api.get('/usuarios')
+             console.log(response.data)
+                 let dados = response.data;
+                 
+             if(response.status === 200 && dados.length > 0 ){
+                     for( let u of dados){
+
+                        let usuario = {
+                            codigo: u.codigo,
+                            nome:u.nome,
+                            senha:u.senha_web
+                         }
+                         
+                             let aux:any =  await useQueryUsuario.selectByCode(usuario.codigo);
+                                
+                                  if(aux?.length > 0 ){
+                                      await useQueryUsuario.update(usuario ) 
+                                  }else{
+                                      await useQueryUsuario.create(usuario)
+                                  }
+                                                       }
+                }else{
+                    console.log(response.data)
+                }
+            }catch(err:any){
+                    Alert.alert("erro", err.response.data.error)
+            }
+
+ 
+        }  
+
+
 useEffect(
     ()=>{
         async function   buscaUsuario(){
@@ -96,17 +131,24 @@ useEffect(
          }       
          buscaUsuario();
 
-         async function filtraUsuarios(){
-                let response : any  = await useQueryUsuario.selectAll();
-                if(response?.length > 0 ) setUsuariosMobile(response)
-                    console.log(response)
-         }
-
-         filtraUsuarios();
+         
     },[]
 )
 
-    function selecionaUsuario(item){
+
+useEffect(()=>{
+    async function filtraUsuarios(){
+        let response : any  = await useQueryUsuario.selectAll();
+        if(response?.length > 0 ) setUsuariosMobile(response)
+            console.log(response)
+ }
+
+ filtraUsuarios();
+
+},[ visibleSelectUser ] )
+    
+
+function selecionaUsuario(item){
         setVisibleSelectUser(false)
         setUsuarioSelecionado(item)
     }
@@ -145,7 +187,7 @@ const t = ({item}) => {
                     
                     
                     <TouchableOpacity style={{   width:'70%', margin:10,padding:10, borderRadius:10, backgroundColor:"#FFF",elevation:2 }} 
-                    onPress={()=> setVisibleSelectUser(true)}
+                    onPress={()=> { visibleSelectUser?  setVisibleSelectUser(false) :  setVisibleSelectUser(true) } }
                      >
                     
                     {   visibleSelectUser ? (
@@ -182,9 +224,10 @@ const t = ({item}) => {
                                             data={ usuariosMobile }
                                             renderItem={t}
                                            />
-                                           :
-                                           <Text> Nenhum Usuario Resgistrado 
-                                           </Text>
+                                           :<View>
+                                             <Text> Nenhum Usuario Resgistrado </Text>
+                                                <Button title="buscar usuarios" onPress={()=> buscaUsuariosDosistema()}/>    
+                                           </View>
                                            }      
                                              
                                     </View>

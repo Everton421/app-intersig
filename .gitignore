@@ -3,6 +3,9 @@
 # dependencies
 node_modules/
 
+#
+src/services/api.tsx
+
 # Expo
 .expo/
 dist/

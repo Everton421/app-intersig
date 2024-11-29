@@ -20,6 +20,7 @@ import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { Cart } from "../Cart";
 
 export const ListaProdutos = ({ codigo_orcamento }) => {
+  
   const [pesquisa, setPesquisa] = useState<any>("1");
   const [selectedItem, setSelectedItem] = useState([]);
   const [data, setData] = useState([]);
@@ -71,7 +72,8 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
     setSelectedItem((prevSelectedItems) => {
       return prevSelectedItems.map((i) => {
         if (i.codigo === item.codigo) {
-          const desconto = parseFloat(value) || 0;
+          let desconto = parseFloat(value) || 0;
+          if(desconto > i.preco ) desconto = 0;
           return { ...i, desconto, total: i.quantidade * i.preco - desconto };
         }
         return i;
@@ -167,7 +169,7 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
 
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontWeight: "bold" }}>Unitario:</Text>
-            <Text>{" " + item.preco}</Text>
+            <Text>{" " + item?.preco.toFixed(2)}</Text>
           </View>
         </View>
 
@@ -181,7 +183,7 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
 
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontWeight: "bold" }}>Total:</Text>
-            <Text>{" " + item.total}</Text>
+            <Text>{" " + item?.total.toFixed(2)}</Text>
           </View>
         </View>
       </View>
@@ -214,7 +216,7 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
             Código: {item.codigo}
           </Text>
           <Text style={[styles.txt, { color: isSelected ? "white" : null }]}>
-            R$: {item.preco}
+            R$: {item?.preco.toFixed(2)}
           </Text>
           {isSelected ? null : (
             <AntDesign name="caretdown" size={24} color={"black"} />
@@ -237,7 +239,7 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
               <Text
                 style={{ color: "white", fontWeight: "bold", fontSize: 15 }}
               >
-                Desconto: {desconto}
+                Desconto: {desconto?.toFixed(2)}
               </Text>
               <TextInput
                 style={{
@@ -292,7 +294,7 @@ export const ListaProdutos = ({ codigo_orcamento }) => {
                     elevation: 5,
                   }}
                 >
-                  Total R$: {item.total}
+                  Total R$: {item?.total.toFixed(2)}
                 </Text>
               </View>
             </View>

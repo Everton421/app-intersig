@@ -428,17 +428,16 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                         contentContainerStyle={{ paddingBottom: 100 }} 
                         />
 
-        
+                   {/*********    botao Novo Pedido  */}
                             <TouchableOpacity onPress={()=> navigation.navigate(to)} 
                                 style={{
                                          backgroundColor:'#185FED' ,  width:50, height:50,   
                                     borderRadius:25,  position:"absolute" , elevation:10  ,left: '80%',bottom: '15%', alignItems:"center", justifyContent:"center" }}>
-                              <MaterialIcons name="add-circle" size={45} color="#FFF" />
-
-                         </TouchableOpacity>
+                                  <MaterialIcons name="add-circle" size={45} color="#FFF" />
+                             </TouchableOpacity>
 
                    {/*********    lista de status dos pedidos  */}
-                     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF',   padding: 10 ,  }}>
+                    <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF',   padding: 10 ,  }}>
                         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', margin:3  }}>
                             <View style={{  alignItems:"center"}}>
                                     <View style={{padding:4,    backgroundColor:'#1E9C43' , borderRadius:4}}></View>

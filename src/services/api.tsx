@@ -11,9 +11,8 @@ const useApi = () => {
 
     const api = axios.create({
             //url teste local
-             baseURL: "http://100.108.116.119:3000/v1/",
-       
-  //   baseURL:"https://template-api-nu.vercel.app/v1",
+              baseURL: "http://100.108.116.119:3000/v1/",
+     // baseURL:"https://template-api-nu.vercel.app/v1",
     });
 
     // Interceptor para adicionar headers dinâmicosz

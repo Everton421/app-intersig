@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { BottomTabProdutos } from "../../routes/bottomTabsProduto";
 
 
 export function Produtos ({navigation}){
@@ -20,7 +22,6 @@ useEffect(()=>{
                 const response = await useQueryProdutos.selectByDescription(pesquisa, 10);
 
                 if(response.length > 0  ){
-                    console.log(response)
                     setDados(response)
                 }
             }
@@ -39,7 +40,7 @@ useEffect(()=>{
             return(
                 <TouchableOpacity 
                     onPress={ ()=> handleSelect(item) }
-                    style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%'}}
+                    style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
                  >
                    <Text style={{ fontWeight:"bold"}}>
                       Codigo: {item.codigo}
@@ -48,15 +49,24 @@ useEffect(()=>{
                    <Text>
                      {item.descricao}
                    </Text>
-                   <Text style={{ fontWeight:"bold"}}>
-                     R$ {item.preco}
-                   </Text>
+                <View style={{ flexDirection:"row", justifyContent:"space-between", margin:3}}>  
+                    <Text style={{ fontWeight:"bold"}}>
+                      R$ {item.preco.toFixed(2)}
+                    </Text>
+                    <Text style={{ fontWeight:"bold"}}>
+                       estoque: {item.estoque}
+                    </Text>
+                </View>
                 </TouchableOpacity>
             )
         }
 
-    return(
-        <View style={{ flex:1 ,    backgroundColor:'#EAF4FE'}}>
+      
+      return <BottomTabProdutos/>
+      
+      
+  {/**  (<View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
+          
            <View style={{   padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
                 <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                     <Ionicons name="arrow-back" size={25} color="#FFF" />
@@ -68,24 +78,15 @@ useEffect(()=>{
                         style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
                         onChangeText={(value)=>setPesquisa(value)}
                         placeholder="pesquisar"
-  
                     /> 
-                   {/** 
-                    <TouchableOpacity onPress={ ()=> setShowPesquisa(false) }   >
-                        <AntDesign name="closecircle" size={24} color="red" />
-                    </TouchableOpacity>
-               */ }
 
                     <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
                         >
                             <AntDesign name="filter" size={35} color="#FFF" />
                         </TouchableOpacity>
                     </View>
-            </View>
-
-
-         
-
+           </View>
+            
                 <Modal transparent={true} visible={ visible }>
                     <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
                         
@@ -148,14 +149,36 @@ useEffect(()=>{
 
                 </Modal>
 
-        <View style={ { marginTop:7 ,alignItems:"center" } } > 
              <FlatList
                  data={dados}
                  renderItem={(item)=> renderItem(item)}
                  keyExtractor={(i)=>i.codigo}
-             />
-            </View>
+             /> 
 
-        </View>
-    )
+            <TouchableOpacity
+                style={{
+                    backgroundColor: '#185FED', 
+                    width: 50, 
+                    height: 50,   
+                    borderRadius: 25,  
+                    position: "absolute",       
+                    bottom: 150,                 
+                    right: 30,                   
+                    elevation: 10,               
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    zIndex: 999,             // Garante que o botão fique sobre os outros itens
+                }}
+                onPress={() => {
+                    navigation.navigate('cadastro_produto')
+                }}
+            >
+                <MaterialIcons name="add-circle" size={45} color="#FFF" />
+            </TouchableOpacity>
+
+
+      </View> )*/}  
+
+      
+     
 }

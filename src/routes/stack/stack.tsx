@@ -17,7 +17,10 @@ import { AuthContext } from "../../contexts/auth";
 import { Usuarios } from "../../screens/usuarios";
 import { Teste } from "../../components/teste";
 import { Cadastro_produto } from "../../screens/cadastro_produto";
-import { Grupos } from "../../screens/grupos";
+import { Grupos } from "../../screens/categorias";
+import { ViewTabProdutos } from "../../screens/tabProdutos";
+import { Cadastro_Marcas } from "../../screens/cadastrarMarcas";
+import { Cadastro_Categorias } from "../../screens/cadastrarCategorias";
 
 const Stack = createStackNavigator();
 
@@ -43,10 +46,17 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="usuarios" component={Usuarios}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="teste" component={Teste}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_produto" component={Cadastro_produto}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="cadastro_marcas" component={Cadastro_Marcas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="cadastro_categorias" component={ Cadastro_Categorias }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    
+            
+                    <Stack.Screen name="ViewTabProdutos" component={ViewTabProdutos} options={{headerShown:false}} />
 
+                    
                     <Stack.Screen name="vendas" component={Vendas} options={{headerShown:false}} />
                     <Stack.Screen name="OS" component={Tela_os}  options={{headerShown:false}} />
-                          
+                    
+                     
                         
                      
                 </Stack.Navigator>

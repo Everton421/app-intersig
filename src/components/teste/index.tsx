@@ -2,9 +2,28 @@ import { TextInput,Text, Button, TouchableOpacity, View, Image } from "react-nat
  
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useEffect } from "react";
+import { useCategoria } from "../../database/queryCategorias/queryCategorias";
+import { useMarcas } from "../../database/queryMarcas/queryMarcas";
  
 
 export const Teste = ({navigation})=>{
+
+const usecategoria = useCategoria()
+const usemarca = useMarcas()
+
+
+    useEffect(
+        ()=>{
+            async function busca(){
+                let a = await usemarca.selectAll();
+                console.log("dados", a)
+          
+            }
+            busca()
+        },[]
+    )
+
     return (
         <View style={{ flex: 1, backgroundColor: "#EAF4FE"  }}>
                       
@@ -14,12 +33,7 @@ export const Teste = ({navigation})=>{
 
             <View style={{ width:'100%', alignItems:"center"  }}> 
                    
-             <Image
-                    style={{ width:145, height:145, resizeMode: 'stretch',}}
-                    source={ {
-                     uri: 'https://i.ibb.co/HXzm2Xf/Screenshot-1.png', } 
-                    }
-                   />
+         
            </View>
   
      

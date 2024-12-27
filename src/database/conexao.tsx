@@ -176,7 +176,22 @@ export async function construtor(db: SQLiteDatabase) {
        responsavel  INTEGER  NOT NULL DEFAULT 0,
        nome TEXT NOT NULL 
       );
- 
+
+    CREATE TABLE IF NOT EXISTS categorias (
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
+       descricao TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL 
+      );
+
+  CREATE TABLE IF NOT EXISTS marcas (
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
+       descricao TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL 
+      );
 
      `); 
  

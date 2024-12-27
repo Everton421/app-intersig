@@ -21,7 +21,8 @@ import { enviaPedidos } from "../../services/sendOrders"
 import { receberPedidos } from "../../services/getOrders"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Fontisto from '@expo/vector-icons/Fontisto';
-
+import { useCategoria } from "../../database/queryCategorias/queryCategorias"
+import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -56,17 +57,16 @@ export const Configurações = () => {
   const useQueryServices = useServices();
   const useQueryVeiculos = useVeiculos();
   const useQueryPedidos = usePedidos();
-  const  useRestartService = restartDatabaseService();
+  const useRestartService = restartDatabaseService();
   const useMoment = configMoment();
-
+  const useQueryCategoria = useCategoria() 
+  const useQueryMarcas = useMarcas();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
-
   const [progress, setProgress] = useState(0);
   const [data, setData] = useState([]);
   const [date, setDate] = useState(new Date());
-
   const [ item , setItem ] = useState<String>();
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>()
@@ -216,7 +216,7 @@ export const Configurações = () => {
         const totalServicos = dados.length;
       for (let v = 0; v <  totalServicos; v++ ) {
         
-        const verifyServices = await useQueryServices.selectByCode(dados[v].codigo);
+        const verifyServices:any = await useQueryServices.selectByCode(dados[v].codigo);
         if (verifyServices.length > 0) {
         
           let data_recadastro =  useMoment.formatarDataHora( dados[v].data_recadastro);
@@ -224,7 +224,7 @@ export const Configurações = () => {
           console.log(`servicos: ${data_recadastro } > ${verifyServices[0].data_recadastro}` )
 
           if (data_recadastro > verifyServices[0].data_recadastro ) {
-             awaituseQueryServices.update(dados[v])
+             await useQueryServices.update(dados[v])
           }
 
         }else{
@@ -242,7 +242,6 @@ export const Configurações = () => {
 
   const fetchTiposOs = async () => {
     setItem('tipo de os');
-
     try {
       const aux = await api.get('/offline/tipo_os');
       const data = aux.data;
@@ -273,6 +272,65 @@ export const Configurações = () => {
     }
   };
 
+  const fetchCategorias = async () => {
+    setItem('categorias');
+    try {
+      const aux = await api.get('/offline/categorias');
+      const data = aux.data;
+      let TotalCategorias = data.length
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiCategoria:any = await useQueryCategoria.selectByCode(data[i].codigo);
+        
+        if (verifiCategoria.length > 0) {
+        
+          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
+
+          console.log(`categoria: ${data_recadastro } > ${verifiCategoria[0].data_recadastro}` )
+          
+          if (data_recadastro > verifiCategoria[0].data_recadastro ) {
+            await useQueryCategoria.update( data[i], data[i].codigo);
+          
+          }
+        } else {
+          await useQueryCategoria.create(data[i]);
+        }
+        const progressPercentage = Math.floor(((i + 1) / TotalCategorias) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+
+      }        
+    } catch (e) {
+      console.log(" ocorreu um erro ao processar as categorias", e);
+    }
+  };
+
+  const fetchMarcas = async () => {
+    setItem('marcas');
+    try {
+      const aux = await api.get('/offline/marcas');
+      const data = aux.data;
+      let TotalMarcas = data.length
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiMarca:any = await useQueryMarcas.selectByCode(data[i].codigo);
+        
+        if (verifiMarca.length > 0) {
+           let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
+       console.log(`marca: ${data_recadastro } > ${verifiMarca[0].data_recadastro}` )
+          
+          if (data_recadastro > verifiMarca[0].data_recadastro ) {
+            await useQueryMarcas.update( data[i], data[i].codigo);
+          
+          }
+        } else {
+          await useQueryMarcas.create(data[i]);
+        }
+        const progressPercentage = Math.floor(((i + 1) / TotalMarcas) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+
+      }        
+    } catch (e) {
+      console.log(" ocorreu um erro ao processar as marcas", e);
+    }
+  };
 
   const fetchVeiculos = async () => {
     setItem('veiculos');
@@ -321,6 +379,8 @@ export const Configurações = () => {
       await fetchServices();
       await fetchTiposOs();
       await fetchVeiculos();
+      await fetchCategorias();
+      await fetchMarcas();
       setData([]); // Atualiza o estado para mostrar dados após a sincronização
     } catch (e) {
       console.log(e);

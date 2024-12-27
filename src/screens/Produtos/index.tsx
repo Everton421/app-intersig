@@ -8,7 +8,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BottomTabProdutos } from "../../routes/bottomTabsProduto";
 
 
-export function Produtos ({navigation}){
+export function Produtos ( {navigation} ){
   const useQueryProdutos = useProducts();
 const [ pesquisa, setPesquisa ] = useState(1);
 const [ dados , setDados ] = useState();
@@ -62,12 +62,11 @@ useEffect(()=>{
         }
 
       
-      return <BottomTabProdutos/>
-      
-      
-  {/**  (<View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
-          
-           <View style={{   padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
+     return  (
+
+      <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
+          <View style={{ backgroundColor:'#185FED', }}> 
+             <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
                 <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                     <Ionicons name="arrow-back" size={25} color="#FFF" />
                 </TouchableOpacity>
@@ -85,8 +84,11 @@ useEffect(()=>{
                             <AntDesign name="filter" size={35} color="#FFF" />
                         </TouchableOpacity>
                     </View>
+             </View>
+                 <Text style={{ color:'#FFF' ,fontWeight:"bold" , fontSize:15}}> produtos </Text>
+
            </View>
-            
+             
                 <Modal transparent={true} visible={ visible }>
                     <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
                         
@@ -147,14 +149,15 @@ useEffect(()=>{
 
                     </View>
 
-                </Modal>
+                </Modal> 
 
+ 
              <FlatList
                  data={dados}
                  renderItem={(item)=> renderItem(item)}
                  keyExtractor={(i)=>i.codigo}
              /> 
-
+    
             <TouchableOpacity
                 style={{
                     backgroundColor: '#185FED', 
@@ -177,7 +180,7 @@ useEffect(()=>{
             </TouchableOpacity>
 
 
-      </View> )*/}  
+      </View> )   
 
       
      

@@ -19,7 +19,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { Cart } from "../Cart";
 
-export const ListaProdutos = ({ codigo_orcamento }) => {
+export const ListaProd11utos = ({ codigo_orcamento }) => {
   
   const [pesquisa, setPesquisa] = useState<any>("1");
   const [selectedItem, setSelectedItem] = useState([]);

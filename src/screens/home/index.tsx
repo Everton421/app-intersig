@@ -98,6 +98,9 @@ useEffect(
        { "nome":"settings",
        "icon":<FontAwesome5 name="sync-alt" size={24} color="#185FED" />
        }, 
+       { "nome":"teste",
+        "icon":<FontAwesome5 name="sync-alt" size={24} color="#185FED" />
+        }, 
     ];
 
   const Item = ({ value }: any) => {
@@ -147,7 +150,7 @@ useEffect(
 
             <View style={{ flexDirection:"row", width:'100%', alignItems:"center", justifyContent:"center"}}>
                       <TouchableOpacity style={{ marginTop:15, margin:10, backgroundColor:'#FFF', width:'40%', padding:15, borderRadius:10, elevation:2 ,   justifyContent:"space-between", alignItems:"center" }}
-                      onPress={()=>{ navigation.navigate('produtos')}} >
+                      onPress={()=>{ navigation.navigate('ViewTabProdutos')}} >
                             <View style={{ backgroundColor:'#EAF4FE' , flexDirection:"row",   height:50, width:50, alignItems:"center",justifyContent:"center", borderRadius:7, elevation:3 }}>
                           <Foundation name="book" size={30} color="#185FED" />
                           </View>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { Button, FlatList, Image, Text, TouchableOpacity, View } from "react-native"
+import { Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
@@ -50,6 +50,37 @@ export const Cadastro_produto = () => {
                         </View>
                     )
                 }
+
+                function RenderModal(){
+                        let [ active, setActive ] = useState<boolean>(false);
+                        
+                        function renderItem ({item}){ return ( <Text>{item.descricao} </Text>)}
+                        return(
+
+                        <View style={{ flex:1}}>
+                            <TouchableOpacity
+                                onPress={()=>{ !active ? setActive(true) : setActive(false)  }}
+                             >
+                                <Text> marcas</Text>
+                            </TouchableOpacity>
+
+                            <Modal visible={ active }>
+                            <TouchableOpacity
+                                onPress={()=>{   setActive(false)  }}
+                             >
+                                <Text> Voltar</Text>
+                            </TouchableOpacity>
+                                <FlatList 
+                                    data={marcas}
+                                renderItem={(item)=> renderItem(item)}
+
+                                />
+                            </Modal>
+
+                        </View>
+                    )
+                }
+
 
 
     return (
@@ -105,6 +136,8 @@ export const Cadastro_produto = () => {
                     <TextInput
                     />
                 </View>
+
+                <RenderModal  />
 
                 <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center", marginTop: 10 }} >
                     <TouchableOpacity style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 15, padding: 5 }}>

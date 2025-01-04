@@ -17,8 +17,9 @@ export const BottomTabProdutos= ()=>{
              name="Produtos" component={Produtos} 
                options={{
                 tabBarStyle:{ backgroundColor:'#185FED'   },
-                
-                tabBarLabelStyle:{ color:"#FFF", fontSize:13},
+                tabBarActiveBackgroundColor: '#00129A',
+                tabBarActiveTintColor:'red',
+                tabBarLabelStyle:{ color:"#FFF", fontSize:13  },
                 tabBarIcon:()=> <FontAwesome name="home" size={24} color="#FFF" />,
                 headerShown:false,
 
@@ -30,9 +31,11 @@ export const BottomTabProdutos= ()=>{
               component={Categoria}
               options={{
                 tabBarStyle:{ backgroundColor:'#185FED'    },
+                tabBarActiveBackgroundColor: '#00129A',
                 tabBarLabelStyle:{ color:"#FFF", fontSize:13},
                 tabBarIcon:()=> <MaterialIcons name="category" size={24} color="#FFF" /> ,
                 headerShown:false,
+
 
               }} />
 
@@ -41,6 +44,7 @@ export const BottomTabProdutos= ()=>{
               component={Marcas}
               options={{
                 tabBarStyle:{ backgroundColor:'#185FED'    },
+                tabBarActiveBackgroundColor: '#00129A',
                 tabBarLabelStyle:{ color:"#FFF", fontSize:13},
                 tabBarIcon:()=> <FontAwesome name="bookmark" size={24} color="#FFF" /> ,
                 headerShown:false,

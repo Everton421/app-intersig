@@ -85,8 +85,7 @@ useEffect(()=>{
                         </TouchableOpacity>
                     </View>
              </View>
-                 <Text style={{ color:'#FFF' ,fontWeight:"bold" , fontSize:15}}> produtos </Text>
-
+                 <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Produtos </Text>
            </View>
              
                 <Modal transparent={true} visible={ visible }>

@@ -20,7 +20,6 @@ import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { Cart } from "../Cart";
 
 export const ListaProd11utos = ({ codigo_orcamento }) => {
-  
   const [pesquisa, setPesquisa] = useState<any>("1");
   const [selectedItem, setSelectedItem] = useState([]);
   const [data, setData] = useState([]);
@@ -73,7 +72,7 @@ export const ListaProd11utos = ({ codigo_orcamento }) => {
       return prevSelectedItems.map((i) => {
         if (i.codigo === item.codigo) {
           let desconto = parseFloat(value) || 0;
-          if(desconto > i.preco ) desconto = 0;
+          if (desconto > i.preco) desconto = 0;
           return { ...i, desconto, total: i.quantidade * i.preco - desconto };
         }
         return i;

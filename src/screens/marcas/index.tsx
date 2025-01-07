@@ -79,7 +79,7 @@ export const Marcas = ({navigation})=>{
             </View>
 
                 <View>
-                    <Text style={{ color:'#FFF' ,fontWeight:"bold" , fontSize:15}}> marcas </Text>
+                 <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Marcas </Text>
                 </View>
       </View>
  

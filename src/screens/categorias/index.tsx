@@ -76,7 +76,7 @@ const useQueryCategoria = useCategoria();
             </View>
 
                 <View>
-                    <Text style={{ color:'#FFF' ,fontWeight:"bold" , fontSize:15}}> categorias </Text>
+                    <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Categorias </Text>
                 </View>
       </View>
  

@@ -97,10 +97,8 @@ useEffect(
           }, 
        { "nome":"settings",
        "icon":<FontAwesome5 name="sync-alt" size={24} color="#185FED" />
-       }, 
-       { "nome":"teste",
-        "icon":<FontAwesome5 name="sync-alt" size={24} color="#185FED" />
-        }, 
+       } 
+       
     ];
 
   const Item = ({ value }: any) => {

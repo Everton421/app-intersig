@@ -4,15 +4,16 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useEffect, useState } from "react";
 import { useMarcas } from "../../database/queryMarcas/queryMarcas";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const Marcas = ({navigation})=>{
     const [ press, setPress ] = useState(false);
     const [ dados, setDados ] = useState([]);
-    const [ pesquisa, setPesquisa ] = useState();
+    const [ pesquisa, setPesquisa ] = useState<string | undefined>('');
     
     const useQueryMarcas = useMarcas();
 
-    useEffect(
+    useFocusEffect(
                 ()=>{
                     
                     async function busca(){ 
@@ -20,19 +21,26 @@ export const Marcas = ({navigation})=>{
                             if( data?.length > 0  ){
                                 setDados(data) 
                             }   
-                          
                         }
-                    busca();
-                },[ ]
+
+                    if( pesquisa === '' || pesquisa === undefined){
+                        busca();
+                    }
+                } 
             )
  
             useEffect(
                 ()=>{   
                     async function busca(){
-         
-                             
+                        let data:any  = await useQueryMarcas.selectByDescription(pesquisa);
+                        if( data?.length > 0  ){
+                            setDados(data) 
+                        }  
                     }
+
+                    if( pesquisa !== '' || pesquisa !== undefined){
                     busca();
+                }
                 },[ pesquisa ]
             )
 

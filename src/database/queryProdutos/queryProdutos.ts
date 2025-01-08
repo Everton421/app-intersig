@@ -8,7 +8,7 @@ export const useProducts = ()=>{
     const db = useSQLiteContext();
     const formataDados =  formatItem();
 
-      type produto = {
+       type produto = {
         codigo:number,
         estoque?:number,
         preco?:number,

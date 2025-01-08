@@ -1,16 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  Modal,
-  Text,
-  TouchableOpacity,
-  View,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+import { Modal, Text, TouchableOpacity, View, ScrollView, Alert,  ActivityIndicator,  StyleSheet, } from "react-native";
 import { ListaProdutos } from "./produtos";
-import { ListaItemOrcamento } from "./itemOrcamento";
 import { ListaClientes } from "./clientes";
 import { Parcelas } from "./parcelas";
 import {
@@ -19,9 +9,6 @@ import {
 } from "../../../contexts/orcamentoContext";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
-import Feather from "@expo/vector-icons/Feather";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Cart } from "./Cart";
 import { Detalhes } from "./detalhes";
 import { AuthContext } from "../../../contexts/auth";
@@ -30,7 +17,6 @@ import { useItemsPedido } from "../../../database/queryPedido/queryItems";
 import { useParcelas } from "../../../database/queryParcelas/queryParcelas";
 import { useServicosPedido } from "../../../database/queryPedido/queryServicosPedido";
 import { configMoment } from "../../../services/moment";
-import { generator } from "../../../services/generatorSecret";
 
 export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
 

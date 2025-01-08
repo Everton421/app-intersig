@@ -19,7 +19,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { Cart } from "../Cart";
 
-export const ListaProd11utos = ({ codigo_orcamento }) => {
+export const ListaProdutos = ({ codigo_orcamento }:any) => {
   const [pesquisa, setPesquisa] = useState<any>("1");
   const [selectedItem, setSelectedItem] = useState([]);
   const [data, setData] = useState([]);
@@ -45,9 +45,9 @@ export const ListaProd11utos = ({ codigo_orcamento }) => {
     });
   };
 
-  const handleDecrement = (item) => {
-    setSelectedItem((prevSelectedItems) => {
-      return prevSelectedItems.map((i) => {
+  const handleDecrement = (item:any) => {
+    setSelectedItem((prevSelectedItems:any) => {
+      return prevSelectedItems.map((i:any) => {
         if (i.codigo === item.codigo) {
           return { ...i, quantidade: Math.max(i.quantidade - 1, 0) };
         }
@@ -56,20 +56,20 @@ export const ListaProd11utos = ({ codigo_orcamento }) => {
     });
   };
 
-  const toggleSelection = (item) => {
-    setSelectedItem((prevSelectedItem) => {
-      const index = prevSelectedItem.findIndex((i) => i.codigo === item.codigo);
+  const toggleSelection = (item:any) => {
+    setSelectedItem((prevSelectedItem:any) => {
+      const index = prevSelectedItem.findIndex((i:any) => i.codigo === item.codigo);
       if (index !== -1) {
-        return prevSelectedItem.filter((i) => i.codigo !== item.codigo);
+        return prevSelectedItem.filter((i:any) => i.codigo !== item.codigo);
       } else {
         return [...prevSelectedItem, { ...item, quantidade: 1, desconto: 0 }];
       }
     });
   };
 
-  const handleDescontoChange = (item, value) => {
-    setSelectedItem((prevSelectedItems) => {
-      return prevSelectedItems.map((i) => {
+  const handleDescontoChange = (item:any, value:any) => {
+    setSelectedItem((prevSelectedItems:any) => {
+      return prevSelectedItems.map((i:any) => {
         if (i.codigo === item.codigo) {
           let desconto = parseFloat(value) || 0;
           if (desconto > i.preco) desconto = 0;
@@ -80,7 +80,7 @@ export const ListaProd11utos = ({ codigo_orcamento }) => {
     });
   };
 
-  const adiciona = (dado) => {
+  const adiciona = (dado:any) => {
     setPesquisa(dado);
   };
 
@@ -92,7 +92,7 @@ export const ListaProd11utos = ({ codigo_orcamento }) => {
   //////////////////
   useEffect(() => {
     let aux = 0;
-    selectedItem.forEach((e) => {
+    selectedItem.forEach((e:any) => {
       e.total = e.quantidade * e.preco - e.desconto;
       aux += e.total;
     });

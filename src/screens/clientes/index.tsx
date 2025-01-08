@@ -3,6 +3,7 @@ import {Text, Button, FlatList, Image, Modal, TextInput, TouchableOpacity, View 
 import { useClients } from "../../database/queryClientes/queryCliente";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export function Clientes({navigation}){
     
@@ -152,6 +153,27 @@ export function Clientes({navigation}){
                          keyExtractor={(i)=>i.codigo}
                      />
                 </View>
+
+                <TouchableOpacity
+                style={{
+                    backgroundColor: '#185FED', 
+                    width: 50, 
+                    height: 50,   
+                    borderRadius: 25,  
+                    position: "absolute",       
+                    bottom: 150,                 
+                    right: 30,                   
+                    elevation: 10,               
+                    alignItems: "center", 
+                    justifyContent: "center",
+                    zIndex: 999,             // Garante que o botão fique sobre os outros itens
+                }}
+                onPress={() => {
+                    navigation.navigate('cadastro_cliente')
+                }}
+            >
+                <MaterialIcons name="add-circle" size={45} color="#FFF" />
+            </TouchableOpacity>
         
                 </View>
             )

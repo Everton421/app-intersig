@@ -4,12 +4,12 @@ import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import { useMarcas } from "../../database/queryMarcas/queryMarcas"
-import AntDesign from "@expo/vector-icons/AntDesign";
 import { RenderModalCategorias } from "./modalCategorias"
 import { RenderModalMarcas } from "./modalMarcas"
 import useApi from "../../services/api"
+import { useProducts } from "../../database/queryProdutos/queryProdutos"
 
-export const Cadastro_produto = () => {
+export const Cadastro_produto = ({navigation}:any) => {
 
     const [ categorias , setCategorias ] = useState([]);
     
@@ -29,6 +29,7 @@ export const Cadastro_produto = () => {
 
     const useQueryCategoria = useCategoria();
     const useQueryMarcas = useMarcas();
+    const useQueryProdutos = useProducts();
     const api = useApi();
 
 
@@ -50,9 +51,18 @@ export const Cadastro_produto = () => {
                 "marca":marcaSelecionada.codigo,
                 "grupo":categoriaSelecionada.codigo
             }
+             let response =   await api.post('/produtos', data)
+             if(response.data.codigo > 0 ){
 
-            let response =   await api.post('/produtos', data)
-            console.log(response.data)
+                try{
+                 await useQueryProdutos.createByCode(response.data, response.data.codigo)
+                 Alert.alert(`Produto ${descricao} registrado com sucesso!`)
+                 setTimeout(()=>{},1000)
+                 navigation.goBack()
+                }catch(e){
+                    console.log(" ocorreu um erro ao cadastrar o produto ",e)
+                }
+                }
     }
 
     return (
@@ -94,19 +104,19 @@ export const Cadastro_produto = () => {
                     />
                 </View>
                
-                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 25, elevation: 5 }}>
+                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
                     <Text > SKU: </Text>
                         <TextInput
                                 onChangeText={(value)=> setSku( value )}
                             />
                     </View>
-                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 25, elevation: 5 }}>
+                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
                     <Text > Cod.Barras: </Text>
                         <TextInput
                                 onChangeText={(value)=> setGtim( value )}
                         />
                 </View>
-                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 25, elevation: 5 }}>
+                <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
                     <Text > Referencia: </Text>
                             <TextInput
                                 onChangeText={(value)=> setReferencia( value )}
@@ -128,8 +138,8 @@ export const Cadastro_produto = () => {
     
                 <View style={{ flexDirection: "row", marginTop:50 ,width: '100%', alignItems: "center", justifyContent: "center" }} >
                     <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius:  5, padding: 5 }}
-                        onPress={()=>gravar()}
+                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius:  10, padding: 5 }}
+                         onPress={()=>gravar()}
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
                     </TouchableOpacity>

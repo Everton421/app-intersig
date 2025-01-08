@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Touchable } from 'react-native';
-import { api } from '../../../../services/api';  
 import { ClienteContext } from '../../../../contexts/clienteDoOrcamento';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';

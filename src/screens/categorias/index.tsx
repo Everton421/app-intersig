@@ -5,34 +5,47 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useEffect, useState } from "react";
 import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 import { FlatList } from "react-native-gesture-handler";
-
+import { useFocusEffect } from "@react-navigation/native";
 
 export const Categoria = ( {navigation} )=>{
 const [ press, setPress ] = useState(false);
 const [ dados, setDados ] = useState([]);
-const [ pesquisa, setPesquisa ] = useState();
+const [ pesquisa, setPesquisa ] = useState<string | undefined >('');
 
 const useQueryCategoria = useCategoria();
     
-    useEffect(
-            ()=>{
-                
-                async function busca(){ 
-                        let data:any  = await useQueryCategoria.selectAll();
+
+    useFocusEffect(
+                ()=>{
+                    
+                    async function busca(){ 
+                            let data:any  = await useQueryCategoria.selectAll();
+                            if( data?.length > 0  ){
+                                setDados(data) 
+                            }   
+                        }
+
+                    if( pesquisa === '' || pesquisa === undefined){
+                        busca();
+                    }
+                } 
+            )
+ 
+            useEffect(
+                ()=>{   
+                    async function busca(){
+                        let data:any  = await useQueryCategoria.selectByDescription(pesquisa);
                         if( data?.length > 0  ){
                             setDados(data) 
-                        }   
-                      
+                        }  
                     }
-                busca();
-            },[]
-        )
 
-        async function busca(){ 
-            let data = await useQueryCategoria.selectAll();
-            console.log(data)
-        }
-
+                    if( pesquisa !== '' || pesquisa !== undefined){
+                    busca();
+                }
+                },[ pesquisa ]
+            )
+  
          function renderItem({item}){
               return(
                   <TouchableOpacity 

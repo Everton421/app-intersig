@@ -1,7 +1,6 @@
 import { createDrawerNavigator, DrawerItem } from '@react-navigation/drawer';
 import { Configurações } from '../../screens/configurações';
 import { Home } from '../../screens/home';
-import { Background } from 'victory-native';
 
 const Drawer = createDrawerNavigator();
 

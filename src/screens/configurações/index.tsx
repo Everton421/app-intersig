@@ -276,6 +276,7 @@ export const Configurações = () => {
     setItem('categorias');
     try {
       const aux = await api.get('/offline/categorias');
+      console.log("request categorias ", aux.data )
       const data = aux.data;
       let TotalCategorias = data.length
       for (let i = 0; i < data.length; i++ ) {

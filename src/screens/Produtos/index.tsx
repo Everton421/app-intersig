@@ -6,11 +6,11 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BottomTabProdutos } from "../../routes/bottomTabsProduto";
-
+import { useFocusEffect  } from "@react-navigation/native";
 
 export function Produtos ( {navigation} ){
   const useQueryProdutos = useProducts();
-const [ pesquisa, setPesquisa ] = useState(1);
+const [ pesquisa, setPesquisa ] = useState();
 const [ dados , setDados ] = useState();
 const [ pSelecionado, setpSelecionado ] = useState();
 const [ visible, setVisible ] = useState(false);
@@ -29,6 +29,21 @@ useEffect(()=>{
            filtrar();
 
         },[ pesquisa ])
+///////
+useFocusEffect(
+            ()=>{
+                async function filtrar(){
+                    const response = await useQueryProdutos.selectAll();
+    
+                    if(response.length > 0  ){
+                        setDados(response)
+                    }
+                }
+    
+               filtrar();
+            } 
+        )
+///////
 
         function handleSelect(item){
                 setpSelecionado(item);
@@ -89,7 +104,7 @@ useEffect(()=>{
            </View>
              
                 <Modal transparent={true} visible={ visible }>
-                    <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
+                    <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: '#FFF'}} >
                         
                         <View style={{ width:'96%',height:'97%', backgroundColor:'#E0E0E0', borderRadius:10}} >
                             

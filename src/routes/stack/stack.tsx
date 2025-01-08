@@ -15,20 +15,15 @@ import { Servicos } from "../../screens/servicos";
  
 import { AuthContext } from "../../contexts/auth";
 import { Usuarios } from "../../screens/usuarios";
-import { Teste } from "../../components/teste";
 import { Cadastro_produto } from "../../screens/cadastro_produto";
-import { Grupos } from "../../screens/categorias";
 import { ViewTabProdutos } from "../../screens/tabProdutos";
 import { Cadastro_Marcas } from "../../screens/cadastrarMarcas";
 import { Cadastro_Categorias } from "../../screens/cadastrarCategorias";
+import { Cadastro_cliente } from "../../screens/cadastro_cliente";
 
 const Stack = createStackNavigator();
 
     export const  MyStack = ()=>{
-
-  //const {  produtos }: any = useContext(ProdutosContext);
-  const { logado, setLogado, usuario , setUsuario }:any = useContext(AuthContext)
-
 
         return(
                 <Stack.Navigator>
@@ -45,6 +40,7 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="NovaOs" component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="usuarios" component={Usuarios}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_produto" component={Cadastro_produto}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="cadastro_cliente" component={Cadastro_cliente}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_marcas" component={Cadastro_Marcas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_categorias" component={ Cadastro_Categorias }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="ViewTabProdutos" component={ViewTabProdutos} options={{headerShown:false}} />

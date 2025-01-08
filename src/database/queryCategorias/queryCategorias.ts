@@ -66,7 +66,17 @@ const db = useSQLiteContext();
             return result;
         }catch(e){ console.log( "erro ao buscar as categorias ",e) }
     }  
+
+    async function selectByDescription( descricao:string ){
+        try{
+            let result   = await db.getAllAsync   ( `SELECT * ,
+                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro FROM categorias WHERE descricao like ?     `,  `%${descricao}%` )
+            //console.log(result);
+            return result;
+        }catch(e){ console.log(`erro ao consultar o categoria ${descricao} `,e)}
+    }
  
-    return { selectAll, selectByCode, create,update  } 
+    return { selectAll, selectByCode, create,update ,selectByDescription } 
  
 }

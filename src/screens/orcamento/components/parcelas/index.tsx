@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Modal, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { ProdutosContext } from "../../../../contexts/produtosDoOrcamento";  
-import { api } from "../../../../services/api";
 import { ScrollView } from "react-native-gesture-handler";
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';

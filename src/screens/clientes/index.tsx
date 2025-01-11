@@ -1,30 +1,45 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {Text, Button, FlatList, Image, Modal, TextInput, TouchableOpacity, View } from "react-native";
 import { useClients } from "../../database/queryClientes/queryCliente";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useFocusEffect } from "@react-navigation/native";
+import { AuthContext } from "../../contexts/auth";
 
 export function Clientes({navigation}){
     
-    const [ pesquisa, setPesquisa ] = useState(1);
+    const [ pesquisa, setPesquisa ] = useState('');
     const [ dados , setDados ] = useState([]);
     const [ cSelecionado, setcSelecionado ] = useState();
     const [ visible, setVisible ] = useState(false);
     
     const useQueryClients = useClients();
 
+  const { usuario }: any = useContext(AuthContext);
 
     ////////////////
+
+       
      useEffect(()=>{
     
                 async function filtrar(){
-                    const response = await useQueryClients.selectByDescription( pesquisa , 10);
-                    if(response.length > 0  ){
-                        console.log(response)
-                        setDados(response)
-                    }
+                    if( pesquisa !== ''){
+                        const response:any = await useQueryClients.selectByDescription( pesquisa , 10);
+                        if(response.length > 0  ){
+                            console.log(response)
+                            setDados(response)
+                        }
+                    }else{
+                        const response:any = await useQueryClients.selectAllLimit(10);
+                        if(response.length > 0  ){
+                            console.log(response)
+                            setDados(response)
+                        }
+                    }  
                 }
+
+
                filtrar();
     
       },[ pesquisa ])
@@ -58,31 +73,28 @@ export function Clientes({navigation}){
 
 
             return(
-                <View style={{ flex:1 ,    backgroundColor:'#EAF4FE'}}>
-                <View style={{   padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-                     <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                         <Ionicons name="arrow-back" size={25} color="#FFF" />
-                     </TouchableOpacity>
-                 
-                       
-                     <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                         < TextInput 
-                             style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                             onChangeText={(value)=>setPesquisa(value)}
-                             placeholder="pesquisar"
-        
-                         /> 
-                        {/** 
-                         <TouchableOpacity onPress={ ()=> setShowPesquisa(false) }   >
-                             <AntDesign name="closecircle" size={24} color="red" />
-                         </TouchableOpacity>
-                    */ }
-        
-                             <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
-                             >
-                                 <AntDesign name="filter" size={35} color="#FFF" />
-                             </TouchableOpacity>
-                       </View>
+                <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
+                <View style={{ backgroundColor:'#185FED', }}> 
+                   <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
+                      <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
+                          <Ionicons name="arrow-back" size={25} color="#FFF" />
+                      </TouchableOpacity>
+                  
+                        
+                      <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
+                          < TextInput 
+                              style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
+                              onChangeText={(value)=>setPesquisa(value)}
+                              placeholder="pesquisar"
+                          /> 
+      
+                          <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
+                              >
+                                  <AntDesign name="filter" size={35} color="#FFF" />
+                              </TouchableOpacity>
+                          </View>
+                   </View>
+                       <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Clientes </Text>
                  </View>
                         <Modal transparent={true} visible={ visible }>
                             <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
@@ -146,13 +158,11 @@ export function Clientes({navigation}){
         
                         </Modal>
         
-                <View style={ { marginTop:4, alignItems:"center"} } > 
                      <FlatList
                          data={dados}
                          renderItem={(item)=> renderItem(item)}
                          keyExtractor={(i)=>i.codigo}
                      />
-                </View>
 
                 <TouchableOpacity
                 style={{

@@ -117,6 +117,9 @@ export const Login = ({ navigation }) => {
           response.data.message || "Erro desconhecido ao logar na empresa."
         );
       }
+      if(response.status === 400){
+        Alert.alert('ocorreu um erro ao tentar se comunicar com a api!')
+      }
     }
   }
 

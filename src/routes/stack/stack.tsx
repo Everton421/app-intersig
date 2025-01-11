@@ -20,6 +20,9 @@ import { ViewTabProdutos } from "../../screens/tabProdutos";
 import { Cadastro_Marcas } from "../../screens/cadastrarMarcas";
 import { Cadastro_Categorias } from "../../screens/cadastrarCategorias";
 import { Cadastro_cliente } from "../../screens/cadastro_cliente";
+import { FormasPagamento } from "../../screens/formasDePagamento";
+import { Cadastro_FormaPagamento } from "../../screens/cadastro-FormaPagamento";
+import { Teste } from "../../components/teste";
 
 const Stack = createStackNavigator();
 
@@ -43,10 +46,19 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="cadastro_cliente" component={Cadastro_cliente}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_marcas" component={Cadastro_Marcas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_categorias" component={ Cadastro_Categorias }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+
+                    <Stack.Screen name="Teste" component={ Teste }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+
+
                     <Stack.Screen name="ViewTabProdutos" component={ViewTabProdutos} options={{headerShown:false}} />
                     <Stack.Screen name="vendas" component={Vendas} options={{headerShown:false}} />
                     <Stack.Screen name="OS" component={Tela_os}  options={{headerShown:false}} />
-                     
+
+                    <Stack.Screen name="formasPagamento" component={FormasPagamento }   options={{headerShown:false}} />
+                    <Stack.Screen name="cadastro_formaPagamento" component={Cadastro_FormaPagamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+
+        
+                    
                 </Stack.Navigator>
         )
     }

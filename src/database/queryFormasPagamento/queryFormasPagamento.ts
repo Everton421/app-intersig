@@ -31,9 +31,7 @@ type fpgt = {
                      (codigo,descricao, desc_maximo, parcelas, intervalo, recebimento ,  data_cadastro, data_recadastro 
                      ) values ( ${forma.codigo},'${forma.descricao}',  ${forma.desc_maximo},  ${forma.parcelas},  ${forma.intervalo}, ${forma.recebimento},'${forma.data_cadastro}',  '${forma.data_recadastro}' );`);
 
-                      console.log('');
-                      console.log(result);
-                      console.log('');
+                      return result.lastInsertRowId;
                      }
             }catch( e ){ console.log(e) }
     }
@@ -83,6 +81,19 @@ type fpgt = {
         }catch(e){ console.log(`erro ao consultar a forma de pagamento com o codigo :  ${code}`,e)}
     }
 
+
+    async function selectByDescription( descricao:string ){
+        try{
+            let result   = await db.getAllAsync   ( `SELECT *   ,
+                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro 
+                   FROM forma_pagamento WHERE descricao like  ? `, `%${descricao}%`)
+            //console.log(result);
+            return result;
+        }catch(e){ console.log(`erro ao consultar a forma de pagamento  :  ${descricao}`,e)}
+    }
+
+
     async function selectAll(){
         try{
             let result = await db.getAllAsync(`SELECT *  ,
@@ -94,6 +105,6 @@ type fpgt = {
         }catch(e){ console.log(e) }
     }  
 
-    return { selectAll, selectByCode, create,update} 
+    return { selectAll, selectByCode, create,update, selectByDescription} 
 
 }

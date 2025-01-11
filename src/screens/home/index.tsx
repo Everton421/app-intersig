@@ -16,7 +16,7 @@ import { restartDatabaseService } from "../../services/restartDatabase";
 import { useProducts } from "../../database/queryProdutos/queryProdutos";
 import { useServices } from "../../database/queryServicos/queryServicos";
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
- 
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export const Home = ({navigation}:any) => {
   const { setLogado , setUsuario, usuario}: any = useContext(AuthContext);
@@ -97,8 +97,8 @@ useEffect(
           }, 
        { "nome":"settings",
        "icon":<FontAwesome5 name="sync-alt" size={24} color="#185FED" />
-       } 
-       
+       }
+     
     ];
 
   const Item = ({ value }: any) => {
@@ -109,7 +109,7 @@ useEffect(
               {value.icon}
 
           </View>
-          <Text style={{fontSize:15, fontWeight:"bold", textAlign:"center"}}> {value.nome}</Text>
+          <Text style={{fontSize:15, fontWeight:"bold", textAlign:"center", maxWidth:150}}> {value.nome}</Text>
  
 
       </TouchableOpacity>
@@ -173,11 +173,22 @@ useEffect(
                             <Feather name="users" size={30} color="#185FED" />
                          </View>
                               <Text style={{ fontWeight:"bold", fontSize:18, color:'#333' ,width: '50%' ,textAlign:'center'}} >clientes</Text>
-                              <AntDesign name="caretright" size={24} color="#185FED" />
+                              <AntDesign name="caretdown" size={24} color="#185FED" />
+                    </TouchableOpacity>
+                    
+                    
+                    <TouchableOpacity style={{ backgroundColor:'#FFF', marginTop:15,width:'80%',padding:15, borderRadius:10, elevation:2 , flexDirection:"row", justifyContent:"space-between", alignItems:"center" }}
+                    onPress={()=>{ navigation.navigate('formasPagamento')}}
+                   >
+                         <View style={{ backgroundColor:'#EAF4FE' , flexDirection:"row",   height:50, width:50, alignItems:"center",justifyContent:"center", borderRadius:7, elevation:3 }}>
+                         <MaterialIcons name="payment" size={30} color="#185FED" />
+                         </View>
+                              <Text style={{ fontWeight:"bold", fontSize:15, color:'#333' ,width: '50%' ,textAlign:'center'}} >formas de pagamento</Text>
+                              <AntDesign name="caretdown" size={24} color="#185FED" />
                     </TouchableOpacity>
 
 
-                
+            
 
                  </View>
 

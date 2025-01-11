@@ -20,7 +20,11 @@
         "foregroundImage": "./assets/splash-intersig.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.everton421.appintersig"
+      "package": "com.everton421.appintersig",
+      "permissions": [
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE" 
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

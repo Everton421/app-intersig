@@ -35,20 +35,18 @@ export const Routes = ( )=>{
     }, [setConnected]);
      
         
-    React.useEffect(() => {
-    }, [setConnected]);
 
     return(
         <NavigationContainer>
-          {
-            logado ?
-                        <OrcamentoProvider>
-                                   <MyStack/> 
-                                 {/**     <MyDrawer/> */}
-                                   
-                      </OrcamentoProvider>
-              :
-              <AuthStack/>
+          { 
+             logado ?
+                         <OrcamentoProvider>
+                                    <MyStack/> 
+                                  {/**     <MyDrawer/> */}
+                                    
+                       </OrcamentoProvider>
+               :
+               <AuthStack/>
           }  
 
    {/**  <MyDrawer/>  */}

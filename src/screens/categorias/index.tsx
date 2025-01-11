@@ -46,7 +46,7 @@ const useQueryCategoria = useCategoria();
                 },[ pesquisa ]
             )
   
-         function renderItem({item}){
+         function renderItem({item}:any){
               return(
                   <TouchableOpacity 
                      // onPress={ ()=> handleSelect(item) }
@@ -55,7 +55,6 @@ const useQueryCategoria = useCategoria();
                      <Text style={{ fontWeight:"bold"}}>
                         Codigo: {item.codigo}
                      </Text>
-  
                      <Text>
                        {item.descricao}
                      </Text>

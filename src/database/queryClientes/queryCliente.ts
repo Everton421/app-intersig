@@ -67,7 +67,14 @@ export const  useClients = ()=>{
     }catch( e ){ console.log(`erro ao consultar o clientes`,e )} 
     }
 
+    async function selectAllLimit( limit:number ) {
+        try{
+        const result = await db.getAllAsync(` SELECT *, strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro FROM clientes limit ? `,  `${limit}`);
+        console.log(result)
+        return result;
 
+    }catch( e ){ console.log(`erro ao consultar o clientes`,e )} 
+    }
 
     
     
@@ -212,7 +219,7 @@ export const  useClients = ()=>{
                                 );`
                         )
                         console.log( `cliente cadastrado `,result.lastInsertRowId)
-                        return;
+                        return result.lastInsertRowId;
 
                     }catch(e){ 
                         console.log(`erro ao cadastrar o cliente : ${client.codigo}  `,e) }
@@ -254,5 +261,5 @@ export const  useClients = ()=>{
     }
 
 
-    return {selectByDescription,selectByCnpjAndCode, selectByCode, selectAll, create,createByCode,update,deleteAll, deleteByCode, restartTable}
+    return {selectByDescription,selectByCnpjAndCode, selectByCode, selectAll, create,createByCode,update,deleteAll, deleteByCode, restartTable ,selectAllLimit}
 }

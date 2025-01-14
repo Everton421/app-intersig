@@ -30,41 +30,13 @@ useEffect(()=>{
 
         },[ pesquisa ])
 
-        function handleSelect(item){
-                setpSelecionado(item);
-            setVisible(true)
-        }
-
-        
-        function renderItem({item}){
-            return(
-                <TouchableOpacity 
-                    onPress={ ()=> handleSelect(item) }
-                    style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
-                 >
-                   <Text style={{ fontWeight:"bold"}}>
-                      Codigo: {item.codigo}
-                   </Text>
-
-                   <Text>
-                     {item.descricao}
-                   </Text>
-                <View style={{ flexDirection:"row", justifyContent:"space-between", margin:3}}>  
-                    <Text style={{ fontWeight:"bold"}}>
-                      R$ {item.preco.toFixed(2)}
-                    </Text>
-                    <Text style={{ fontWeight:"bold"}}>
-                       estoque: {item.estoque}
-                    </Text>
-                </View>
-                </TouchableOpacity>
-            )
-        }
+     
 
       
-      return <BottomTabProdutos/>
-      
-      
-   
+      return(
+      <View style={{ flex:1}}>
+        <BottomTabProdutos/>
+      </View>
+      )
      
 }

@@ -23,6 +23,7 @@ import { Cadastro_cliente } from "../../screens/cadastro_cliente";
 import { FormasPagamento } from "../../screens/formasDePagamento";
 import { Cadastro_FormaPagamento } from "../../screens/cadastro-FormaPagamento";
 import { Teste } from "../../components/teste";
+import { Cadastro_servico } from "../../screens/cadastro_servicos";
 
 const Stack = createStackNavigator();
 
@@ -33,7 +34,11 @@ const Stack = createStackNavigator();
    
                     <Stack.Screen name="home" component={Home} options={{headerShown:false}} />
                     <Stack.Screen name="produtos" component={Produtos} options={{headerShown:false}} />
+
                     <Stack.Screen name="serviços" component={Servicos}  options={{headerShown:false}} />
+                    <Stack.Screen name="cadastro_servico" component={Cadastro_servico}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    
+                    
                     <Stack.Screen name="clientes" component={Clientes} options={{headerShown:false}} />
                     <Stack.Screen name="settings" component={Configurações}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="editarOrcamento" component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />

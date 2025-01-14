@@ -5,7 +5,6 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { BottomTabProdutos } from "../../routes/bottomTabsProduto";
 import { useFocusEffect  } from "@react-navigation/native";
 
 export function Produtos ( {navigation} ){

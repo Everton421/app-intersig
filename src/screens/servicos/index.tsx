@@ -142,7 +142,7 @@ export function Servicos({navigation}){
                     zIndex: 999,             // Garante que o botão fique sobre os outros itens
                 }}
                 onPress={() => {
-                    //navigation.navigate('cadastro_cliente')
+                     navigation.navigate('cadastro_servico')
                 }}
             >
                 <MaterialIcons name="add-circle" size={45} color="#FFF" />

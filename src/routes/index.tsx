@@ -11,7 +11,6 @@ import OrcamentoProvider from "../contexts/orcamentoContext";
 import ConnectedProvider, { ConnectedContext } from "../contexts/conectedContext";
 import NetInfo from '@react-native-community/netinfo';
 import { AuthStack } from "./stack/authStack";
-import { MyDrawer } from "./stack/drawer";
 
 export const Routes = ( )=>{
     const { logado, setLogado, usuario , setUsuario }:any = useContext(AuthContext)
@@ -21,18 +20,21 @@ export const Routes = ( )=>{
 
       
     React.useEffect(() => {
-        // Adiciona o listener
+
+     function setConexao(){
         const unsubscribe = NetInfo.addEventListener(state => {
-              //setConnected(false)
                 setConnected(state.isConnected);
-                console.log('conectado :', state.isConnected);
+                console.log('conexao com a internet :', state.isConnected);
         
            });
         // Remove o listener quando o componente for desmontado
         return () => {
             unsubscribe();
         };
-    }, [setConnected]);
+    }
+    setConexao();
+
+    }, []);
      
         
 

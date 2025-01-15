@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import useApi from "../../services/api"
 import { useServices } from "../../database/queryServicos/queryServicos"
+import { ConnectedContext } from "../../contexts/conectedContext"
+import NetInfo from '@react-native-community/netinfo';
 
 export const Cadastro_servico = ({navigation}:any) => {
 
@@ -11,9 +13,29 @@ export const Cadastro_servico = ({navigation}:any) => {
     const api = useApi();
     const useQueryServices = useServices();
 
+    const {connected,  setConnected} = useContext(ConnectedContext)
+
+
+
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener(state => {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+           
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
 
 
     async function gravar (){
+
+            if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
             if(!aplicacao) return Alert.alert('É necessario informar a descrição para gravar o serviço!');
             if(!valor) return Alert.alert('É necessario informar o valor para gravar o serviço !');
@@ -39,6 +61,7 @@ export const Cadastro_servico = ({navigation}:any) => {
                          console.log(" ocorreu um erro ao cadastrar o Serviço ",e)
                      }
                      }
+                    
         }
 
 

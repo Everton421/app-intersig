@@ -1,9 +1,11 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, Platform, ScrollView, Modal } from "react-native";
 import useApi from "../../services/api";
 import { useClients } from "../../database/queryClientes/queryCliente";
 import { AuthContext } from "../../contexts/auth";
 import { AntDesign } from '@expo/vector-icons';
+import NetInfo from '@react-native-community/netinfo';
+import { ConnectedContext } from "../../contexts/conectedContext"
 
 export const Cadastro_cliente = ({ navigation }: any) => {
     const [cnpj, setCnpj] = useState<string>();
@@ -21,7 +23,23 @@ export const Cadastro_cliente = ({ navigation }: any) => {
     const useQueryClient = useClients();
     const { usuario }: any = useContext(AuthContext);
 
-    type client = {
+    const {connected,  setConnected} = useContext(ConnectedContext)
+
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener((state) => {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
+   
+       type client = {
         cnpj: string | undefined
         ie: string | undefined
         nome: string | undefined
@@ -35,6 +53,8 @@ export const Cadastro_cliente = ({ navigation }: any) => {
     }
 
     async function gravar() {
+        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
+
         if (!cnpj || cnpj === '') return Alert.alert('É necessario informar o cpnj/cpf para gravar!');
         if (!ie || ie === '') return Alert.alert('É necessario informar a ie/rg para gravar!');
         if (!nome || nome === '') return Alert.alert('É necessario informar a razao/nome da empresa para gravar!');

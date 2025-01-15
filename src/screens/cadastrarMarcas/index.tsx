@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert, Button, Image, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 import useApi from "../../services/api";
 import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 import { useMarcas } from "../../database/queryMarcas/queryMarcas";
-
+import NetInfo from '@react-native-community/netinfo';
+import { ConnectedContext } from "../../contexts/conectedContext"
 export const Cadastro_Marcas = ( {navigation}:any ) => {
 
 
@@ -14,8 +15,27 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
      
     const api = useApi();
     const useQueryMarcas = useMarcas();
+    const {connected,  setConnected} = useContext(ConnectedContext)
 
-        async function gravar (){
+     
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener((state) => {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
+
+    
+    async function gravar (){
+        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
+
             if(!input || input === "") return Alert.alert("é necessario informar a descricao!") 
             let resposta = await api.post('/offline/marcas', { "descricao": input});
                  

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
@@ -7,18 +7,17 @@ import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { RenderModalCategorias } from "./modalCategorias"
 import { RenderModalMarcas } from "./modalMarcas"
 import useApi from "../../services/api"
+import NetInfo from '@react-native-community/netinfo';
+import { ConnectedContext } from "../../contexts/conectedContext"
+
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
 
 export const Cadastro_produto = ({navigation}:any) => {
-
     const [ categorias , setCategorias ] = useState([]);
-    
     const [ verMarcas, setVerMarcas ] = useState<boolean>(false)
     const [ verCategorias, setVerCategorias ] = useState<boolean>(false)
     const [ marcaSelecionada, setMarcaSelecionada ] = useState(); 
     const [ categoriaSelecionada, setCategoriaSelecionada ] = useState(); 
-
-     
     const [ estoque, setEstoque ] = useState<number>();
     const [ preco, setPreco ] = useState<number>();
     const [ sku, setSku ] = useState<string>();
@@ -26,14 +25,32 @@ export const Cadastro_produto = ({navigation}:any) => {
     const [descricao, setDescricao] = useState<string>();
     const [ gtim, setGtim ] = useState<string>();
     const [ referencia, setReferencia ] = useState<string>();
-
     const useQueryCategoria = useCategoria();
     const useQueryMarcas = useMarcas();
     const useQueryProdutos = useProducts();
     const api = useApi();
+    const {connected,  setConnected} = useContext(ConnectedContext)
+
+
+
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener((state) => {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
 
 
     async function gravar (){
+        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
+
         if(!preco) setPreco(0);
         if(!estoque) setEstoque(0);
         if(!sku) setSku('');

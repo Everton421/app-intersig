@@ -4,8 +4,10 @@ import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
  
 import useApi from "../../services/api"
 import { useSQLiteContext } from "expo-sqlite"
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
+import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+import { ConnectedContext } from "../../contexts/conectedContext"
 
 export const Cadastro_Categorias = ({navigation}:any) => {
 
@@ -14,8 +16,28 @@ export const Cadastro_Categorias = ({navigation}:any) => {
      
     const api = useApi();
     const useQueryCategoria = useCategoria();
+    const {connected,  setConnected} = useContext(ConnectedContext)
+
+
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener((state:NetInfoState)=> {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
+
 
         async function gravar (){
+
+        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
+
             if(!input || input === "") return Alert.alert("é necessario informar a descricao!") 
             let resposta = await api.post('/offline/categorias', { "descricao": input});
                  

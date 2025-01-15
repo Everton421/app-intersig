@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Alert, Button, FlatList, Image, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
@@ -6,7 +6,8 @@ import useApi from "../../services/api";
 import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
-
+import NetInfo from '@react-native-community/netinfo';
+import { ConnectedContext } from "../../contexts/conectedContext"
 export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
 
 
@@ -19,12 +20,26 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
     const [ descricao, setDescricao ] = useState<string>(); 
     let api = useApi();
     let useQueryfpgt = useFormasDePagamentos();
+    const {connected,  setConnected} = useContext(ConnectedContext)
 
      type parcela = {
         parcela:number
         vencimento:number
     }
 
+    useEffect(() => {
+        function setConexao(){
+           const unsubscribe = NetInfo.addEventListener((state) => {
+                   setConnected(state.isConnected);
+                   console.log('conexao com a internet :', state.isConnected);
+              });
+           // Remove o listener quando o componente for desmontado
+           return () => {
+               unsubscribe();
+           };
+       }
+       setConexao();
+       }, []);
 
     const Gerar = () => {
         let vencimento = intervalo;
@@ -54,6 +69,8 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
     };
 
     async function gravar() {
+        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
+
         if(!intervalo || intervalo === null) return Alert.alert('É necessario informar o intervalo para gravar!')
          if(!quantidade || quantidade === null) return Alert.alert('É necessario informar a quantidade de parcelas para gravar!')
             let data =

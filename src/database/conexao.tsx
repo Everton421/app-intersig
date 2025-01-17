@@ -18,7 +18,7 @@ export async function construtor(db: SQLiteDatabase) {
     --  DROP TABLE IF EXISTS servicos_pedido ;
     --  DROP TABLE IF EXISTS parcelas ;
     --  DROP TABLE IF EXISTS empresas;
-
+    --  DROP TABLE IF EXISTS fotos_produtos;
 
   CREATE TABLE IF NOT EXISTS usuarios (
       codigo INTEGER  NOT NULL, 
@@ -193,6 +193,15 @@ export async function construtor(db: SQLiteDatabase) {
        data_recadastro TEXT NOT NULL 
       );
 
+      CREATE TABLE IF NOT EXISTS fotos_produtos(
+       produto INTEGER NOT NULL DEFAULT 0,
+       sequencia INTEGER NOT NULL DEFAULT 0,
+       descricao TEXT NOT NULL,
+       link TEXT NOT NULL,
+       foto TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL
+      )
      `); 
  
   console.log('banco carregado com sucesso !');

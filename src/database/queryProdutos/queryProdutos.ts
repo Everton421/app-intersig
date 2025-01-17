@@ -43,7 +43,11 @@ export const useProducts = ()=>{
           }
 
           async function selectAll() {
-                 const result = await db.getAllAsync(`SELECT * FROM produtos`);
+                 const result = await db.getAllAsync(
+                  `SELECT * 
+                  FROM produtos  where codigo=1
+                 
+                  `);
           //  console.log(result);
                  return result;
           }

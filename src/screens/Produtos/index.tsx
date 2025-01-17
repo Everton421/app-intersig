@@ -6,14 +6,28 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useFocusEffect  } from "@react-navigation/native";
+import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos";
 
-export function Produtos ( {navigation} ){
-  const useQueryProdutos = useProducts();
+export function Produtos ( {navigation}:any ){
+  
+    const useQueryProdutos = useProducts();
+    const useQueryFotos = useFotosProdutos();
+
 const [ pesquisa, setPesquisa ] = useState();
 const [ dados , setDados ] = useState();
 const [ pSelecionado, setpSelecionado ] = useState();
 const [ visible, setVisible ] = useState(false);
 
+type fotoProduto =
+ {
+produto: number,
+sequencia:number,
+descricao:string,
+link:string,
+foto:string,
+data_cadastro:string,
+data_recadastro:string 
+ }
 
 useEffect(()=>{
 
@@ -29,18 +43,32 @@ useEffect(()=>{
 
         },[ pesquisa ])
 ///////
-useFocusEffect(
+useEffect(
             ()=>{
                 async function filtrar(){
                     const response = await useQueryProdutos.selectAll();
-    
+                    for( let p of response ){
+                        let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+                        if(dadosFoto?.length > 0 ){
+                            p.fotos = dadosFoto
+                        }
+                    }
+                    console.log(response[0].fotos)
+
+                    const response2 = await useQueryProdutos.selectByCode(1);
+                    
                     if(response.length > 0  ){
                         setDados(response)
                     }
+                        let aux:fotoProduto = { produto:1, sequencia:1, link:'https://i.ibb.co/L0Cxydc/Screenshot-3.png', foto:'foto1', descricao:'foto1', data_cadastro:'2025-01-17', data_recadastro:'2025-01-01 00:00:00'};
+                      // await useQueryFotos.create(aux);
+                      //let data = await useQueryFotos.selectAll();
+                       // await useQueryFotos.deleteAll();
                 }
     
                filtrar();
-            } 
+ 
+            },[]
         )
 ///////
 
@@ -56,6 +84,12 @@ useFocusEffect(
                     onPress={ ()=> handleSelect(item) }
                     style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
                  >
+                       <Image
+                             source={{ uri: `${item.fotos[0].link}` }}
+                             // style={styles.galleryImage}
+                             style={{ width: 100, height: 100,  borderRadius: 5,}}
+                              resizeMode="contain"
+                            />
                    <Text style={{ fontWeight:"bold"}}>
                       Codigo: {item.codigo}
                    </Text>

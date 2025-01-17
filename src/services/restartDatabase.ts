@@ -24,7 +24,7 @@ export const restartDatabaseService = ()=>{
       DROP TABLE IF EXISTS empresas;
       DROP TABLE IF EXISTS marcas;
       DROP TABLE IF EXISTS categorias;
-
+      DROP TABLE IF EXISTS fotos_produtos;
 
   CREATE TABLE IF NOT EXISTS usuarios (
       codigo INTEGER  NOT NULL, 
@@ -199,6 +199,15 @@ export const restartDatabaseService = ()=>{
        data_recadastro TEXT NOT NULL 
       );
 
+  CREATE TABLE IF NOT EXISTS fotos_produtos(
+       produto INTEGER NOT NULL DEFAULT 0,
+       sequencia INTEGER NOT NULL DEFAULT 0,
+       descricao TEXT NOT NULL,
+       link TEXT NOT NULL,
+       foto TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL
+      )
 
  
    `)

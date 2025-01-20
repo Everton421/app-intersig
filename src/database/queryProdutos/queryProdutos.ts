@@ -45,12 +45,13 @@ export const useProducts = ()=>{
           async function selectAll() {
                  const result = await db.getAllAsync(
                   `SELECT * 
-                  FROM produtos  where codigo=1
+                  FROM produtos
                  
                   `);
           //  console.log(result);
                  return result;
           }
+
 
           
           async function selectByDescription( query:any, limit:number ) {

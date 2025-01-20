@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
@@ -11,8 +11,16 @@ import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
+import { useRoute } from "@react-navigation/native"
 
-export const Cadastro_produto = ({navigation}:any) => {
+
+type props =
+ {
+    route: any | null,
+    navigation:any
+}
+export const Cadastro_produto: React.FC  = ( { props }:any ) => {
+
     const [ categorias , setCategorias ] = useState([]);
     const [ verMarcas, setVerMarcas ] = useState<boolean>(false)
     const [ verCategorias, setVerCategorias ] = useState<boolean>(false)
@@ -22,16 +30,17 @@ export const Cadastro_produto = ({navigation}:any) => {
     const [ preco, setPreco ] = useState<number>();
     const [ sku, setSku ] = useState<string>();
     const [ grupo, setGrupo ] = useState<number>();
-    const [descricao, setDescricao] = useState<string>();
+    const [ descricao, setDescricao] = useState<string>();
     const [ gtim, setGtim ] = useState<string>();
     const [ referencia, setReferencia ] = useState<string>();
+
     const useQueryCategoria = useCategoria();
     const useQueryMarcas = useMarcas();
     const useQueryProdutos = useProducts();
     const api = useApi();
     const {connected,  setConnected} = useContext(ConnectedContext)
 
-
+    let { codigo_produto} = props.route.params;
 
     useEffect(() => {
         function setConexao(){
@@ -45,6 +54,23 @@ export const Cadastro_produto = ({navigation}:any) => {
            };
        }
        setConexao();
+
+       async function carregarProduto(codigo:number){
+        if( codigo_produto && codigo_produto > 0 ){
+          let dataProd = await useQueryProdutos.selectByCode(codigo);
+          let prod:any = dataProd[0]  
+          if(dataProd.length > 0 ){
+                setCategoriaSelecionada(prod.categoria);
+                setCategoriaSelecionada(prod.marca);
+                setEstoque(prod.estoque);
+                setPreco(prod.preco);
+                setSku(prod.sku);
+                setDescricao(prod.sku)
+                setGtim(prod)
+            }
+        }
+        }
+
        }, []);
 
 
@@ -75,7 +101,7 @@ export const Cadastro_produto = ({navigation}:any) => {
                  await useQueryProdutos.createByCode(response.data, response.data.codigo)
                  Alert.alert(`Produto ${descricao} registrado com sucesso!`)
                  setTimeout(()=>{},1000)
-                 navigation.goBack()
+                 props.navigation.goBack()
                 }catch(e){
                     console.log(" ocorreu um erro ao cadastrar o produto ",e)
                 }

@@ -23,6 +23,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import { useMarcas } from "../../database/queryMarcas/queryMarcas"
+import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -61,6 +62,7 @@ export const Configurações = () => {
   const useMoment = configMoment();
   const useQueryCategoria = useCategoria() 
   const useQueryMarcas = useMarcas();
+  const useQueryFotos = useFotosProdutos();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
@@ -368,6 +370,41 @@ export const Configurações = () => {
     }
   };
 
+  const fetchImgs = async () => {
+    setItem('fotos');
+
+    try {
+      const aux = await api.get('/offline/fotos');
+      const data = aux.data;
+
+      const totalimgs = data.length
+
+      for (let i = 0; i < data.length; i++ ) {
+        const verifiImg:any = await useQueryFotos.selectByCode(data[i].produto);
+        
+        if (verifiImg.length > 0) {
+
+          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
+
+          console.log(`foto: ${data_recadastro } > ${verifiImg[i].data_recadastro}` )
+
+          if (data_recadastro > verifiImg[0].data_recadastro ) {
+            await useQueryFotos.update( data[i], data[i].produto );
+          }
+
+        } else {
+          await useQueryFotos.create(data[i]);
+        }
+
+        const progressPercentage = Math.floor(((i + 1) / totalimgs) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      
+      } 
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
 
   const syncData = async () => {
     setIsLoading(true);
@@ -382,6 +419,7 @@ export const Configurações = () => {
       await fetchVeiculos();
       await fetchCategorias();
       await fetchMarcas();
+      await fetchImgs(),
       setData([]); // Atualiza o estado para mostrar dados após a sincronização
     } catch (e) {
       console.log(e);

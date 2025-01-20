@@ -33,7 +33,7 @@ useEffect(()=>{
 
             async function filtrar(){
                 const response = await useQueryProdutos.selectByDescription(pesquisa, 10);
-
+    
                 if(response.length > 0  ){
                     setDados(response)
                 }
@@ -47,23 +47,23 @@ useEffect(
             ()=>{
                 async function filtrar(){
                     const response = await useQueryProdutos.selectAll();
-                    for( let p of response ){
-                        let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
-                        if(dadosFoto?.length > 0 ){
-                            p.fotos = dadosFoto
-                        }
-                    }
-                    console.log(response[0].fotos)
-
-                    const response2 = await useQueryProdutos.selectByCode(1);
-                    
-                    if(response.length > 0  ){
-                        setDados(response)
-                    }
-                        let aux:fotoProduto = { produto:1, sequencia:1, link:'https://i.ibb.co/L0Cxydc/Screenshot-3.png', foto:'foto1', descricao:'foto1', data_cadastro:'2025-01-17', data_recadastro:'2025-01-01 00:00:00'};
-                      // await useQueryFotos.create(aux);
-                      //let data = await useQueryFotos.selectAll();
-                       // await useQueryFotos.deleteAll();
+                    console.log(response)
+                     for( let p of response ){
+                         let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+                         if(dadosFoto?.length > 0 ){
+                             p.fotos = dadosFoto
+                         }
+                     }
+                  
+                     
+                     if(response.length > 0  ){
+                         setDados(response)
+                     }
+                         let aux:fotoProduto = { produto:1, sequencia:1, link:'https://i.ibb.co/L0Cxydc/Screenshot-3.png', foto:'foto1', descricao:'foto1', data_cadastro:'2025-01-17', data_recadastro:'2025-01-01 00:00:00'};
+                       //  await useQueryFotos.create(aux);
+                       let data = await useQueryFotos.selectAll();
+                        // await useQueryFotos.deleteAll();
+                   
                 }
     
                filtrar();
@@ -74,7 +74,10 @@ useEffect(
 
         function handleSelect(item){
                 setpSelecionado(item);
-            setVisible(true)
+            //setVisible(true)
+            navigation.navigate('cadastro_produto',{
+                codigo_produto:item.codigo
+            })
         }
 
         
@@ -84,19 +87,24 @@ useEffect(
                     onPress={ ()=> handleSelect(item) }
                     style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
                  >
-                       <Image
+                    
+                   <Text style={{ fontWeight:"bold"}}>
+                      Codigo: {item.codigo}
+                   </Text>
+
+                   <Text style={{fontSize:15}}>
+                     {item.descricao}
+                   </Text>
+
+                   {  item.fotos && item.fotos[0].link &&
+                        <Image
                              source={{ uri: `${item.fotos[0].link}` }}
                              // style={styles.galleryImage}
                              style={{ width: 100, height: 100,  borderRadius: 5,}}
                               resizeMode="contain"
                             />
-                   <Text style={{ fontWeight:"bold"}}>
-                      Codigo: {item.codigo}
-                   </Text>
+                        }
 
-                   <Text>
-                     {item.descricao}
-                   </Text>
                 <View style={{ flexDirection:"row", justifyContent:"space-between", margin:3}}>  
                     <Text style={{ fontWeight:"bold"}}>
                       R$ {item.preco.toFixed(2)}
@@ -148,12 +156,20 @@ useEffect(
                                 </View>
 
                                  <View style={{ margin:10, gap:15, flexDirection:"row"}}>
-                                    <Image
-                                        style={{ width: 70 , height: 70   }}
-                                        source={{
-                                            uri:'https://reactnative.dev/img/tiny_logo.png' 
-                                        }}
-                                        />
+                                    
+
+                          {  pSelecionado?.fotos && pSelecionado?.fotos[0].link &&
+
+                                         (<Image
+                                                source={{ uri: `${pSelecionado?.fotos[0].link}` }}
+                                                // style={styles.galleryImage}
+                                                style={{ width: 70 , height: 70   }}
+                                                resizeMode="contain"
+                                                />
+                                        ) 
+                                            }
+
+
                                      <View style={{ backgroundColor:'#fff', borderRadius:5, height:25, elevation:5 }}>
                                          <Text style={{ fontWeight:"bold" }} > Codigo: {pSelecionado?.codigo} </Text>
                                      </View>   

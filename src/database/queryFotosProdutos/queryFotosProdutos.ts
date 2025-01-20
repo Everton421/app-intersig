@@ -15,7 +15,7 @@ data_cadastro:string,
 data_recadastro:string 
  }
 
-async function create(  foto:fotoProduto ) {
+async function create(  foto:fotoProduto  ) {
     try{
       
       //  let aux:any  = await selectByCode( marca.codigo ); 
@@ -46,6 +46,25 @@ async function create(  foto:fotoProduto ) {
     }catch( e ){ console.log(`erro ao registrar foto `,e) }
 }
 
+async function update(  foto:fotoProduto,codigo:number ) {
+    try{
+    let aux = await db.runAsync( 
+        `UPDATE fotos SET
+        produto  = ${foto.produto},  
+        sequencia  = ${foto.sequencia}, 
+        descricao  = '${foto.descricao}', 
+        link  = '${foto.link}', 
+        foto  = '${foto.foto}', 
+        data_cadastro  ='${foto.data_cadastro}', 
+        data_recadastro  = '${foto.data_recadastro}',   
+        WHERE produto =  ${codigo}`
+         )
+         console.log('foto atualizada com sucesso ')
+        }catch(e){
+            console.log('erro ao atualizar foto do produto ', codigo)
+        }
+}
+
 async function selectAll(){
         try{
             let result = await db.getAllAsync(`SELECT *,
@@ -65,7 +84,7 @@ async function selectByCode( codigo:number) {
               ;`);
       //  console.log(result);
         return result;
-    }catch(e){ console.log( "erro ao buscar as marcas ",e) }
+    }catch(e){ console.log( "erro ao buscar as fotos ",e) }
 }
 
 async function deleteAll(){
@@ -77,6 +96,6 @@ async function deleteAll(){
 }
 
 
- return { create, selectAll, deleteAll, selectByCode }
+ return { create, selectAll, deleteAll, selectByCode,update }
 
 }

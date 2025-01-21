@@ -5,7 +5,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 
 
-export  const RenderModalCategorias = ({setCategoria}:any) => {
+export  const RenderModalCategorias = ({setCategoria,codigoCategoria   }:any) => {
 
     type categoria = {
       codigo:Number,
@@ -22,16 +22,28 @@ export  const RenderModalCategorias = ({setCategoria}:any) => {
  
     useEffect(
         ()=>{
-            async function buscaMarcas(){
+            async function buscacategorias(){
                 let dados:any = await useQuerCategorias.selectAll();   
                 if(dados?.length > 0 ){
                     setData(dados);  
-                    console.log(dados)
                 }
             }
-buscaMarcas();
-        },[]
+            async function buscacategoria(){
+              let dados:any = await useQuerCategorias.selectByCode(codigoCategoria);   
+              if(dados?.length > 0 ){
+                  selecionaCategoria(dados[0])
+              }
+          }
+          
+          if(codigoCategoria > 0 ){
+            buscacategoria();
+          }else{
+            buscacategorias();
+          }
+          
+        },[codigoCategoria]
     )
+
  
     
 function selecionaCategoria(item){

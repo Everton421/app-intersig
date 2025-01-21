@@ -380,7 +380,7 @@ export const Configurações = () => {
       const totalimgs = data.length
 
       for (let i = 0; i < data.length; i++ ) {
-        const verifiImg:any = await useQueryFotos.selectByCode(data[i].produto);
+        const verifiImg:any = await useQueryFotos.selectByCodeAndSequenci(data[i].produto, data[i].sequencia);
         
         if (verifiImg.length > 0) {
 

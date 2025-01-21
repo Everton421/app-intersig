@@ -3,7 +3,7 @@ import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { FlatList, Modal, Text, TouchableOpacity, View } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-export  const RenderModalMarcas = ({setMarca}:any) => {
+export  const RenderModalMarcas = ({setMarca, codigoMarca}) => {
     
         const useQueryMarcas = useMarcas();
 
@@ -15,14 +15,29 @@ export  const RenderModalMarcas = ({setMarca}:any) => {
 /*-----*/
     useEffect(
         ()=>{
+
+          console.log('codigo marca', codigoMarca )
             async function buscaMarcas(){
                 let dados:any = await useQueryMarcas.selectAll();
                 if(dados?.length > 0 ){
                     setData(dados);  
                 }
             }
-buscaMarcas();
-        },[]
+             async function buscaMarca(){
+                let dados:any = await useQueryMarcas.selectByCode(codigoMarca);
+                  if(dados?.length > 0 ){
+                    selecionaMarca(dados[0])
+                  }
+            }
+              
+
+            if(codigoMarca > 0 ){
+              buscaMarca()
+            }else{
+              buscaMarcas()
+            }
+
+        },[codigoMarca]
     )
 /*-----*/
     

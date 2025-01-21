@@ -87,6 +87,19 @@ async function selectByCode( codigo:number) {
     }catch(e){ console.log( "erro ao buscar as fotos ",e) }
 }
 
+async function selectByCodeAndSequenci( codigo:number, sequencia:number) {
+    try{
+        let result = await db.getAllAsync(`SELECT *,
+              strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+              strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  from fotos_produtos 
+              where produto = ${codigo} and sequencia = ${sequencia}
+              ;`);
+      //  console.log(result);
+        return result;
+    }catch(e){ console.log( "erro ao buscar as fotos ",e) }
+}
+
+
 async function deleteAll(){
     try{
         await db.execAsync('DELETE   FROM fotos_produtos;')
@@ -96,6 +109,6 @@ async function deleteAll(){
 }
 
 
- return { create, selectAll, deleteAll, selectByCode,update }
+ return { create, selectAll, deleteAll, selectByCode,update,selectByCodeAndSequenci }
 
 }

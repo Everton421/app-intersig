@@ -59,11 +59,7 @@ useEffect(
                      if(response.length > 0  ){
                          setDados(response)
                      }
-                         let aux:fotoProduto = { produto:1, sequencia:1, link:'https://i.ibb.co/L0Cxydc/Screenshot-3.png', foto:'foto1', descricao:'foto1', data_cadastro:'2025-01-17', data_recadastro:'2025-01-01 00:00:00'};
-                       //  await useQueryFotos.create(aux);
                        let data = await useQueryFotos.selectAll();
-                        // await useQueryFotos.deleteAll();
-                   
                 }
     
                filtrar();

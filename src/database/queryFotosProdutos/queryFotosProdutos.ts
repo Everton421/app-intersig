@@ -1,27 +1,21 @@
 import { useSQLiteContext } from "expo-sqlite";
+import { typeFotoProduto } from "../../screens/cadastro_produto/types/fotos";
 
 export const useFotosProdutos = ()=> {
 
 const db = useSQLiteContext();
 
-type fotoProduto =
- {
-produto: number,
-sequencia:number,
-descricao:string,
-link:string,
-foto:string,
-data_cadastro:string,
-data_recadastro:string 
- }
+    
+ 
 
-async function create(  foto:fotoProduto  ) {
+async function create(  foto:typeFotoProduto  ) {
     try{
       
       //  let aux:any  = await selectByCode( marca.codigo ); 
+ 
          const result = await  db.runAsync(
-             `
-             INSERT INTO fotos_produtos 
+              
+          `  INSERT INTO fotos_produtos 
              (
             produto,
             sequencia,
@@ -42,11 +36,12 @@ async function create(  foto:fotoProduto  ) {
              '${foto.data_recadastro}'
               
              )`);
-              console.log(`foto ${foto.foto} registrada com sucesso! `)
+           
+              console.log(`foto ${foto.link} registrada com sucesso! `)
     }catch( e ){ console.log(`erro ao registrar foto `,e) }
 }
 
-async function update(  foto:fotoProduto,codigo:number ) {
+async function update(  foto:typeFotoProduto,codigo:number ) {
     try{
     let aux = await db.runAsync( 
         `UPDATE fotos SET
@@ -75,9 +70,9 @@ async function selectAll(){
         }catch(e){ console.log( "erro ao buscar as fotos ",e) }
 }
 
-async function selectByCode( codigo:number) {
+async function selectByCode ( codigo:number):Promise< typeFotoProduto[]    > {
     try{
-        let result = await db.getAllAsync(`SELECT *,
+        let result:typeFotoProduto[] = await db.getAllAsync(`SELECT *,
               strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
               strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  from fotos_produtos 
               where produto = ${codigo}
@@ -108,7 +103,13 @@ async function deleteAll(){
     }
 }
 
-
- return { create, selectAll, deleteAll, selectByCode,update,selectByCodeAndSequenci }
+async function deleteByCodeProduct(codigo:number){
+    try{
+        await db.execAsync(`DELETE   FROM fotos_produtos where produto = ${codigo};`)
+    }catch(e){
+        console.log('erro ao excluir fotos dos produtos',e)
+    }
+}
+ return { create, selectAll, deleteAll, selectByCode,update,selectByCodeAndSequenci,deleteByCodeProduct }
 
 }

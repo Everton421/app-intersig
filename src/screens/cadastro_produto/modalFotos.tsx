@@ -1,40 +1,64 @@
-import { cloneElement, useState } from "react"
+import { cloneElement, useEffect, useState } from "react"
 import { Image, Modal, requireNativeComponent, Text, TouchableOpacity, View } from "react-native"
 import { FlatList, TextInput } from "react-native-gesture-handler";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
+import { typeFotoProduto } from "./types/fotos";
 
-
-export const Modal_fotos = ({img, codigo_produto , setImgs}:any)=>{
+type props = 
+{
+    imgs: typeFotoProduto,
+    codigo_produto:number,
+    setImgs:any
+}
+export const Modal_fotos = ({imgs , codigo_produto , setImgs} :any)=>{
     const [ visible, setVisible ] = useState<Boolean>(false);
     const [ link, setLink ] = useState(''); 
+    const [ fotos, setFotos ] = useState<typeFotoProduto[]>([])
+
+
+ 
+
+    function deleteItemListImgs(item){
+        setImgs ((prev:any) => {
+                    let aux =  prev.filter( (i) => i.sequencia !==  item.sequencia )
+                    return aux
+           });
+
+ }
 
     function renderImgs({item}){
         return(
-            <View style={{ margin:5,  borderRadius:10}}>
-                <View >
+            <View style={{ margin:5,padding:4, borderRadius:10, backgroundColor:'#FFF', elevation:3}}>
+                   <TouchableOpacity
+                     onPress={()=> deleteItemListImgs(item)} 
+                     >
+                        <AntDesign name="closecircle" size={24} color="red" />
+                    </TouchableOpacity>
                     <Image
                     source={{ uri: `${item.link}` }}
                     // style={styles.galleryImage}
-                    style={{ width: 100 , height: 100, borderRadius:5   }}
+                    style={{ width: 120 , height: 120, borderRadius:5   }}
                     resizeMode="contain"
                     />
-                </View>
-
             </View>
         )
     }
 
     function gravarImgs(  ){
-        let tam = img.length
-        let ultimoItem = img.find( (i)=> tam === i.sequencia   )
+        if( link === '')  return
+        let tam = imgs.length
+        let ultimoItem = imgs.find( (i)=> tam === i.sequencia   )
         let sequencia = ultimoItem.sequencia + 1; 
 
-      let json =  {"data_cadastro": "0000-00-00", "data_recadastro": "0000-00-00 00:00:00", "descricao": link, "foto": link, "link": link, codigo_produto: 1, "sequencia": sequencia}
-      console.log(json)
-      img.push(json);
-      setImgs(img)
+      let json =  {"produto": codigo_produto, "data_cadastro": "0000-00-00", "data_recadastro": "0000-00-00 00:00:00", "descricao": link, "foto": link, "link": link, codigo_produto: 1, "sequencia": sequencia}
+        
+      setImgs((prev)=> ({
+        ...prev,
+         json
+    }))
+
       setLink('')
     }
 
@@ -47,11 +71,10 @@ export const Modal_fotos = ({img, codigo_produto , setImgs}:any)=>{
                          <View
                             style={{ margin:2 }}  >
                                 {
-                                    img  !== null  ?
+                                        imgs !== null ?
                                     (
                                         <Image
-                                        source={{ uri: `${img[0].link}` }}
-                                        // style={styles.galleryImage}
+                                        source={{ uri: `${ imgs[0].link}` }}
                                         style={{ width: 100 , height: 100, borderRadius:5   }}
                                         resizeMode="contain"
                                         />
@@ -80,9 +103,9 @@ export const Modal_fotos = ({img, codigo_produto , setImgs}:any)=>{
                                     </TouchableOpacity>
                          </View>
 
-                       <View style={{ alignItems:"center"}}>
+                       <View style={{ alignItems:"center" }}>
                                 <FlatList
-                                         data={img}
+                                         data={imgs}
                                          keyExtractor={(item)=>item.sequencia}
                                          renderItem={(item)=> renderImgs(item)}
                                          horizontal={true}
@@ -116,9 +139,14 @@ export const Modal_fotos = ({img, codigo_produto , setImgs}:any)=>{
                                         value={link}
                                     />
 
-                                    <TouchableOpacity  style={{ alignItems:"center"}} onPress={()=>gravarImgs()}> 
-                                          <Entypo name="save" size={30} color="#185FED" />
+                                    <TouchableOpacity  style={{padding:5, alignItems:"center"}} onPress={()=>gravarImgs()}> 
+                                          <Entypo name="arrow-with-circle-up" size={35} color="#185FED" />
                                           <Text style={{color:'#185FED', fontWeight:"bold"}}> salvar </Text>
+                                     </TouchableOpacity> 
+
+                                     <TouchableOpacity  style={{padding:5, alignItems:"center"}} onPress={()=> console.log(imgs)}> 
+                                          <Entypo name="arrow-with-circle-up" size={35} color="#185FED" />
+                                          <Text style={{color:'#185FED', fontWeight:"bold"}}> mostrar </Text>
                                      </TouchableOpacity> 
                                 </View>
                        

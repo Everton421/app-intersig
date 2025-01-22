@@ -14,7 +14,7 @@ import { useProducts } from "../../database/queryProdutos/queryProdutos"
 import { useRoute } from "@react-navigation/native"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
 import { Modal_fotos } from "./modalFotos"
-
+import { typeFotoProduto } from "./types/fotos"
  
 export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
@@ -32,7 +32,7 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     const [ referencia, setReferencia ] = useState<string>('');
 
     const [produto, setProduto] = useState();
-    const [ imgs, setImgs] = useState();
+    const [ imgs, setImgs] = useState<typeFotoProduto[]>();
 
     const useQueryCategoria = useCategoria();
     const useQueryMarcas = useMarcas();
@@ -66,13 +66,14 @@ let [ dadosfic] = useState(
 
        async function carregarProduto(){
             if( codigo_produto && codigo_produto > 0 ){
+
+
+
             let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
                 let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
                 
-                 
                 dataProd[0].fotos = dadosFoto;
-
-            console.log(dadosFoto)
+                setImgs(dadosFoto)
 
             let prod:any = dataProd[0]  
             setProduto(prod)
@@ -97,7 +98,17 @@ let [ dadosfic] = useState(
     async function gravar (){
 
         if( codigo_produto > 0 || codigo_produto){
-            console.log(imgs)
+
+                let imgsProd:typeFotoProduto[] = await useQueryFotos.selectByCode(codigo_produto);
+                if ( imgsProd.length > 0 ){
+                    await useQueryFotos.deleteByCodeProduct(codigo_produto);
+                }  
+                if(imgs?.length === 0 ){
+                    imgs = imgsProd
+                }
+               imgs?.forEach( async ( f:typeFotoProduto )=>{
+                    await useQueryFotos.create(f)
+               })       
         }else{
 
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
@@ -130,7 +141,7 @@ let [ dadosfic] = useState(
                     }catch(e){
                         console.log(" ocorreu um erro ao cadastrar o produto ",e)
                     }
-                    }
+             }
         }
     }
 
@@ -144,8 +155,8 @@ let [ dadosfic] = useState(
                     
                                         
                                        { produto && produto?.fotos[0] ?
-                                        (   <Modal_fotos  img={produto?.fotos} codigo_produto={codigo_produto} setImgs={ setImgs} />   )
-                                        :(   <Modal_fotos  img={null} codigo_produto={codigo_produto} setImgs={ setImgs}  />   )
+                                        (   <Modal_fotos  imgs={imgs} codigo_produto={codigo_produto} setImgs={ setImgs} />   )
+                                        :(   <Modal_fotos  imgs={null} codigo_produto={codigo_produto} setImgs={ setImgs}  />   )
                                         }
 
                     <View style={{ gap:10}}>

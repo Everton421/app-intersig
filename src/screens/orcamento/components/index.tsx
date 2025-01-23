@@ -236,7 +236,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         <View style={{ borderWidth: 0.5, margin: 5 }}></View>
 
         {codigo_orcamento && codigo_orcamento > 0 && editavel === true ? (
-          <Text>codigo: {codigo_orcamento}</Text>
+          <Text style={{ marginLeft:7, fontWeight:"bold"}}>codigo: {codigo_orcamento}</Text>
         ) : null}
 
         <View style={{ flexDirection: "row" }}>

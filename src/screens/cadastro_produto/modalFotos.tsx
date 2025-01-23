@@ -46,18 +46,16 @@ export const Modal_fotos = ({imgs , codigo_produto , setImgs} :any)=>{
         )
     }
 
-    function gravarImgs(  ){
+    function gravarImgs(){
         if( link === '')  return
         let tam = imgs.length
         let ultimoItem = imgs.find( (i)=> tam === i.sequencia   )
         let sequencia = ultimoItem.sequencia + 1; 
 
       let json =  {"produto": codigo_produto, "data_cadastro": "0000-00-00", "data_recadastro": "0000-00-00 00:00:00", "descricao": link, "foto": link, "link": link, codigo_produto: 1, "sequencia": sequencia}
-        
-      setImgs((prev)=> ({
-        ...prev,
-         json
-    }))
+        let aux = imgs
+        aux.push(json)
+      setImgs(aux)
 
       setLink('')
     }
@@ -141,13 +139,9 @@ export const Modal_fotos = ({imgs , codigo_produto , setImgs} :any)=>{
 
                                     <TouchableOpacity  style={{padding:5, alignItems:"center"}} onPress={()=>gravarImgs()}> 
                                           <Entypo name="arrow-with-circle-up" size={35} color="#185FED" />
-                                          <Text style={{color:'#185FED', fontWeight:"bold"}}> salvar </Text>
                                      </TouchableOpacity> 
 
-                                     <TouchableOpacity  style={{padding:5, alignItems:"center"}} onPress={()=> console.log(imgs)}> 
-                                          <Entypo name="arrow-with-circle-up" size={35} color="#185FED" />
-                                          <Text style={{color:'#185FED', fontWeight:"bold"}}> mostrar </Text>
-                                     </TouchableOpacity> 
+                                    
                                 </View>
                        
                   </View>

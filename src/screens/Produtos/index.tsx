@@ -33,7 +33,15 @@ useEffect(()=>{
 
             async function filtrar(){
                 const response = await useQueryProdutos.selectByDescription(pesquisa, 10);
-    
+                for( let p of response ){
+                    let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+                    if(dadosFoto?.length > 0 ){
+                        p.fotos = dadosFoto
+                    }else{
+                        p.fotos = []
+                     }
+                }
+             
                 if(response.length > 0  ){
                     setDados(response)
                 }
@@ -47,7 +55,6 @@ useEffect(
             ()=>{
                 async function filtrar(){
                     const response = await useQueryProdutos.selectAll();
-                    console.log(response)
                      for( let p of response ){
                          let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
                          if(dadosFoto?.length > 0 ){
@@ -59,7 +66,6 @@ useEffect(
                      if(response.length > 0  ){
                          setDados(response)
                      }
-                       let data = await useQueryFotos.selectAll();
                 }
     
                filtrar();
@@ -92,14 +98,17 @@ useEffect(
                      {item.descricao}
                    </Text>
 
-                   {  item.fotos && item.fotos[0].link &&
-                        <Image
-                             source={{ uri: `${item.fotos[0].link}` }}
-                             // style={styles.galleryImage}
-                             style={{ width: 100, height: 100,  borderRadius: 5,}}
-                              resizeMode="contain"
-                            />
-                        }
+                   {  item.fotos && item.fotos[0].link ?
+                     (<Image
+                        source={{ uri: `${item.fotos[0].link}` }}
+                        // style={styles.galleryImage}
+                        style={{ width: 100, height: 100,  borderRadius: 5,}}
+                         resizeMode="contain"
+                       />) :(
+                         <MaterialIcons name="no-photography" size={40} color="black"  />
+                       )
+                    
+                    }
 
                 <View style={{ flexDirection:"row", justifyContent:"space-between", margin:3}}>  
                     <Text style={{ fontWeight:"bold"}}>

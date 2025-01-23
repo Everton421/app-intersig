@@ -8,6 +8,7 @@ import {
   TextInput,
   Modal,
   ActivityIndicator,
+  Image,
 } from "react-native";
 
 import { ProdutosContext } from "../../../../contexts/produtosDoOrcamento";
@@ -18,6 +19,8 @@ import { useProducts } from "../../../../database/queryProdutos/queryProdutos";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { Cart } from "../Cart";
+import { useFotosProdutos } from "../../../../database/queryFotosProdutos/queryFotosProdutos";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export const ListaProdutos = ({ codigo_orcamento }:any) => {
   const [pesquisa, setPesquisa] = useState<any>("1");
@@ -31,7 +34,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
   const { connected, setConnected } = useContext(ConnectedContext);
 
   const useQueryProdutos = useProducts();
-
+  const useQueryFotos = useFotosProdutos();
   const useQueryItemsPedido = useItemsPedido();
 
   const handleIncrement = (item) => {
@@ -107,7 +110,15 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
   useEffect(() => {
     const busca = async () => {
       try {
-        let aux: any = await useQueryProdutos.selectByDescription(pesquisa, 10);
+        let aux: any = await useQueryProdutos.selectByDescription(pesquisa, 20);
+        for( let p of aux ){
+          let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+          if(dadosFoto?.length > 0 ){
+              p.fotos = dadosFoto
+          }else{
+              p.fotos = []
+           }
+      }
         setData(aux);
       } catch (e) {
         console.log(e);
@@ -122,7 +133,9 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
       setData([]);
     }
   }, [pesquisa]);
+  
   //////////////////
+
   useEffect(() => {
     async function init() {
       if (codigo_orcamento && codigo_orcamento > 0) {
@@ -130,9 +143,14 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
         console.log(codigo_orcamento);
         console.log("****");
         setSelectedItem([]);
-        let data: any = await useQueryItemsPedido.selectByCodeOrder(
-          codigo_orcamento
-        );
+        let data: any = await useQueryItemsPedido.selectByCodeOrder(  codigo_orcamento );
+        if( data.length > 0  ){
+          for( let p of data ){
+            let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+            p.fotos = dadosFoto
+          }
+
+        }
         setSelectedItem(data);
       }
     }
@@ -145,21 +163,9 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
     return (
       <View
-        style={{
-          backgroundColor: "#FFF",
-          elevation: 5,
-          margin: 3,
-          borderRadius: 30,
-          padding: 35,
-          width: 300,
-        }}
-      >
+        style={{backgroundColor: "#FFF", elevation: 5, margin: 3,borderRadius: 30, padding: 35, width: 300,}}   >
         <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            margin: 3,
-          }}
+          style={{ flexDirection: "row", justifyContent: "space-between", margin: 3, }}
         >
           <View style={{ flexDirection: "row" }}>
             <Text style={{ fontWeight: "bold" }}>Codigo:</Text>
@@ -171,7 +177,20 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
             <Text>{" " + item?.preco.toFixed(2)}</Text>
           </View>
         </View>
+        {
+           item.fotos && item.fotos.length > 0 ?
+           (<Image
+            source={{ uri: `${item.fotos[0].link}` }}
+            // style={styles.galleryImage}
+            style={{ width: 100, height: 100,  borderRadius: 5,}}
+             resizeMode="contain"
+           />
 
+           ):(
+            <MaterialIcons name="no-photography" size={100} color=  "black" />
+
+           )
+        }
         <Text numberOfLines={2}>{item.descricao}</Text>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -204,28 +223,43 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
         ]}
         onPress={() => toggleSelection(item)}
       >
-        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-          <Text
-            style={[
-              styles.txt,
-              { fontWeight: isSelected ? "bold" : null },
-              { color: isSelected ? "white" : null },
-            ]}
-          >
-            Código: {item.codigo}
-          </Text>
-          <Text style={[styles.txt, { color: isSelected ? "white" : null }]}>
-            R$: {item?.preco.toFixed(2)}
-          </Text>
-          {isSelected ? null : (
-            <AntDesign name="caretdown" size={24} color={"black"} />
-          )}
-        </View>
+          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                <Text
+                  style={[
+                    styles.txt,
+                    { fontWeight: isSelected ? "bold" : null },
+                    { color: isSelected ? "white" : null },
+                  ]}
+                >
+                  Código: {item.codigo}
+                </Text>
+                <Text style={[styles.txt, { color: isSelected ? "white" : null }]}>
+                  R$: {item?.preco.toFixed(2)}
+                </Text>
+
+                <Text style={[styles.txt, { color: isSelected ? "white" : null }]}>
+                  estoque: {item?.estoque}
+                </Text>
+                
+              
+          </View>
+           <View style={{ flexDirection:"row", justifyContent:"space-between"}}>
+            {  item.fotos.length > 0 && item.fotos[0].link ?
+                        (<Image
+                             source={{ uri: `${item.fotos[0].link}` }}
+                             // style={styles.galleryImage}
+                             style={{ width: 100, height: 100,  borderRadius: 5,}}
+                              resizeMode="contain"
+                            />) :(
+                              <MaterialIcons name="no-photography" size={40} color={ isSelected ? "#FFF":  "black"} />
+                            )
+                 }
+                {  isSelected ? null : (
+                  <AntDesign name="caretdown" size={24} color={"black"} />
+                )}
+            </View>
         <Text
-          style={[styles.txtDescricao, { color: isSelected ? "white" : null }]}
-        >
-          {item.descricao}
-        </Text>
+          style={[styles.txtDescricao, { color: isSelected ? "white" : null }]}  >   {item.descricao}  </Text>
         {isSelected && (
           <View
             style={{
@@ -317,17 +351,8 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
       <TouchableOpacity
         onPress={() => setVisibleProdutos(true)}
-        style={{
-          margin: 5,
-          elevation: 5,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          backgroundColor: "#009de2",
-          padding: 10,
-          borderRadius: 10,
-          width: "98%",
-        }}
-      >
+        style={{    margin: 5,   elevation: 4,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#009de2",  padding: 10,   borderRadius: 5,  width: "98%",
+        }}   >
         <FontAwesome name="search" size={22} color="#FFF" />
         <Text
           style={{
@@ -350,32 +375,11 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
         >
           <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", flex: 1 }}>
             <View
-              style={{
-                margin: 5,
-                backgroundColor: "white",
-                borderRadius: 20,
-                width: "96%",
-                height: "80%",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 4,
-                elevation: 5,
-              }}
-            >
-              <View style={styles.searchContainer}>
+            style={{  margin: 5,  backgroundColor: "white",   borderRadius: 20,  width: "96%",    height: "80%",  shadowColor: "#000",   shadowOffset: { width: 0, height: 2 },  shadowOpacity: 0.25,  shadowRadius: 4,  elevation: 5,   }}    >
+            <View style={styles.searchContainer}>
                 <TouchableOpacity
-                  onPress={() => {
-                    setVisibleProdutos(false);
-                  }}
-                  style={{
-                    margin: 15,
-                    backgroundColor: "#009de2",
-                    padding: 7,
-                    borderRadius: 7,
-                    width: "20%",
-                    elevation: 5,
-                  }}
+                  onPress={() => {  setVisibleProdutos(false);   }}
+                  style={{    margin: 15,  backgroundColor: "#009de2",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
                 >
                   <Text style={{ color: "#FFF", fontWeight: "bold" }}>
                     voltar
@@ -383,14 +387,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
                 </TouchableOpacity>
 
                 <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 15,
-                    margin: 5,
-                    elevation: 5,
-                  }}
-                >
+                  style={{   flexDirection: "row", justifyContent: "space-between",  marginBottom: 15,   margin: 5,   elevation: 5,  }}   >
                   <TextInput
                     style={{
                       backgroundColor: "#FFF",

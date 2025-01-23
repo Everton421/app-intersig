@@ -136,7 +136,7 @@ function seleciona(item){
     <View style={styles.container}>
 
     <TouchableOpacity onPress={()=>setVisibleClientes(true)  }  
-    style={{ justifyContent:'space-between', flexDirection:'row',margin:10,backgroundColor:'#009de2',borderRadius:7 , padding:5, elevation:5, width:'95%'}}>
+    style={{ justifyContent:'space-between', flexDirection:'row',margin:10,backgroundColor:'#009de2' ,borderRadius:7 , padding:10, elevation:4, width:'95%'}}>
                         <FontAwesome name="search" size={22} color="white" />
                        
                         <Text style={{fontWeight:'bold' , fontSize:20, color:'white' ,width: '50%' ,textAlign:'center'}}>

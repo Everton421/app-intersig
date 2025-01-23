@@ -1,5 +1,6 @@
 import { useSQLiteContext } from "expo-sqlite";
 import { formatItem } from "../../services/formatStrings";
+import { useFotosProdutos } from "../queryFotosProdutos/queryFotosProdutos";
 
 
 export const useProducts = ()=>{
@@ -7,6 +8,8 @@ export const useProducts = ()=>{
 
     const db = useSQLiteContext();
     const formataDados =  formatItem();
+
+    const useQueryFotos = useFotosProdutos()
 
        type produto = {
         codigo:number,
@@ -60,6 +63,29 @@ export const useProducts = ()=>{
             return result;
              }
      
+             async function selectProductAndImgsByDescription( query:any, limit:number ) {
+              const result = await db.getAllAsync(
+                `SELECT p.codigo, p.descricao, p.preco, p.estoque   FROM produtos as p
+                WHERE  p.descricao like ? OR  p.codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
+            //  console.log(result);
+
+                  if(result.length > 0 ){
+                     result.forEach( async (i)=>{
+                          let fotos = await useQueryFotos.selectByCode(i.codigo)
+                          if(fotos.length > 0 ){
+                            i.fotos = fotos;
+                          }else{
+                            i.fotos = [];
+                          }
+                       
+                         })
+                  }
+                  console.log(result)  
+
+                  return result;
+
+               }
+
             /// cria produto sem Informar o codigo 
             async function create( produto:produto){
 
@@ -253,7 +279,7 @@ export const useProducts = ()=>{
 
 
 
-        return { update ,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription  }
+        return { update ,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription ,selectProductAndImgsByDescription }
     }
 
         

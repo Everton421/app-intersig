@@ -43,13 +43,36 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
     let { codigo_produto } =   route.params || { codigo_produto : 0};
 
-let [ dadosfic] = useState(
-    [
-        {"link":'https://reactnative.dev/img/tiny_logo.png', 'sequencia':1}
-        ,{"link":'https://reactnative.dev/img/tiny_logo.png', 'sequencia':2}
-         
-    ]
-)
+ 
+
+    function delay(ms:number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      
+
+    async function carregarProduto(){
+        if( codigo_produto && codigo_produto > 0 ){
+        let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
+            let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
+            dataProd[0].fotos = dadosFoto;
+            setImgs(dadosFoto)
+        let prod:any = dataProd[0]  
+        setProduto(prod)
+        if(dataProd.length > 0 ){
+                setCategoriaSelecionada(prod.categoria);
+                setMarcaSelecionada(prod.marca);
+                setReferencia(prod.num_original)
+                setEstoque(prod.estoque);
+                setPreco( Number(prod.preco));
+                setSku(prod.sku);
+                setDescricao(prod.descricao)
+                setGtim(prod.num_fabricante)
+            }
+
+        }
+    }
+
+
 ///////////////////
     useEffect(() => {
             function setConexao(){
@@ -63,54 +86,13 @@ let [ dadosfic] = useState(
            };
        }
        setConexao();
-
-       async function carregarProduto(){
-            if( codigo_produto && codigo_produto > 0 ){
-
-
-
-            let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
-                let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
-                
-                dataProd[0].fotos = dadosFoto;
-                setImgs(dadosFoto)
-
-            let prod:any = dataProd[0]  
-            setProduto(prod)
-            if(dataProd.length > 0 ){
-                    setCategoriaSelecionada(prod.categoria);
-                    setMarcaSelecionada(prod.marca);
-                    setReferencia(prod.num_original)
-                    setEstoque(prod.estoque);
-                    setPreco( Number(prod.preco));
-                    setSku(prod.sku);
-                    setDescricao(prod.descricao)
-                    setGtim(prod.num_fabricante)
-                }
-
-            }
-        }
         carregarProduto();
        }, []);
 ///////////////////
- 
+   
 
     async function gravar (){
-
-        if( codigo_produto > 0 || codigo_produto){
-
-                let imgsProd:typeFotoProduto[] = await useQueryFotos.selectByCode(codigo_produto);
-                if ( imgsProd.length > 0 ){
-                    await useQueryFotos.deleteByCodeProduct(codigo_produto);
-                }  
-                if(imgs?.length === 0 ){
-                    imgs = imgsProd
-                }
-               imgs?.forEach( async ( f:typeFotoProduto )=>{
-                    await useQueryFotos.create(f)
-               })       
-        }else{
-
+      
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
         if(!preco) setPreco(0);
@@ -119,6 +101,35 @@ let [ dadosfic] = useState(
         if(!referencia) setReferencia('');
         if(!marcaSelecionada) return Alert.alert('É necessario informar uma marca para gravar o produto!');
         if(!categoriaSelecionada) return Alert.alert('É necessario informar uma categoria para gravar o produto!');
+
+
+        if( codigo_produto > 0 || codigo_produto){
+            let responseApi
+                try{
+                    let obj = { codigo: codigo_produto, fotos: imgs};
+                    responseApi = await api.post('/offline/fotos', obj);
+                    console.log(responseApi.data)
+                }catch(e){
+                    console.log(e);
+                    return Alert.alert('Erro', 'ocorreu um erro ao tentar cadastrar/atualizar as fotos do produto! ')
+                }
+
+
+                let imgsProd:typeFotoProduto[] = await useQueryFotos.selectByCode(codigo_produto);
+                if ( imgsProd.length > 0 ||imgs?.length === 0  ){
+                    await useQueryFotos.deleteByCodeProduct(codigo_produto);
+                }  
+                if(imgs?.length === 0 ){
+                    setImgs(imgsProd)
+                }
+               imgs?.forEach( async ( f:typeFotoProduto )=>{
+                    await useQueryFotos.create(f)
+               })     
+               Alert.alert("" ,"Produto alterado com sucesso")
+               await delay(300)
+               navigation.goBack();
+                 
+        }else{
 
 
         let data =   { 
@@ -156,7 +167,7 @@ let [ dadosfic] = useState(
                                         
                                        { produto && produto?.fotos[0] ?
                                         (   <Modal_fotos  imgs={imgs} codigo_produto={codigo_produto} setImgs={ setImgs} />   )
-                                        :(   <Modal_fotos  imgs={null} codigo_produto={codigo_produto} setImgs={ setImgs}  />   )
+                                        :(   <Modal_fotos  imgs={[]} codigo_produto={codigo_produto} setImgs={ setImgs}  />   )
                                         }
 
                     <View style={{ gap:10}}>

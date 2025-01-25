@@ -29,50 +29,61 @@ data_cadastro:string,
 data_recadastro:string 
  }
 
-useEffect(()=>{
 
-            async function filtrar(){
-                const response = await useQueryProdutos.selectByDescription(pesquisa, 10);
-                for( let p of response ){
-                    let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
-                    if(dadosFoto?.length > 0 ){
-                        p.fotos = dadosFoto
-                    }else{
-                        p.fotos = []
-                     }
-                }
-             
-                if(response.length > 0  ){
-                    setDados(response)
-                }
+    async function filterByDescription(){
+        const response:any = await useQueryProdutos.selectByDescription(pesquisa, 10);
+        for( let p of response ){
+            let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+            if(dadosFoto?.length > 0 ){
+                p.fotos = dadosFoto
+            }else{
+                p.fotos = []
             }
+        }
 
-           filtrar();
+        if(response.length > 0  ){
+            setDados(response)
+        }
+        console.log('useEffect1 carregando produtos ....');
 
-        },[ pesquisa ])
+    }
+
+    async function filterAll(){
+        const response:any = await useQueryProdutos.selectAll();
+        for( let p of response ){
+            let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
+            if(dadosFoto?.length > 0 ){
+                p.fotos = dadosFoto
+            }
+        }
+        if(response.length > 0  ){
+            setDados(response)
+        }
+        console.log('useEffect2 carregando produtos ....');
+    }
+
+
 ///////
-useEffect(
-            ()=>{
-                async function filtrar(){
-                    const response = await useQueryProdutos.selectAll();
-                     for( let p of response ){
-                         let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
-                         if(dadosFoto?.length > 0 ){
-                             p.fotos = dadosFoto
-                         }
-                     }
-                  
-                     
-                     if(response.length > 0  ){
-                         setDados(response)
-                     }
-                }
-    
-               filtrar();
+   useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if( pesquisa !== null || pesquisa !== '' ){
+        filterByDescription()
+      }
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+        filterAll()
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+///////
  
-            },[]
-        )
-///////
+
 
         function handleSelect(item){
                 setpSelecionado(item);
@@ -98,7 +109,7 @@ useEffect(
                      {item.descricao}
                    </Text>
 
-                   {  item.fotos && item.fotos[0].link ?
+                   {  item.fotos && item.fotos.length > 0 && item.fotos[0].link ?
                      (<Image
                         source={{ uri: `${item.fotos[0].link}` }}
                         // style={styles.galleryImage}
@@ -163,7 +174,7 @@ useEffect(
                                  <View style={{ margin:10, gap:15, flexDirection:"row"}}>
                                     
 
-                          {  pSelecionado?.fotos && pSelecionado?.fotos[0].link &&
+                          {   pSelecionado?.fotos &&  pSelecionado?.fotos.length > 0 && pSelecionado?.fotos[0].link &&
 
                                          (<Image
                                                 source={{ uri: `${pSelecionado?.fotos[0].link}` }}

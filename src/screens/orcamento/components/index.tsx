@@ -67,7 +67,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
     setDataHora(dataHora);
     async function init() {
       if (!codigo_orcamento || codigo_orcamento === null) {
-        setOrcamento((prevOrcamento: OrcamentoModel) => ({
+        setOrcamento((prevOrcamento: OrcamentoModel) =>  ({
           ...prevOrcamento,
           vendedor: usuario.codigo,
           total_produtos: 0,
@@ -90,6 +90,8 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       } else {
         setEditavel(true);
         setCodigoOrcamento(codigo_orcamento);
+        console.log('carrregando orcamento tipo', tipo)
+
       }
     }
     init();
@@ -171,8 +173,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       descontos: totaDescontosProdutos,
       data_recadastro: dataHora,
     }));
-  }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos,
-  ]);
+  }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
   ////////////////////////////////////////////////////////////////////////////
   const gravar = async () => {
     setLoading(true);
@@ -244,7 +245,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         </View>
 
         {/*//////////////// components serviços  ////////////////////////*/}
-        {tipo === 3 && (
+        {tipo && tipo === 3 && (
           <View>
             <Servico codigo_orcamento={codigo_orcamento} />
           </View>

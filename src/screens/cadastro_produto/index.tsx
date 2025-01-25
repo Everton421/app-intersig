@@ -8,8 +8,10 @@ import { RenderModalCategorias } from "./modalCategorias"
 import { RenderModalMarcas } from "./modalMarcas"
 import useApi from "../../services/api"
 import NetInfo from '@react-native-community/netinfo';
+import Entypo from "@expo/vector-icons/Entypo";
 import { ConnectedContext } from "../../contexts/conectedContext"
-
+import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons"
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
 import { useRoute } from "@react-navigation/native"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
@@ -30,6 +32,11 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     const [ descricao, setDescricao] = useState<string>('');
     const [ gtim, setGtim ] = useState<string>('');
     const [ referencia, setReferencia ] = useState<string>('');
+
+
+    const [visible, setVisible] = useState<Boolean>(false);
+    const [link, setLink] = useState("");
+    const [fotos, setFotos] = useState<typeFotoProduto[]>([]);
 
     const [produto, setProduto] = useState();
     const [ imgs, setImgs] = useState<typeFotoProduto[]>();
@@ -155,7 +162,55 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
              }
         }
     }
-
+    const renderImgs = ({ item }: { item: typeFotoProduto }) => {
+        return (
+          <View style={{ margin: 5, padding: 4, borderRadius: 10, backgroundColor: "#FFF", elevation: 3 }}>
+            <TouchableOpacity onPress={() => deleteItemListImgs(item)}>
+              <AntDesign name="closecircle" size={24} color="red" />
+            </TouchableOpacity>
+            {item.foto && item.link ? (
+              <Image
+                source={{ uri: `${item.link}` }}
+                style={{ width: 120, height: 120, borderRadius: 5 }}
+                resizeMode="contain"
+              />
+            ) : null}
+          </View>
+        );
+      };
+    
+      
+  const deleteItemListImgs = (item:typeFotoProduto) => {
+    setImgs((prev: any) => {
+      let aux = prev.filter((i: typeFotoProduto) => i.sequencia !== item.sequencia);
+        setFotos(aux);
+       return aux;
+    });
+  };
+      const gravarImgs = () => {
+        if (link === "") return;
+      
+        let sequencia = imgs.length > 0 ? Math.max(...imgs.map((i) => i.sequencia)) + 1 : 1;
+      
+        const newImage: typeFotoProduto = {
+          produto: codigo_produto,
+          data_cadastro: "0000-00-00",
+          data_recadastro: "0000-00-00 00:00:00",
+          descricao: link,
+          foto: link,
+          link: link,
+         
+          sequencia: sequencia,
+        };
+      
+          setImgs((prev: any) => {
+              const aux = [...prev,newImage]
+                 setFotos(aux)
+             return aux
+            });
+    
+          setLink('');
+      };
     
 
     return (
@@ -165,39 +220,112 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     
                                         
-                                       { produto && produto?.fotos[0] ?
+                                       { /*produto && produto?.fotos[0] ?
                                         (   <Modal_fotos  imgs={imgs} codigo_produto={codigo_produto} setImgs={ setImgs} />   )
                                         :(   <Modal_fotos  imgs={[]} codigo_produto={codigo_produto} setImgs={ setImgs}  />   )
-                                        }
+                                        */}
+                            <TouchableOpacity onPress={() => setVisible(true)}>
+                                <View style={{ margin: 2 }}>
+                                {imgs && imgs.length > 0 ? (
+                                    <Image
+                                    source={{ uri: `${imgs[0].link}` }}
+                                    style={{ width: 100, height: 100, borderRadius: 5 }}
+                                    resizeMode="contain"
+                                    />
+                                ) : (
+                                    <MaterialIcons name="no-photography" size={100} color="black" />
+                                )}
+                                </View>
+                            </TouchableOpacity>
+                                                        <Modal visible={visible} transparent={true}>
+                                                                <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", flex: 1 }}>
+                                                                <View style={{ backgroundColor: "#FFF", flex: 1, margin: 15, borderRadius: 15, height: "80%" }}>
+                                                                    <View style={{ backgroundColor: "#FFF" }}>
+                                                                    <TouchableOpacity
+                                                                        onPress={() => {
+                                                                        setVisible(false);
+                                                                        }}
+                                                                        style={{
+                                                                        margin: 15,
+                                                                        backgroundColor: "#185FED",
+                                                                        padding: 7,
+                                                                        borderRadius: 7,
+                                                                        width: "20%",
+                                                                        elevation: 5,
+                                                                        }}
+                                                                    >
+                                                                        <Text style={{ color: "#FFF", fontWeight: "bold" }}>voltar</Text>
+                                                                    </TouchableOpacity>
+                                                                    </View>
+
+                                                                    <View style={{ alignItems: "center" }}>
+
+                                                                    {imgs && imgs.length > 0 && (
+                                                                        <FlatList
+                                                                        data={imgs}
+                                                                        keyExtractor={(item) => String(item.sequencia)}
+                                                                        renderItem={renderImgs}
+                                                                        horizontal={true}
+                                                                        />
+                                                                    )}
+                                                                    </View>
+                                                                    <View style={{ alignItems: "center" }}>
+                                                                        {link !== "" ? (
+                                                                        <View style={{ margin: 10 }}>
+                                                                            <Image style={{ width: 100, height: 100 }} source={{ uri: `${link}` }} />
+                                                                        </View>
+                                                                        ) : (
+                                                                        <View style={{ margin: 10 }}>
+                                                                            <Entypo name="image" size={54} color="#185FED" />
+                                                                        </View>
+                                                                        )}
+                                                                        <TextInput
+                                                                        style={{ borderWidth: 1, width: "90%", padding: 10, borderRadius: 5 }}
+                                                                        placeholder="https://reactnative.dev/img/tiny_logo.png"
+                                                                        onChangeText={(v) => {
+                                                                            setLink(v);
+                                                                        }}
+                                                                        value={link}
+                                                                        />
+                                                                        <TouchableOpacity style={{ padding: 5, alignItems: "center" }} onPress={() => gravarImgs()}>
+                                                                        <Entypo name="arrow-with-circle-up" size={35} color="#185FED" />
+                                                                        </TouchableOpacity>
+                                                                    </View>
+                                                                </View>
+                                                                </View>
+                                                     </Modal>
+
+
 
                     <View style={{ gap:10}}>
-                         <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' , padding:2,borderRadius: 5,  elevation: 5}}>
-                                <Text style={{fontWeight:"bold"}} > codigo: {codigo_produto} </Text>
-                         </View>
-
-                    <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
-                    <Text style={{fontWeight:"bold"}} > Preço:$ </Text>
-                                <TextInput
-                                onChangeText={(v)=> setPreco( v )}
-                                style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
-                                keyboardType="numeric"
-                                value={String(preco.toFixed(2))}
-                                />
-
-                        </View>
+                            <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' , padding:2,borderRadius: 5,  elevation: 5}}>
+                                    <Text style={{fontWeight:"bold"}} > codigo: {codigo_produto} </Text>
+                            </View>
 
                         <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
-                            <Text style={{fontWeight:"bold"}} > Estoque: </Text>
-                                <TextInput
-                                onChangeText={(value)=> setEstoque( value )}
-                                style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
-                                keyboardType="numeric"
-                                value={String( estoque )}
+                        <Text style={{fontWeight:"bold"}} > Preço:$ </Text>
+                                    <TextInput
+                                    onChangeText={(v)=> setPreco( v )}
+                                    style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
+                                    keyboardType="numeric"
+                                    value={String(preco.toFixed(2))}
+                                    />
 
-                                />
+                            </View>
+
+                            <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
+                                <Text style={{fontWeight:"bold"}} > Estoque: </Text>
+                                    <TextInput
+                                    onChangeText={(value)=> setEstoque( value )}
+                                    style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
+                                    keyboardType="numeric"
+                                    value={String( estoque )}
+
+                                    />
+                            </View>
+
                         </View>
 
-                    </View>
                 </View>
 
                 <View style={{ margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 5 }}>

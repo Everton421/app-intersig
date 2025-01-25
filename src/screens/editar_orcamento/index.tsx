@@ -12,13 +12,13 @@ import { useRoute } from "@react-navigation/native";
 
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
         
-        const { codigo_orcamento } = route.params
+        const { codigo_orcamento, tipo } = route.params
 
         return(
     
             < Orcamento
              navigation={navigation}
-              orcamentoEditavel={orcamento} tipo={1}
+              orcamentoEditavel={orcamento} tipo={tipo}
                 codigo_orcamento={codigo_orcamento}
                  />
         

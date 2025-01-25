@@ -11,6 +11,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { ModalOrcamento } from "./modalOrcamento";
 
 
 export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
@@ -84,8 +85,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
         useEffect(()=>{
              console.log(pesquisa)
             busca2()
-        },[ pesquisa, navigation ]
-    )
+        },[ pesquisa, navigation ]  )
     /////////////////////////////////////////////////
     useEffect(()=>{
         async function busca(){
@@ -100,60 +100,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     /////////////////////////////////////////////////
     
     
-    const ProdOrcamento = ( {item}:any )=>{
-        return(
-            <View style={{backgroundColor:'#3335' , borderRadius:5 , margin: 3 }}>
-                    <Text style={{ fontWeight:"bold"}}>
-                        codigo: {item.codigo}
-                    </Text>
-                    <Text>
-                        { item.descricao}
-                    </Text>
-                        <View style={{flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-                        <Text style={{ fontWeight:"bold",width:'30%',fontSize:12}}>
-                                Quantidade: {item.quantidade}
-                            </Text>
-                        <Text style={{ fontWeight:"bold",width:'40%',fontSize:12}}>
-                                unitario: {item.preco.toFixed(2)}
-                            </Text>
-                            <Text style={{ fontWeight:"bold",width:'20%',fontSize:12}}>
-
-                                total: {item.total.toFixed(2)}
-                            </Text>
-                        </View>  
-
-            </View>
-        )
-    }
-
-    const ServiceOrcamento = ( { item }:any )=>{
-        return(
-            <View style={{backgroundColor:'#3335' , borderRadius:5 , margin: 3 }}>
-                    <Text style={{ fontWeight:"bold"}}>
-                        codigo: {item.codigo}
-                    </Text>
-                    <Text>
-                        { item.aplicacao}
-                    </Text>
-                        <View style={{flexDirection:"row", alignItems:"center", justifyContent:"space-between"}}>
-                    
-
-                        <Text style={{ fontWeight:"bold"}}>
-                                Quantidade: {item.quantidade}
-                            </Text>
-                            
-                            <Text style={{ fontWeight:"bold"}}>
-                                unitario: {item?.valor.toFixed(2)}
-                            </Text>
-                            <Text style={{ fontWeight:"bold"}}>
-
-                                total: {item?.total.toFixed(2)}
-                            </Text>
-                        </View>  
-
-            </View>
-        )
-    }
+ 
  
     async function deleteOrder (item:any){
         Alert.alert('', `Deseja excluir o orcamento : ${item.codigo} ?`,[
@@ -189,7 +136,8 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
           setSelecionado(item);
          setVisible(true);
          navigation.navigate('editarOrcamento',{
-            codigo_orcamento: item.codigo
+            codigo_orcamento: item.codigo,
+            tipo: item.tipo
          });
     }
 
@@ -325,84 +273,13 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
             </View>
        
       
+        {/** */}
+     
+
+                <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
+         
         
-        <Modal transparent={true}  visible={ visibleModal }>
-            <View style={{ flex:1, backgroundColor:'rgba( 50 , 50, 50 , 0.5)', alignItems:'center', justifyContent:"center" }}>
-                  <View style={{ backgroundColor:'#FFF', width:'97%', height:'97%', borderRadius:10}}>
-                     <View style={{ padding:5 , justifyContent:"space-between", flexDirection:"row"  }} >
-                        <Text>  
-                            { orcamento?.tipo === 1 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}> Orçamento: {orcamentoModal?.codigo} </Text> ) : 
-                            orcamento?.tipo === 3 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}>  OS: {orcamentoModal?.codigo} </Text> ) : null
-                            }
-                        </Text>
-                      </View>
-                  <View style={{ padding:5 }}>   
-                         <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                               Data Cadastro: {orcamento.data_cadastro}
-                         </Text>      
-                        <Text style={{  fontWeight:"bold"}} >
-                            cliente: {orcamentoModal?.cliente.codigo}
-                        </Text>
-                        <Text style={{ fontWeight:"bold"}}>
-                            {orcamentoModal?.cliente.nome}
-                        </Text>
-                 </View>
-
-                 <View style={{   padding:3}}>   
-                            <View style={{ flexDirection:"row" , justifyContent:'space-between'}}>
-                                    <Text style={{ fontWeight:"bold", width:'50%'}}>
-                                        Total: { orcamentoModal?.total_geral ? orcamentoModal.total_geral.toFixed(2) : 0  }
-                                    </Text>
-                                    
-                                    <Text style={{ fontWeight:"bold", width:'50%'}}>
-                                        Descontos: {orcamentoModal?.descontos ? orcamentoModal.descontos.toFixed(2) : 0}
-                                    </Text>
-                            </View>
-
-                            <View style={{ flexDirection:"row" , justifyContent:'space-between' }}>
-                                <Text style={{ fontWeight:"bold",width:'50%'}}>
-                                    Total Servicos: {  orcamentoModal?.total_servicos ?  orcamentoModal?.total_servicos.toFixed(2) : 0  }
-                                </Text>
-                                <Text style={{ fontWeight:"bold",width:'50%'}}>
-                                    Total Produtos: {  orcamentoModal?.total_produtos ? orcamentoModal?.total_produtos.toFixed(2) : 0  }
-                                </Text>
-                            
-                            </View>
-                 </View>  
-
-                  {/** *** separador ***/} 
-               <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-                                    <View style={{ alignItems:"center"}}>
-                                            <Text>
-                                                PRODUTOS
-                                            </Text>
-                                    </View>
-
-                                    <FlatList
-                                        data={orcamentoModal?.produtos}
-                                        renderItem={ ({item})=> <ProdOrcamento item={item} /> }
-                                        />
-                            {/** *** separador ***/} 
-                  <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
-                            <View style={{ alignItems:"center"}}>
-                                            <Text>
-                                                SERVIÇOS
-                                            </Text>
-                                    </View>
-
-                                    <FlatList
-                                        data={orcamentoModal?.servicos}
-                                        renderItem={ ({item})=> <ServiceOrcamento item={item} /> }
-                                        />
-
-                             <Button
-                                title="voltar"
-                                onPress={() => {setVisibleModal(false)  }}
-                            />
-                </View>
-
-            </View>
-        </Modal>
+        
         {/** <Button title="press" onPress={()=> setVisibleModal(true)}/>
         */}
 

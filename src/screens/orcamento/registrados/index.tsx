@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react"
 import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert, Button, TouchableOpacity} from "react-native"
 import Feather from '@expo/vector-icons/Feather';
+import { FontAwesome5 } from "@expo/vector-icons";
 import { OrcamentoContext } from "../../../contexts/orcamentoContext";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
@@ -12,6 +13,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalOrcamento } from "./modalOrcamento";
+import { enviaPedidos } from "../../../services/sendOrders";
 
 
 export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
@@ -23,6 +25,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
 
     const useQuerypedidos = usePedidos();
     const useMoment = configMoment();
+    const useEnvioPedidos = enviaPedidos();
 
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visible, setVisible ] = useState<boolean>(false);
@@ -99,8 +102,13 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     },[selecionado])
     /////////////////////////////////////////////////
     
-    
- 
+    // função responsavel por enviar o pedido
+    async function sincPedido(item:any){
+      await  useEnvioPedidos.postPedido(item.codigo)
+    }
+
+
+
  
     async function deleteOrder (item:any){
         Alert.alert('', `Deseja excluir o orcamento : ${item.codigo} ?`,[
@@ -222,14 +230,24 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                           Data Cadastro: {item?.data_cadastro} 
                       </Text>
 
-                    {
-                        item.enviado === 'S'?
-                        <Ionicons name="checkmark-done" size={24} color="#73FBFD" />
-                        :
-                        <Ionicons name="checkmark" size={24} color="#75F94D" />
-                    }
-                    
-                    </View>
+                  <View style={{ flexDirection:"row", justifyContent:"space-between"}}>
+                      
+                      
+                        {
+                            item.enviado === 'S'?
+                            <Ionicons name="checkmark-done" size={24} color="#73FBFD" />
+                            :
+                            <Ionicons name="checkmark" size={24} color="#75F94D" />
+                        }
+
+                     {/*   <TouchableOpacity 
+                            onPress={ ()=> sincPedido(item)}
+                           style={{  borderRadius:5, elevation:5,alignItems:"center", justifyContent:"center",backgroundColor:'white' ,width:35, padding:5}} >
+                          <FontAwesome5 name="sync-alt" size={20} color="#009de2" />
+                        </TouchableOpacity>
+                      */}
+                      </View>
+               </View>
         )
     }
 
@@ -260,11 +278,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                         placeholder="pesquisar"
   
                     /> 
-                   {/** 
-                    <TouchableOpacity onPress={ ()=> setShowPesquisa(false) }   >
-                        <AntDesign name="closecircle" size={24} color="red" />
-                    </TouchableOpacity>
-               */ }
+          
 
                     <TouchableOpacity  onPress={()=> setShowPesquisa(true)}>
                             <AntDesign name="filter" size={35} color="#FFF" />
@@ -280,23 +294,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
          
         
         
-        {/** <Button title="press" onPress={()=> setVisibleModal(true)}/>
-        */}
-
-            {/** componente de alterar a data */ }
- { /**         <TouchableOpacity onPress={  ()=> setShowPicker(true)  } style={{ margin:5 }}>
-                                    <Fontisto name="date" size={35} color="#009de2" />
-             </TouchableOpacity>
-                            {showPicker && (
-                                            <DateTimePicker
-                                            value={ date  }
-                                            display="calendar"
-                                            mode="date"
-                                            onChange={handleEvent}
-                                            accessibilityLanguage='pt-br'
-                                            />
-                                        )}
-*/}
+ 
  
         {/******************************************* */}
                         <FlatList

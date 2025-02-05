@@ -49,7 +49,7 @@ data_recadastro:string
     }
 
     async function filterAll(){
-        const response:any = await useQueryProdutos.selectAll();
+        const response:any = await useQueryProdutos.selectAllLimit(25);
         for( let p of response ){
             let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
             if(dadosFoto?.length > 0 ){

@@ -20,12 +20,9 @@ import { configMoment } from "../../../services/moment";
 
 export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
 
-  const [visibleProdutos, setVisibleProdutos] = useState<boolean>(false);
-  const [visibleClientes, setVisibleClientes] = useState<boolean>(false);
   const [totalGeral, setTotalGeral] = useState<number | undefined>();
   const [descontosGeral, setDescontosGeral] = useState<number>(0);
   const [totalProdutos, setTotalProdutos] = useState<number>();
-  const [quantidade_parcelas, setQuantidade_parcelas] = useState< number | undefined >();
   const [observacoes, setObservacoes] = useState<string>("");
   const [formaPagamento, setFormaPagamento] = useState<number | undefined>();
   const [status, setStatus] = useState<number>(0);
@@ -34,10 +31,8 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
   const [loading, setLoading] = useState<boolean>(false);
   const [dataAtual, setDataAtual] = useState<any>();
   const [dataHora, setDataHora] = useState<any>();
-  const [tipoOrcamento, setTipoOrcamento] = useState<number>(1);
   const [codigoOrcamento, setCodigoOrcamento] = useState<number>();
   /////
-  const [selectedItem, setSelectedItem] = useState([]);
   ////
   const { usuario }: any = useContext(AuthContext);
 
@@ -45,9 +40,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
   const { connected } = useContext(ConnectedContext);
 
   const useQuerypedidos = usePedidos();
-  const useQueryitems = useItemsPedido();
-  const useQueryParcelas = useParcelas();
-  const useQueryServicos = useServicosPedido();
+ 
   const useMoment = configMoment();
 
   const gerarCodigo = () => {

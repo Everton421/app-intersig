@@ -126,10 +126,16 @@ export const receberPedidos = ()=>{
                                       
                                     
                                }else{
+                                
+                                if(i.tipo != pedidoMobile[0].tipo || i.situacao != pedidoMobile[0].situacao ){
+                                    console.log('atualizando status ...')
+                                    await useQuerypedidos.updateByCode(i, codigo_pedido)
+                                }else{
                                 console.log(` Não ouve nehuma alteracao no  orcamento ${codigo_pedido}`)
                                 console.log('')
                                 console.log( i.data_recadastro ,'  >  ', dataRecadMobile )
                                 console.log('')
+                            }
                                }
                        }else{
                         console.log('')

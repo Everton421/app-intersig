@@ -93,6 +93,40 @@ export const useServices = ()=>{
                 }
                 }
 
+
+                async function createByCode2( servico:servico, codigo:number){
+
+                  servico.aplicacao = normalizeString(servico.aplicacao)
+                 
+                    try{
+                      const result = await db.runAsync( 
+                          `INSERT INTO servicos 
+                            (
+                          codigo,
+                            valor,
+                            aplicacao,
+                            tipo_serv,
+                            data_cadastro,
+                            data_recadastro 
+                            )
+                           VALUES (
+                            ${servico.codigo},
+                            ${servico.valor},
+                           '${servico.aplicacao}' ,
+                            ${servico.tipo_serv} ,
+                            '${servico.data_cadastro}' ,
+                            '${servico.data_recadastro}'  
+    
+                           );`
+                        
+                        );
+                    //  console.log(result);
+                      console.log(`servico ${servico.codigo} cadastrado com sucesso! `)
+                    }catch( e ) { 
+                        console.log('erro ao cadastrar o servico ' , e )
+                    }
+                    }
+    
             
             async function updateByCode(servico:servico, code:number ){
                 let verifCode:any[]; 
@@ -200,7 +234,7 @@ export const useServices = ()=>{
 
 
 
-        return { update ,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription  }
+        return { update ,  selectByCode,createByCode2, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription  }
     }
 
         

@@ -33,26 +33,21 @@ export const enviaPedidos = () => {
 
 
 
-
+    async function postItem(dados) {
+        let resultApi:any
+        let aux = await api.post('/pedidos', dados);
+        if(aux.data ){
+            resultApi   = aux.data;
+            resultApi.results.forEach(  async ( i:any )=>{
+                if( i !== null ){
+                    await useQuerypedidos.updateSentOrderByCode('S',i.codigo)
+                }
+            })  
+        }
+        return resultApi;
+    }
  
     async function postPedidos() {
-
-        async function postItem(dados) {
-            let resultApi:any
-            let aux = await api.post('/pedidos', dados);
-            if(aux.data ){
-                resultApi   = aux.data;
-                resultApi.results.forEach(  async ( i:any )=>{
-                    if( i !== null ){
-                        await useQuerypedidos.updateSentOrderByCode('S',i.codigo)
-                    }
-                })  
-            }
-            return resultApi;
-        }
-
-
-
         let orders:any = await useQuerypedidos.selectAll();
 
         if (orders?.length > 0) {
@@ -73,5 +68,20 @@ export const enviaPedidos = () => {
         }
     }
 
-    return { postPedidos  };
+
+async function postPedido(codigo:number){
+    const obj:any = [];  
+    let aux = await useQuerypedidos.selectCompleteOrderByCode( codigo);
+    obj.push(aux); // Adicionando ao array
+    
+    let resultPedido;
+     if(obj.length > 0 ){
+        resultPedido =   postItem(obj)  
+ 
+     }
+
+}
+
+
+    return { postPedidos ,postPedido };
 }

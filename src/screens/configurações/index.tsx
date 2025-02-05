@@ -230,7 +230,7 @@ export const Configurações = () => {
           }
 
         }else{
-          await useQueryServices.create(dados[v], dados[v].codigo);
+          await useQueryServices.createByCode2(dados[v], dados[v].codigo);
 
         }
         const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);

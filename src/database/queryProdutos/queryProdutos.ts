@@ -55,6 +55,15 @@ export const useProducts = ()=>{
                  return result;
           }
 
+          async function selectAllLimit(limit:number) {
+            const result = await db.getAllAsync(
+             `SELECT * 
+             FROM produtos
+              limit ${limit}
+             `);
+     //  console.log(result);
+            return result;
+     }
 
           
           async function selectByDescription( query:any, limit:number ) {
@@ -279,7 +288,7 @@ export const useProducts = ()=>{
 
 
 
-        return { update ,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription ,selectProductAndImgsByDescription }
+        return { update ,selectAllLimit,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription ,selectProductAndImgsByDescription }
     }
 
         

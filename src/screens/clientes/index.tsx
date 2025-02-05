@@ -25,13 +25,13 @@ export function Clientes({navigation}){
     
                 async function filtrar(){
                     if( pesquisa !== ''){
-                        const response:any = await useQueryClients.selectByDescription( pesquisa , 10);
+                        const response:any = await useQueryClients.selectByDescription( pesquisa , 25);
                         if(response.length > 0  ){
                             console.log(response)
                             setDados(response)
                         }
                     }else{
-                        const response:any = await useQueryClients.selectAllLimit(10);
+                        const response:any = await useQueryClients.selectAllLimit(25);
                         if(response.length > 0  ){
                             console.log(response)
                             setDados(response)

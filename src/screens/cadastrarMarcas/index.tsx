@@ -7,6 +7,7 @@ import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
+
 export const Cadastro_Marcas = ( {navigation}:any ) => {
 
 

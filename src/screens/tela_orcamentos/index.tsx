@@ -11,10 +11,6 @@ export const Vendas = ({navigation})=>{
 return (
     <View  style={{flex:1}} >
       <OrcamentosRegistrados tipo={1}  navigation={navigation} to={'novoOrcamento'}/>
-
-
-
- 
     </View >
 )
 

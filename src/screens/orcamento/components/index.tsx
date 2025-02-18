@@ -3,20 +3,14 @@ import { Modal, Text, TouchableOpacity, View, ScrollView, Alert,  ActivityIndica
 import { ListaProdutos } from "./produtos";
 import { ListaClientes } from "./clientes";
 import { Parcelas } from "./parcelas";
-import {
-  OrcamentoContext,
-  OrcamentoModel,
-} from "../../../contexts/orcamentoContext";
+import { OrcamentoContext, OrcamentoModel,} from "../../../contexts/orcamentoContext";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
-import { Cart } from "./Cart";
 import { Detalhes } from "./detalhes";
 import { AuthContext } from "../../../contexts/auth";
 import { Servico } from "./servico";
-import { useItemsPedido } from "../../../database/queryPedido/queryItems";
-import { useParcelas } from "../../../database/queryParcelas/queryParcelas";
-import { useServicosPedido } from "../../../database/queryPedido/queryServicosPedido";
 import { configMoment } from "../../../services/moment";
+
 
 export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
 

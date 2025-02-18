@@ -285,17 +285,8 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                         </TouchableOpacity>
                     </View>
             </View>
-       
-      
-        {/** */}
      
-
                 <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
-         
-        
-        
- 
- 
         {/******************************************* */}
                         <FlatList
                         data={orcamentosRegistrados}

@@ -13,7 +13,10 @@
     "preset": "jest-expo",
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@sentry/react-native|native-base|react-native-svg)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "expo-font": "<rootDir>/__mocks__/expo-font.ts"
+    }
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.24.0",

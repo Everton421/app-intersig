@@ -78,9 +78,9 @@ export const  useClients = ()=>{
 
     
     
-    async function selectByDescription( query:any, limit:number){
+    async function selectByDescription( query:any, limit:number):  Promise<cliente[] | undefined | []> {
         try{
-              let result =  await db.getAllAsync(
+              let result:cliente[] =  await db.getAllAsync(
                 `   SELECT *, strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro FROM clientes WHERE nome like ? or codigo like ? limit ? `, `%${query}%`,`%${query}%`, `${limit}` )
                // console.log(result)
                 return result;

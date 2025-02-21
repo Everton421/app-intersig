@@ -1,7 +1,5 @@
-import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { useContext, useEffect, useState } from 'react';
 import { TextInput, ActivityIndicator, Alert, Button, FlatList, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { api } from '../../../../services/api'; 
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
 import { ConnectedContext } from '../../../../contexts/conectedContext';

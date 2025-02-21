@@ -1,22 +1,32 @@
-import { useContext, useEffect, useState } from "react";
+import {   useEffect, useState } from "react";
 import {Text, Button, FlatList, Image, Modal, TextInput, TouchableOpacity, View } from "react-native";
 import { useClients } from "../../database/queryClientes/queryCliente";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useFocusEffect } from "@react-navigation/native";
-import { AuthContext } from "../../contexts/auth";
+import { RenderItensClients } from "./renderItemsClients/RenderItensClients";
 
-export function Clientes({navigation}){
+export type client = 
+{
+    codigo:number,
+    cnpj:string,
+    nome:string,
+    ie:string,
+    cep:string,
+    cidade:string,
+    endereco:string,
+    numero:string
+}
+
+export function Clientes({navigation}:any){
     
     const [ pesquisa, setPesquisa ] = useState('');
-    const [ dados , setDados ] = useState([]);
-    const [ cSelecionado, setcSelecionado ] = useState();
+    const [ dados , setDados ] = useState<client[]>([]);
+    const [ cSelecionado, setcSelecionado ] = useState<client>();
     const [ visible, setVisible ] = useState(false);
     
     const useQueryClients = useClients();
 
-  const { usuario }: any = useContext(AuthContext);
 
     ////////////////
 
@@ -25,7 +35,8 @@ export function Clientes({navigation}){
     
                 async function filtrar(){
                     if( pesquisa !== ''){
-                        const response:any = await useQueryClients.selectByDescription( pesquisa , 25);
+                        let response:any
+                          response = await useQueryClients.selectByDescription( pesquisa , 25);
                         if(response.length > 0  ){
                             console.log(response)
                             setDados(response)
@@ -45,31 +56,13 @@ export function Clientes({navigation}){
       },[ pesquisa ])
     ////////////////
   
-    function handleSelect(item){
+    function handleSelect(item:client){
                 setcSelecionado(item);
                 setVisible(true)
             }
     
             
-            function renderItem({item}){
-                return(
-                    <TouchableOpacity 
-                        onPress={ ()=> handleSelect(item) }
-                        style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%'}}
-                     >
-                       <Text style={{ fontWeight:"bold"}}>
-                          Codigo: {item.codigo}
-                       </Text>
-    
-                       <Text>
-                         {item.nome}
-                       </Text>
-                       <Text style={{ fontWeight:"bold" }}>
-                           CNPJ:  {item.cnpj}
-                       </Text>
-                    </TouchableOpacity>
-                )
-            }
+            
 
 
             return(
@@ -160,8 +153,8 @@ export function Clientes({navigation}){
         
                      <FlatList
                          data={dados}
-                         renderItem={(item)=> renderItem(item)}
-                         keyExtractor={(i)=>i.codigo}
+                         renderItem={(item)=> RenderItensClients(item)}
+                         keyExtractor={(i)=> i.codigo.toString() }
                      />
 
                 <TouchableOpacity

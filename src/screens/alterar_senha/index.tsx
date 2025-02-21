@@ -79,7 +79,7 @@ export const Alterar_senha = ({navigation}:any)=>{
                                 textAlign: "center",
                                 }}
                             >
-                                alterar senha 
+                                Alterar Senha 
                             </Text>
                         </TouchableOpacity>
 

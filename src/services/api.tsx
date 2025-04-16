@@ -13,8 +13,8 @@ const useApi = () => {
             //url teste local
               //baseURL: "http://100.108.116.119:3000/v1/",
            //  baseURL: "http://192.168.237.68:3000/v1/",
-                  baseURL: "https://server.intersig.com.br:3000/v1/",
-               //  baseURL:"https://template-api-nu.vercel.app/v1/",
+                 // baseURL: "https://server.intersig.com.br:3000/v1/",
+                  baseURL:"https://template-api-nu.vercel.app/v1/",
                  
     });
 

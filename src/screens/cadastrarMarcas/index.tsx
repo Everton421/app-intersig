@@ -7,12 +7,14 @@ import { useCategoria } from "../../database/queryCategorias/queryCategorias";
 import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
+import { LodingComponent } from "../../components/loading";
 
 export const Cadastro_Marcas = ( {navigation}:any ) => {
 
 
     const [ input , setInput ] = useState('');
     const [ marcaApi, setMarcaApi ] = useState<boolean>(false);
+    const [ loading, setLoading ] = useState(false); 
      
     const api = useApi();
     const useQueryMarcas = useMarcas();
@@ -36,11 +38,12 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
     
     async function gravar (){
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
-
             if(!input || input === "") return Alert.alert("é necessario informar a descricao!") 
-            let resposta = await api.post('/offline/marcas', { "descricao": input});
-                 
-                if(resposta.data.codigo > 0 ){
+                
+                try{
+                    setLoading(true)
+            let resposta = await api.post('/marca', { "descricao": input});
+            if(resposta.status === 200 && resposta.data.codigo > 0 ){
 
                     let valid:any = await useQueryMarcas.selectByCode(resposta.data.codigo);
                         if(valid?.length > 0 ){
@@ -50,35 +53,24 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
                         }
                     setInput('')
                     navigation.goBack()
-                    return Alert.alert(`Marca ${input} registrada com sucesso! `)
+                    return Alert.alert('',`Marca ${input} registrada com sucesso! `)
                 }
-                if( resposta.data.erro === true ){
-                    setInput('')
-                    return Alert.alert(`${resposta.data.msg}`) 
+            }catch(e:any){
+                if( e.status === 400 ){
+                    return Alert.alert( 'Erro!',`${e.response.data.msg}`)
                 }
-
+            }finally{
+            setLoading(false)
+            }
         } 
-        async function validaMarca(value:string){
-
-            if(value === '' || !value) { setMarcaApi(false); return };
-            setInput(value)
-            setMarcaApi(false);
-            let result = await api.get(`/offline/marcas/${value}`)
-               if( result.data.length > 0 ){
-                setMarcaApi(true);
-               }
-             
-        }
-
-
 
 
     return (
         <View style={{ flex: 1 }}>
 
+            <LodingComponent isLoading={loading} />
+
             <View style={{ width: '100%', height: '100%', backgroundColor: '#EAF4FE' }} >
-
-
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     <Image
                         style={{ width: 70, height: 70 }}
@@ -86,7 +78,6 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
                             uri: 'https://reactnative.dev/img/tiny_logo.png'
                         }}
                     />
-
                 </View>
 
                         <Text style={{ fontWeight:"bold", fontSize:20, color:'#185FED'}} > marca </Text>
@@ -95,7 +86,7 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
                     <TextInput
                         style={{ padding: 5, backgroundColor: '#FFF' }}
                         placeholder="descrição"
-                        onChangeText={(v:any)=> validaMarca(v)}
+                        onChangeText={(v:any)=> setInput(v)}
 
                     />
                 </View>

@@ -39,7 +39,7 @@ export const queryEmpresas = ()=>{
         try{
             let result = await db.getAllAsync(`SELECT * FROM empresas  `)
             return result;
-        }catch(e){ console.log(` Erro ao consultar a empresa cnpj: ${cnpj}  ` ,e)}
+        }catch(e){ console.log(` Erro ao consultar as empresas   ` ,e)}
     }
 
     async function findBycnpj(cnpj:String) {
@@ -68,7 +68,7 @@ export const queryEmpresas = ()=>{
                          let deletedEmp =    await deleteByCode(empresa.codigo_empresa); 
                          console.log("deletado ",deletedEmp)    
                      } 
-                        console.log(`criando ${empresa.cnpj}`)
+                        console.log(`criando ${empresa}`)
                       
                 let resultEmpresa:any = await create(empresa);
                 

@@ -49,12 +49,12 @@ export const Inicio = ({navigation}) => {
                     }}
                 >
                     <View style={{ width: '100%', alignItems: "center", marginTop: 25 }}>
-                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#fff', width: '90%', elevation: 5 }} 
+                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#fff', width: '90%' }} 
                          onPress={()=> navigation.navigate('registrar_empresa')}  >
                             <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18 }}>Registrar Empresa</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#FFF', width: '90%', marginTop: 15, elevation: 5 }}
+                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#FFF', width: '90%', marginTop: 15   }}
                          onPress={()=> navigation.navigate('login')}  >
                             <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18}}>Entrar</Text>
                         </TouchableOpacity>

@@ -25,38 +25,50 @@ async function selectAll(){
 }
 
 
-async function selectByCode( code:number ){
+async function selectByCode( code:number ):Promise<Usuario[] | undefined>{
     try{
-        let result = await db.getAllAsync(`SELECT * FROM usuarios where codigo = ${ code } `);
+        let result:Usuario[] = await db.getAllAsync(`SELECT * FROM usuarios where codigo = ${ code } `);
         console.log(result);
         return result;
     }catch( e){
-        console.log(`erro ao buscar usuarios `, e);
+        console.log(`erro ao buscar usuario codigo ${code} `, e);
     } 
 }
+
+
 async function selectByName( name:string ){
     try{
         let result = await db.getAllAsync(`SELECT * FROM usuarios where nome = '${ name }' `);
         console.log(result);
         return result;
     }catch( e){
-        console.log(`erro ao buscar usuarios `, e);
+        console.log(`erro ao buscar usuario pelo nome ${name} `, e);
     } 
 }
 
-async function selectRemember(){
+async function selectRemember(): Promise<Usuario[] | undefined>{
+    let result:Usuario[] | [];
     try{
-        let result = await db.getAllAsync(`SELECT * FROM usuarios where lembrar = 'S' `);
-        console.log(result);
+        result = await db.getAllAsync(`SELECT * FROM usuarios where lembrar = 'S' `);
+        if( result.length < 0 || isNaN(result.length)){
+        }
         return result;
+
     }catch( e){
-        console.log(`erro ao buscar usuarios `, e);
+        console.log(`erro ao buscar usuario lembrar = S `, e);
     } 
 }
  
 async function create ( user:Usuario ){
-   let  { codigo , nome, senha , email, cnpj, lembrar } = user;
-   let verifyUser: any = await selectByCode( codigo );
+    console.log(user)
+    let  { codigo , nome, senha , email, cnpj, lembrar } = user;
+   let verifyUser: any
+   
+   if( codigo){
+    verifyUser  = await selectByCode( codigo );
+    }else{
+        console.log(`codigo ${codigo } invalido`)
+    }
          
     if(verifyUser.length > 0 ){
     console.log('Usuario', nome,' ja foi cadastrado!');    
@@ -89,14 +101,14 @@ async function create ( user:Usuario ){
 async function createUser ( user:Usuario ){
 
     let verifyRemember:any = await selectRemember()
-        if(verifyRemember?.length > 0 ){
+        if(verifyRemember?.length > 0 || verifyRemember !== undefined){
             await updateRemember()
         }
 
     let  { codigo , nome, senha , email ,cnpj , lembrar} = user;
     let verifyUser: any = await selectByCode( codigo );
           
-     if(verifyUser.length > 0 ){
+     if(verifyUser.length > 0 || verifyUser !== undefined ){
         await deleteUser(codigo)
             try{
                 let result = await db.runAsync(
@@ -116,9 +128,9 @@ async function createUser ( user:Usuario ){
                                  ` INSERT INTO usuarios
                                      ( codigo, nome, senha , email, cnpj, lembrar ) VALUES 
                              ( ${codigo}, '${nome}', '${senha}', '${email}', '${cnpj}', '${lembrar}' ); `);
-                            // console.log('Usuario cadastrado: ',result.lastInsertRowId);
+                             console.log('Usuario cadastrado: ',result.lastInsertRowId);
                              return result.lastInsertRowId
-     
+                                
                      }catch(e){
                          console.log('Erro ao criar o usuario: ', codigo,' nome: ', nome ,' ', e)
                      }
@@ -184,7 +196,7 @@ async function update ( user:Usuario ){
 async function deleteAll(){
     try{
         let result = await db.execAsync(`DELETE FROM usuarios `)
-        console.log(`log exclusao usuarios `)
+        console.log(`log exclusao usuarios `, result)
     }catch( e ) { console.log(e) }
 }
 

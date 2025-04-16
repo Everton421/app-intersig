@@ -20,15 +20,11 @@ import { typeFotoProduto } from "./types/fotos"
  
 export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
-    const [ categorias , setCategorias ] = useState([]);
-    const [ verMarcas, setVerMarcas ] = useState<boolean>(false)
-    const [ verCategorias, setVerCategorias ] = useState<boolean>(false)
     const [ marcaSelecionada, setMarcaSelecionada ] = useState(0); 
     const [ categoriaSelecionada, setCategoriaSelecionada ] = useState(0); 
     const [ estoque, setEstoque ] = useState<number>(0);
     const [ preco, setPreco ] = useState<number>(0);
     const [ sku, setSku ] = useState<string>('');
-    const [ grupo, setGrupo ] = useState<number>(0);
     const [ descricao, setDescricao] = useState<string>('');
     const [ gtim, setGtim ] = useState<string>('');
     const [ referencia, setReferencia ] = useState<string>('');
@@ -41,8 +37,6 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     const [produto, setProduto] = useState();
     const [ imgs, setImgs] = useState<typeFotoProduto[]>();
 
-    const useQueryCategoria = useCategoria();
-    const useQueryMarcas = useMarcas();
     const useQueryProdutos = useProducts();
     const api = useApi();
     const {connected,  setConnected} = useContext(ConnectedContext)
@@ -138,7 +132,6 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                  
         }else{
 
-
         let data =   { 
                     "preco":preco,
                     "estoque":estoque,
@@ -148,14 +141,15 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                     "marca":marcaSelecionada.codigo,
                     "grupo":categoriaSelecionada.codigo
                 }
+
                 let response =   await api.post('/produtos', data)
                 if(response.data.codigo > 0 ){
 
                     try{
-                    await useQueryProdutos.createByCode(response.data, response.data.codigo)
-                    Alert.alert(`Produto ${descricao} registrado com sucesso!`)
-                    setTimeout(()=>{},1000)
-                    navigation.goBack()
+                           await useQueryProdutos.createByCode(response.data, response.data.codigo)
+                           Alert.alert(`Produto ${descricao} registrado com sucesso!`)
+                        setTimeout(()=>{},1000)
+                        navigation.goBack()
                     }catch(e){
                         console.log(" ocorreu um erro ao cadastrar o produto ",e)
                     }

@@ -1,19 +1,19 @@
 import { Alert, Button, Image, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
  
 import useApi from "../../services/api"
-import { useSQLiteContext } from "expo-sqlite"
 import { useContext, useEffect, useState } from "react"
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
+import { LodingComponent } from "../../components/loading"
 
 export const Cadastro_Categorias = ({navigation}:any) => {
 
     const [ input , setInput ] = useState('');
     const [ categoriaApi, setCategoriaApi ] = useState<boolean>(false);
-     
+    const [ loading, setLoading ] = useState(false); 
+
     const api = useApi();
     const useQueryCategoria = useCategoria();
     const {connected,  setConnected} = useContext(ConnectedContext)
@@ -39,45 +39,44 @@ export const Cadastro_Categorias = ({navigation}:any) => {
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
             if(!input || input === "") return Alert.alert("é necessario informar a descricao!") 
-            let resposta = await api.post('/offline/categorias', { "descricao": input});
-                 
-                if(resposta.data.codigo > 0 ){
 
-                    let valid:any = await useQueryCategoria.selectByCode(resposta.data.codigo);
-                        if(valid?.length > 0 ){
-                            console.log(valid) 
-                        }else{
-                            await useQueryCategoria.create(resposta.data)
+
+                try{
+                    setLoading(true)
+                    let resposta = await api.post('/categoria', { "descricao": input});
+                        
+                        if(resposta.status === 200 && resposta.data.codigo > 0 ){
+                            let valid:any = await useQueryCategoria.selectByCode(resposta.data.codigo);
+                                if(valid?.length > 0 ){
+                                    console.log(valid) 
+                                }else{
+                                    await useQueryCategoria.create(resposta.data)
+                                }
+                            setInput('')
+                            navigation.goBack()
+                            return Alert.alert('',`Categoria ${input} registrada com sucesso! `)
                         }
-                    setInput('')
-                    navigation.goBack()
-                    return Alert.alert(`Categoria ${input} registrada com sucesso! `)
-                }
-                if( resposta.data.erro === true ){
-                    setInput('')
-                    return Alert.alert(`${resposta.data.msg}`) 
-                }
+                    }catch(e:any){
+                        if( e.status === 400 ){
+                            return Alert.alert( 'Erro!',`${e.response.data.msg}`)
+                        }
+                    }finally{
+                    setLoading(false)
+                    }
+
+//                if( resposta.data.erro === true ){
+//                    setInput('')
+//                    return Alert.alert(`${resposta.data.msg}`) 
+//                }
 
         } 
-        async function validaCategoria(value:string){
-
-            if(value === '' || !value) { setCategoriaApi(false); return };
-            setInput(value)
-            setCategoriaApi(false);
-            let result = await api.get(`/offline/categorias/${value}`)
-               if( result.data.length > 0 ){
-                 setCategoriaApi(true);
-               }
-             
-        }
-
+ 
 
     return (
         <View style={{ flex: 1 }}>
+            <LodingComponent isLoading={loading} />
 
             <View style={{ width: '100%', height: '100%', backgroundColor: '#EAF4FE' }} >
-
-
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     <Image
                         style={{ width: 70, height: 70 }}
@@ -85,7 +84,6 @@ export const Cadastro_Categorias = ({navigation}:any) => {
                             uri: 'https://reactnative.dev/img/tiny_logo.png'
                         }}
                     />
-
                 </View>
                 <Text style={{ fontWeight:"bold", fontSize:20, color:'#185FED'}} > categoria </Text>
 
@@ -93,7 +91,7 @@ export const Cadastro_Categorias = ({navigation}:any) => {
                     <TextInput
                         style={{ padding: 5, backgroundColor: '#FFF' }}
                         placeholder="descrição"
-                        onChangeText={(v:any)=> validaCategoria(v)}
+                        onChangeText={(v:any)=> setInput(v)}
                         //value={input}
                     />
               

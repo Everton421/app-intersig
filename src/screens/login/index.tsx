@@ -1,41 +1,48 @@
-import {
-  TextInput,
-  Text,
-  Button,
-  TouchableOpacity,
-  View,
-  Image,
-  Alert,
-  Modal,
-  ActivityIndicator,
-  Animated,
-  ScrollView,
-} from "react-native";
+import { TextInput, Text, Button, TouchableOpacity, View, Image, Alert, Modal, ActivityIndicator, Animated,  ScrollView, } from "react-native";
 import useApi from "../../services/api";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/auth";
 import { useUsuario } from "../../database/queryUsuario/queryUsuario";
-import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { restartDatabaseService } from "../../services/restartDatabase";
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
-import { blue } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 
-export const Login = ({ navigation }) => {
+
+type propsLoadingLogin = { isLoading:boolean}
+
+const LoadingLogin = ({ isLoading }:propsLoadingLogin) => (
+  <Modal animationType='slide' transparent={true} visible={isLoading}>
+    <View style={ {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    }}>
+      <ActivityIndicator size="large" color="#FFF" />
+      {/**
+      <Text style={styles.loadingText}>Carregando  pedidos ...  </Text>
+       <Animated.View style={[styles.progressBar, { width: `${1}%` }]} />*/}
+    </View>
+  </Modal>
+);
+  
+
+export const Login = ({ navigation }:any) => {
   const useQueryEmpresa = queryEmpresas();
   const api = useApi();
 
-  const { logado, setLogado, usuario, setUsuario }: any =
-    useContext(AuthContext);
+  const { logado, setLogado, usuario, setUsuario }: any = useContext(AuthContext);
+
   const useQueryUsuario = useUsuario();
   const useRestart = restartDatabaseService();
 
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState<Boolean>(false);
+  
+  const [ loading, setLoading ] = useState(false);
 
   useEffect(() => {
     async function buscaUser() {
@@ -62,7 +69,7 @@ export const Login = ({ navigation }) => {
 
     let user = { email: email, senha: senha };
 
-    let userRemember: any = await useQueryUsuario.selectRemember();
+    let userRemember: any  = await useQueryUsuario.selectRemember();
 
     if (userRemember.length > 0 && userRemember[0].email === user.email) {
       if (lembrar === false) {
@@ -73,58 +80,76 @@ export const Login = ({ navigation }) => {
       setLogado(true);
       return;
     } else {
-      let response: any = await api.post("/login", user);
 
-      if (response.status === 200) {
-        if (response.data.ok === true) {
-          console.log(response.data);
+      try{
+        setLoading(true)
+  
+          let response: any = await api.post("/login", user);
 
-          let lembrarUsuario = lembrar ? "S" : "N";
-          let userMobile = {
-            email: response.data.email,
-            senha: response.data.senha,
-            cnpj: response.data.empresa,
-            codigo: response.data.codigo,
-            nome: response.data.nome,
-            lembrar: lembrarUsuario,
-          };
+            if (response.data.status.ok === true) {
 
-          await useRestart.restart();
-          setUsuario(userMobile);
-          setLogado(true);
+              let lembrarUsuario = lembrar ? "S" : "N";
+              let userMobile = {
+                email: response.data.data.email,
+                senha: response.data.data.senha,
+                cnpj: response.data.data.empresa,
+                codigo: response.data.data.codigo,
+                nome: response.data.data.nome,
+                lembrar: lembrarUsuario,
+              };
 
-          let codeUser = await useQueryUsuario.createUser(userMobile);
-          let validEmpresa = await api.post("/empresa/validacao", {
-            cnpj: response.data.empresa,
-          });
-          if (validEmpresa.data.cadastrada) {
-            let objEmpr = {
-              codigo_empresa: validEmpresa.data.codigo,
-              nome: validEmpresa.data.nome,
-              cnpj: validEmpresa.data.cnpj,
-              email: validEmpresa.data.email_empresa,
-              responsavel: validEmpresa.data.responsavel,
-            };
-            let aux = await useQueryEmpresa.createByCode(objEmpr);
+              await useRestart.restart();
+              setUsuario(userMobile);
+              setLogado(true);
+
+              let codeUser = await useQueryUsuario.create(userMobile);
+
+                  try{
+
+                      let validEmpresa = await api.post("/empresa/validacao", {
+                        cnpj: response.data.data.empresa,
+                      });
+                      if (validEmpresa.data.status.cadastrada) {
+                        let objEmpr = {
+                          codigo_empresa: validEmpresa.data.data.codigo,
+                          nome: validEmpresa.data.data.nome,
+                          cnpj: validEmpresa.data.data.cnpj,
+                          email: validEmpresa.data.data.email_empresa,
+                          responsavel: validEmpresa.data.data.responsavel,
+                        };
+                        let aux = await useQueryEmpresa.createByCode(objEmpr);
+                      }
+                    }catch(e:any){
+                 console.log( 'Ocorreu um erro ao tentar validar a empresa ',  e.response.data.msg )
+               //  Alert.alert('Erro!', e.response.data.msg);
+                    }     
+
+              setTimeout(() => {}, 2000);
+
+            } else {
+              return Alert.alert(response.data.status.msg);
+            }
+
+        }catch(e:any){
+          
+          if(e.response.status === 400){
+            console.log(   e.response.data.msg )
+            Alert.alert('Erro!', e.response.data.msg);
           }
-
-          setTimeout(() => {}, 2000);
-        } else {
-          return Alert.alert(response.data.msg);
+        }finally{
+          setLoading(false)
         }
-      } else {
-        throw new Error(
-          response.data.message || "Erro desconhecido ao logar na empresa."
-        );
-      }
-      if(response.status === 400){
-        Alert.alert('ocorreu um erro ao tentar se comunicar com a api!')
-      }
+          
     }
   }
 
+ 
+
   return (
     <View style={{ flex: 1, backgroundColor: "#EAF4FE" }}>
+      
+      <LoadingLogin  isLoading={loading} />
+      
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, backgroundColor: "#EAF4FE" }}
       >
@@ -176,7 +201,7 @@ export const Login = ({ navigation }) => {
             </Text>
 
             <View style={{ width: "100%" }}>
-              <Text style={{ color: "#185FED" }}> EMAIL </Text>
+              <Text style={{ color: "#185FED", fontWeight:"bold" }}> EMAIL </Text>
               <TextInput
                 style={{ borderBottomWidth: 1, width: "90%" }}
                 placeholder="example@example.com"
@@ -186,7 +211,7 @@ export const Login = ({ navigation }) => {
             </View>
 
             <View style={{ width: "100%", marginTop: 50 }}>
-              <Text style={{ color: "#185FED" }}> SENHA </Text>
+              <Text style={{ color: "#185FED", fontWeight:"bold"  }}> SENHA </Text>
               <TextInput
                 style={{ borderBottomWidth: 1, width: "90%" }}
                 secureTextEntry

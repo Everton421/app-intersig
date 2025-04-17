@@ -6,6 +6,7 @@ import { AuthContext } from "../../contexts/auth";
 import { AntDesign } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
+import { LodingComponent } from "../../components/loading";
 
 export const Cadastro_cliente = ({ navigation }: any) => {
     const [cnpj, setCnpj] = useState<string>();
@@ -18,6 +19,7 @@ export const Cadastro_cliente = ({ navigation }: any) => {
     const [bairro, setBairro] = useState<string>();
     const [numero, setNumero] = useState<string>();
     const [ visibleEndereco, setVisibleEndereco] = useState<boolean>(false); 
+    const [ loading, setLoading] = useState<boolean>(false);
 
     const api = useApi();
     const useQueryClient = useClients();
@@ -31,7 +33,6 @@ export const Cadastro_cliente = ({ navigation }: any) => {
                    setConnected(state.isConnected);
                    console.log('conexao com a internet :', state.isConnected);
               });
-           // Remove o listener quando o componente for desmontado
            return () => {
                unsubscribe();
            };
@@ -78,19 +79,29 @@ export const Cadastro_cliente = ({ navigation }: any) => {
             vendedor: usuario.codigo
         }
 
-        let result: any = await api.post('/clientes', aux)
-        console.log("resultado api:", result.data);
+      try{
+        setLoading(true);
 
-        if (result.data.codigo > 0 && !result.data.erro) {
+        let result: any = await api.post('/cliente', aux)
+        //console.log("resultado api:", result.data);
+
+        if (  result.status ===200 && result.data.codigo > 0  ) {
             let resultSqlite: any = await useQueryClient.createByCode(result.data);
-            Alert.alert("Cliente registrado com sucesso!")
+            Alert.alert('',"Cliente Registrado Com Sucesso!")
             setTimeout(() => { }, 2000)
             navigation.goBack()
         }
-        if (result.data.erro) {
-            return Alert.alert(result.data.msg)
-        }
 
+      } catch(e){
+            if(e.status === 400) {
+             return Alert.alert( e.response.data.msg)
+            }else{
+             return Alert.alert('Erro!',"erro desconhecido" )
+            }
+      }finally{
+        setLoading(false);
+      }     
+       
     }
 
     return (
@@ -99,6 +110,8 @@ export const Cadastro_cliente = ({ navigation }: any) => {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Tente ajustar aqui
            // keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} // Ajuste fino para o ios
         >
+            <LodingComponent isLoading={loading} />
+
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
 

@@ -169,6 +169,8 @@ export const useServices = ()=>{
               )
 
               console.log(`servico ${servico.codigo} atualizado com sucesso !`)
+              return aux;
+              
               }catch(e){
                 console.log('erro ao atualizar o servico', servico.codigo );
               }

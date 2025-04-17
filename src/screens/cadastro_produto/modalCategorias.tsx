@@ -31,12 +31,13 @@ export  const RenderModalCategorias = ({setCategoria,codigoCategoria   }:any) =>
             async function buscacategoria(){
               let dados:any = await useQuerCategorias.selectByCode(codigoCategoria);   
               if(dados?.length > 0 ){
-                  selecionaCategoria(dados[0])
-              }
+                  setCategoriaSelecionada(dados[0])
+                }
           }
           
           if(codigoCategoria > 0 ){
             buscacategoria();
+
           }else{
             buscacategorias();
           }
@@ -48,7 +49,7 @@ export  const RenderModalCategorias = ({setCategoria,codigoCategoria   }:any) =>
     
 function selecionaCategoria(item){
   setCategoriaSelecionada(item);
-  setCategoria(item)
+  setCategoria(item.codigo)
     setActive(false)
 }
         
@@ -71,7 +72,18 @@ function selecionaCategoria(item){
                           style={{ backgroundColor:'#185FED',   padding:5, borderRadius:5, flexDirection:"row",justifyContent:"space-between" , margin:7, elevation:3}}
                           onPress={()=>{ !active ? setActive(true) : setActive(false)  }}
                         >
-                     <Text style={{color:'#FFF', fontWeight:"bold", fontSize:15}}> {categoriaSelecionada ? categoriaSelecionada.descricao : 'categorias'} </Text>
+                          {
+                            categoriaSelecionada ? (
+                              <>
+                              <Text style={{color:'#FFF', fontWeight:"bold", fontSize:15}}> Codigo: {  String(categoriaSelecionada?.codigo)  } </Text>
+
+                              <Text style={{color:'#FFF', fontWeight:"bold", fontSize:15}}> {  categoriaSelecionada?.descricao  } </Text>
+                              </>
+                            ): (
+                              <Text style={{color:'#FFF', fontWeight:"bold", fontSize:15}}> categorias </Text>
+
+                            )
+                          }
                     <AntDesign name="caretdown" size={24} color="white"    />  
                   </TouchableOpacity>
               </View>

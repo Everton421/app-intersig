@@ -5,6 +5,7 @@ import useApi from "../../services/api"
 import { useServices } from "../../database/queryServicos/queryServicos"
 import { ConnectedContext } from "../../contexts/conectedContext"
 import NetInfo from '@react-native-community/netinfo';
+import { LodingComponent } from "../../components/loading"
 
 export const Cadastro_servico = ({navigation}:any) => {
 
@@ -12,6 +13,7 @@ export const Cadastro_servico = ({navigation}:any) => {
     const [ valor, setValor ] = useState<number>(0)
     const api = useApi();
     const useQueryServices = useServices();
+    const [ loading, setLoading] = useState(false);
 
     const {connected,  setConnected} = useContext(ConnectedContext)
 
@@ -34,21 +36,22 @@ export const Cadastro_servico = ({navigation}:any) => {
 
 
     async function gravar (){
-
             if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
-            if(!aplicacao) return Alert.alert('É necessario informar a descrição para gravar o serviço!');
-            if(!valor) return Alert.alert('É necessario informar o valor para gravar o serviço !');
+            if(!aplicacao) return Alert.alert('','É necessario informar a aplicação para gravar o serviço!');
+            if(!valor) return Alert.alert('','É necessario informar o valor para gravar o serviço !');
 
             
 
         let data =   { 
                     "valor":valor,
                     "aplicacao":aplicacao,
-
                 }
 
-                let response =   await api.post('/servicos', data)
+                try{
+                    setLoading(true)
+
+                let response =   await api.post('/servico', data)
                 console.log(response.data) 
                 if(response.data.codigo > 0 ){
 
@@ -57,10 +60,19 @@ export const Cadastro_servico = ({navigation}:any) => {
                       Alert.alert(`Serviço ${aplicacao} registrado com sucesso!`)
                       setTimeout(()=>{},1000)
                       navigation.goBack()
+                    return Alert.alert('', `Serviço ${data.aplicacao} registrado com Sucesso!`)
+
                      }catch(e){
                          console.log(" ocorreu um erro ao cadastrar o Serviço ",e)
                      }
-                     }
+                    }
+                }catch(e:any){
+                    if(e.status === 400 ){
+                        return Alert.alert('Erro!', e.response.data.msg);
+                    }
+                }finally{
+            setLoading(false)
+                }
                     
         }
 
@@ -69,6 +81,8 @@ export const Cadastro_servico = ({navigation}:any) => {
     return (
         <View style={{ flex: 1 }}>
  
+        <LodingComponent isLoading={loading} />
+
             <View style={{ flex: 1 ,width: '100%',  backgroundColor: '#EAF4FE' }} >
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     <Image
@@ -94,7 +108,7 @@ export const Cadastro_servico = ({navigation}:any) => {
                     <TextInput
                                 onChangeText={(value:any)=> setAplicacao( value )}
                         style={{ padding: 5, backgroundColor: '#FFF' }}
-                        placeholder="descrição"
+                        placeholder="aplicação:"
                     />
                 </View>
 

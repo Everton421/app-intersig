@@ -38,13 +38,13 @@ export function Clientes({navigation}:any){
                         let response:any
                           response = await useQueryClients.selectByDescription( pesquisa , 25);
                         if(response.length > 0  ){
-                            console.log(response)
+                           // console.log(response)
                             setDados(response)
                         }
                     }else{
                         const response:any = await useQueryClients.selectAllLimit(25);
                         if(response.length > 0  ){
-                            console.log(response)
+                           // console.log(response)
                             setDados(response)
                         }
                     }  

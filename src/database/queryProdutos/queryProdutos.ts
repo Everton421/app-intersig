@@ -170,33 +170,33 @@ export const useProducts = ()=>{
                       if(verifCode.length > 0 ){
                          // console.log('ja existe produto cadastrado com o codigo ', code );
                         //  console.log(verifCode);
-             let aux = await db.runAsync( 
-                `UPDATE produtos SET  
-                estoque         = ${produto.estoque},  
-                preco           = ${produto.preco},
-                grupo           = ${produto.grupo},  
-                origem          = '${produto.origem}',
-                descricao       = '${descricao}',
-                ativo           = '${produto.ativo}',
-                sku             = '${produto.sku}',    
-                marca           = ${produto.marca},
-                class_fiscal    = '${produto.class_fiscal}',   
-                cst             = '${produto.cst}', 
-                num_fabricante  = '${produto.num_fabricante}',
-                data_cadastro   = '${data_cadastro}',
-                data_recadastro = '${data_recadastro}',
-                observacoes1    = '${observacoes2}', 
-                observacoes2    = '${observacoes2}',
-                observacoes3    = '${observacoes3}',  
-                tipo            = '${produto.tipo}'
-                WHERE codigo =  ${code}`
-                 )
+                  let aux = await db.runAsync( 
+                      `UPDATE produtos SET  
+                      estoque         = ${produto.estoque},  
+                      preco           = ${produto.preco},
+                      grupo           = ${produto.grupo},  
+                      origem          = '${produto.origem}',
+                      descricao       = '${descricao}',
+                      ativo           = '${produto.ativo}',
+                      sku             = '${produto.sku}',    
+                      marca           = ${produto.marca},
+                      class_fiscal    = '${produto.class_fiscal}',   
+                      cst             = '${produto.cst}', 
+                      num_fabricante  = '${produto.num_fabricante}',
+                      data_cadastro   = '${data_cadastro}',
+                      data_recadastro = '${data_recadastro}',
+                      observacoes1    = '${observacoes2}', 
+                      observacoes2    = '${observacoes2}',
+                      observacoes3    = '${observacoes3}',  
+                      tipo            = '${produto.tipo}'
+                      WHERE codigo =  ${code}`
+                      )
                          
                   console.log( 'produto atualizado codigo: ',code)
                           }else{
                             console.log('nao foi encontrado produto com o codigo:', code)
                           }
-                }catch(e){ console.log(e) }
+                }catch(e){ console.log(` Erro ao tentar atualizar o produto codigo: ${code} `,e) }
                
             }
 

@@ -1,9 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
-import { useCategoria } from "../../database/queryCategorias/queryCategorias"
-import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { RenderModalCategorias } from "./modalCategorias"
 import { RenderModalMarcas } from "./modalMarcas"
 import useApi from "../../services/api"
@@ -13,17 +10,41 @@ import { ConnectedContext } from "../../contexts/conectedContext"
 import { MaterialIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons"
 import { useProducts } from "../../database/queryProdutos/queryProdutos"
-import { useRoute } from "@react-navigation/native"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
-import { Modal_fotos } from "./modalFotos"
 import { typeFotoProduto } from "./types/fotos"
+import { LodingComponent } from "../../components/loading"
  
+
+type produtoBancoLocal = 
+
+ { 
+    ativo : string,
+    class_fiscal : string,  
+    codigo : number,
+    cst: string,
+    data_cadastro:  string,
+    data_recadastro: string,
+    descricao :string,
+    estoque: number,
+    grupo: number,
+    marca: number,
+    num_fabricante: string,
+    num_original : string,
+    observacoes1: string,
+    observacoes2 : string,
+    observacoes3 : string,
+    origem : string,
+    preco : number,
+    sku : string,
+    tipo : string
+}
+
 export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
     const [ marcaSelecionada, setMarcaSelecionada ] = useState(0); 
     const [ categoriaSelecionada, setCategoriaSelecionada ] = useState(0); 
     const [ estoque, setEstoque ] = useState<number>(0);
-    const [ preco, setPreco ] = useState<number>(0);
+    const [ preco, setPreco ] = useState<any>(0);
     const [ sku, setSku ] = useState<string>('');
     const [ descricao, setDescricao] = useState<string>('');
     const [ gtim, setGtim ] = useState<string>('');
@@ -34,8 +55,9 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     const [link, setLink] = useState("");
     const [fotos, setFotos] = useState<typeFotoProduto[]>([]);
 
-    const [produto, setProduto] = useState();
+    const [produto, setProduto] = useState<produtoBancoLocal>();
     const [ imgs, setImgs] = useState<typeFotoProduto[]>();
+    const [ loading, setLoading ] = useState<boolean>(false);
 
     const useQueryProdutos = useProducts();
     const api = useApi();
@@ -54,13 +76,16 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     async function carregarProduto(){
         if( codigo_produto && codigo_produto > 0 ){
         let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
+            
+            console.log(dataProd)
+
             let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
             dataProd[0].fotos = dadosFoto;
             setImgs(dadosFoto)
-        let prod:any = dataProd[0]  
+        let prod:produtoBancoLocal = dataProd[0]  
         setProduto(prod)
         if(dataProd.length > 0 ){
-                setCategoriaSelecionada(prod.categoria);
+                setCategoriaSelecionada(prod.grupo);
                 setMarcaSelecionada(prod.marca);
                 setReferencia(prod.num_original)
                 setEstoque(prod.estoque);
@@ -106,31 +131,94 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
         if( codigo_produto > 0 || codigo_produto){
             let responseApi
+            let data =   { 
+                "codigo":codigo_produto,
+                "preco":preco,
+                "estoque":estoque,
+                "descricao":descricao,
+                "sku":sku,
+                "referencia":referencia,
+                "marca":  marcaSelecionada  ,
+                "grupo": {codigo:categoriaSelecionada }
+            }
+          //  console.log(data)
+        try{
+            setLoading(true)
+            let obj = { produto: codigo_produto, fotos: imgs};
+            console.log(obj);
+             
                 try{
-                    let obj = { codigo: codigo_produto, fotos: imgs};
-                    responseApi = await api.post('/offline/fotos', obj);
-                    console.log(responseApi.data)
-                }catch(e){
-                    console.log(e);
-                    return Alert.alert('Erro', 'ocorreu um erro ao tentar cadastrar/atualizar as fotos do produto! ')
-                }
+                        let obj = { produto: codigo_produto, fotos: imgs};
+                        responseApi = await api.post('/offline/fotos', obj);
+                            
+                        if(responseApi.status === 200){
 
+                                let imgsProd:typeFotoProduto[] = await useQueryFotos.selectByCode(codigo_produto);
+                                if ( imgsProd.length > 0 ||imgs?.length === 0  ){
+                                    await useQueryFotos.deleteByCodeProduct(codigo_produto);
+                                }  
+                                if(imgs?.length === 0 ){
+                                    setImgs(imgsProd)
+                                }
+                            imgs?.forEach( async ( f:typeFotoProduto )=>{
+                                    await useQueryFotos.create(f)
+                            })   
+                        }
 
-                let imgsProd:typeFotoProduto[] = await useQueryFotos.selectByCode(codigo_produto);
-                if ( imgsProd.length > 0 ||imgs?.length === 0  ){
-                    await useQueryFotos.deleteByCodeProduct(codigo_produto);
-                }  
-                if(imgs?.length === 0 ){
-                    setImgs(imgsProd)
+                    }catch(e:any){
+                        console.log(e);
+                        if( e.status === 400 ){
+
+                            return Alert.alert('Erro ao processar imagens!', e.response.data.msg)
+                        }
+                    }
+
+                     
+                  let  responseProdutoApi = await api.put('/produto', data);
+                        if(responseProdutoApi.status === 200 && responseProdutoApi.data.codigo > 0 ){
+                            let objResponse = 
+                            {
+                                 codigo :responseProdutoApi.data.codigo,
+                                 id :responseProdutoApi.data.id,
+                                 estoque :responseProdutoApi.data.estoque,
+                                 preco :responseProdutoApi.data.preco,
+                                 grupo :responseProdutoApi.data.grupo.codigo,
+                                 origem :responseProdutoApi.data.origem,
+                                 descricao: responseProdutoApi.data.descricao,
+                                 num_fabricante: responseProdutoApi.data.num_fabricante,
+                                 num_original: responseProdutoApi.data.num_original,
+                                 sku: responseProdutoApi.data.sku,
+                                 marca :responseProdutoApi.data.marca.codigo  ,
+                                 ativo: responseProdutoApi.data.ativo,
+                                 class_fiscal: responseProdutoApi.data.class_fiscal,
+                                 cst: responseProdutoApi.data.cst,
+                                 data_recadastro: responseProdutoApi.data.data_recadastro,
+                                 data_cadastro: responseProdutoApi.data.data_cadastro,
+                                 observacoes1: responseProdutoApi.data.observacoes1,
+                                 observacoes2: responseProdutoApi.data.observacoes2,
+                                 observacoes3: responseProdutoApi.data.observacoes3,
+                                 tipo: responseProdutoApi.data.tipo
+                            }
+                            
+
+                            useQueryProdutos.update(objResponse, objResponse.codigo);
+                        
+                            navigation.goBack();
+                            return Alert.alert('', `Produto ${responseProdutoApi.data.codigo} Alterado Com Sucesso! `)     
+                        }
+
+            
+            }catch(e:any){
+                if(e.status === 400 ){
+                Alert.alert("Erro!" , e.response.data.msg );
                 }
-               imgs?.forEach( async ( f:typeFotoProduto )=>{
-                    await useQueryFotos.create(f)
-               })     
-               Alert.alert("" ,"Produto alterado com sucesso")
-               await delay(300)
-               navigation.goBack();
-                 
-        }else{
+            } finally{
+                setLoading(false)
+            } 
+        
+        }
+        /*
+        else{
 
         let data =   { 
                     "preco":preco,
@@ -138,23 +226,61 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                     "descricao":descricao,
                     "sku":sku,
                     "referencia":referencia,
-                    "marca":marcaSelecionada.codigo,
-                    "grupo":categoriaSelecionada.codigo
+                    "marca":  marcaSelecionada ,
+                    "grupo":categoriaSelecionada 
                 }
 
-                let response =   await api.post('/produtos', data)
-                if(response.data.codigo > 0 ){
+             try{
+                    setLoading(true)
+                let response =   await api.post('/produto', data)
+                if(response.status === 200 && response.data.codigo > 0 ){
 
+                            let objResponse = 
+                            {
+                                 codigo : response.data.codigo,
+                                 id : response.data.id,
+                                 estoque : response.data.estoque,
+                                 preco : response.data.preco,
+                                 grupo :  response.data.grupo.codigo,
+                                 origem : response.data.origem,
+                                 descricao: response.data.descricao,
+                                 num_fabricante: response.data.num_fabricante,
+                                 num_original: response.data.num_original,
+                                 sku: response.data.sku,
+                                 marca : response.data.marca.codigo  ,
+                                 ativo: response.data.ativo,
+                                 class_fiscal:  response.data.class_fiscal,
+                                 cst: response.data.cst,
+                                 data_recadastro: response.data.data_recadastro,
+                                 data_cadastro: response.data.data_cadastro,
+                                 observacoes1: response.data.observacoes1,
+                                 observacoes2: response.data.observacoes2,
+                                 observacoes3: response.data.observacoes3,
+                                 tipo: response.data.tipo
+                            }
                     try{
-                           await useQueryProdutos.createByCode(response.data, response.data.codigo)
-                           Alert.alert(`Produto ${descricao} registrado com sucesso!`)
-                        setTimeout(()=>{},1000)
+                           await useQueryProdutos.createByCode(objResponse, response.data.codigo)
+                           Alert.alert('',`Produto ${descricao} registrado com sucesso!`)
+                             setTimeout(()=>{},1000)
                         navigation.goBack()
                     }catch(e){
                         console.log(" ocorreu um erro ao cadastrar o produto ",e)
+                        Alert.alert('Erro!',` Ocorreu um erro ao tentar registrar o produto no banco local!`);
                     }
-             }
+                }
+                }catch(e:any){
+                    if(e.status === 400 ){
+                        console.log(`erro ao tentar registrar o produto na api ` , e )
+                        Alert.alert('Erro!',` ${e.response.data.msg}`)
+                    }
+
+                }finally{
+                    setLoading(false)
+
+                }
+
         }
+        */
     }
     const renderImgs = ({ item }: { item: typeFotoProduto }) => {
         return (
@@ -209,7 +335,8 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
     return (
         <View style={{ flex: 1 }}>
- 
+             <LodingComponent isLoading={loading} />
+
           <View style={{ flex: 1 ,width: '100%',  backgroundColor: '#EAF4FE' }} >
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     
@@ -299,10 +426,10 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                         <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
                         <Text style={{fontWeight:"bold"}} > Preço:$ </Text>
                                     <TextInput
-                                    onChangeText={(v)=> setPreco( v )}
+                                    onChangeText={(v)=> setPreco( Number(v) )}
                                     style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
                                     keyboardType="numeric"
-                                    value={String(preco.toFixed(2))}
+                                    defaultValue={ String(preco)  }
                                     />
 
                             </View>
@@ -356,13 +483,13 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                 <Text style={{marginLeft:5}} > { marcaSelecionada && 'Marca:'}</Text> 
 
                  <View style={{ flexDirection:"row" }}>
-                    <RenderModalMarcas codigoMarca={  produto ? produto.marca : 0  } setMarca={setMarcaSelecionada} />
+                    <RenderModalMarcas codigoMarca={  marcaSelecionada ? marcaSelecionada : 0  } setMarca={setMarcaSelecionada} />
                  </View>  
 
                 <Text style={{marginLeft:5}} > { categoriaSelecionada && 'Categoria:'}</Text> 
 
                  <View style={{ flexDirection:"row" }}>
-                    <RenderModalCategorias  codigoCategoria={ produto ? produto.grupo : 0}  setCategoria={setCategoriaSelecionada}  />
+                    <RenderModalCategorias  codigoCategoria={ categoriaSelecionada ? categoriaSelecionada  : 0}  setCategoria={setCategoriaSelecionada}  />
                  </View> 
               
     

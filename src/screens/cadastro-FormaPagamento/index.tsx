@@ -8,6 +8,7 @@ import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
+import { LodingComponent } from "../../components/loading";
 export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
 
 
@@ -18,6 +19,8 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
     const [ intervalo, setIntervalo ] = useState(1);
     const [ parcelas, setParcelas ] = useState<parcela[]>();
     const [ descricao, setDescricao ] = useState<string>(); 
+    const [ loading, setLoading ] = useState(false);
+
     let api = useApi();
     let useQueryfpgt = useFormasDePagamentos();
     const {connected,  setConnected} = useContext(ConnectedContext)
@@ -82,22 +85,38 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
         console.log(data);
 
         try{
-          let response = await api.post('/formas_pagamento',  {data} );
-            if(response.data.codigo > 0  ){
+            setLoading(true)
+          let response = await api.post('/formas_pagamento',   data  );
+
+            if( response.status === 200 && response.data.codigo > 0  ){
                 let result:any = await useQueryfpgt.create(response.data)
                  if(result > 0  ) {
-                          Alert.alert(`Forma De Pagamento registrada com sucesso!`) 
                          setTimeout(()=>{},3000);
                          navigation.goBack()
-                    }
+                         return  Alert.alert('',`Forma De Pagamento registrada com sucesso!`) 
+
+                     }
             }
-        }catch(e){ }
+
+        }catch(e){
+            if(e.status === 400 ){
+                return  Alert.alert(`Erro!`, e.response.data.msg); 
+            }else{
+                return Alert.alert(`Erro!`, 'Erro Desconhecido!');
+            } 
+         }finally{
+            setLoading(false)
+         }
+
+
+         
         }
 
 
     return (
         <View style={{ flex:1 ,  backgroundColor:'#EAF4FE'}}>
 
+            <LodingComponent isLoading={loading} />
  
             <View style={{ marginTop:20}}>
                 <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} > Descrição:</Text>

@@ -70,7 +70,7 @@ export const  useClients = ()=>{
     async function selectAllLimit( limit:number ) {
         try{
         const result = await db.getAllAsync(` SELECT *, strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro FROM clientes limit ? `,  `${limit}`);
-        console.log(result)
+        //console.log(result)
         return result;
 
     }catch( e ){ console.log(`erro ao consultar o clientes`,e )} 

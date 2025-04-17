@@ -16,7 +16,6 @@ export  const RenderModalMarcas = ({setMarca, codigoMarca}) => {
     useEffect(
         ()=>{
 
-          console.log('codigo marca', codigoMarca )
             async function buscaMarcas(){
                 let dados:any = await useQueryMarcas.selectAll();
                 if(dados?.length > 0 ){

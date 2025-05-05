@@ -28,7 +28,7 @@ export const Resgistrar_empresa = ({ navigation }) => {
     const [ cnpjValid , setCnpjValid ] = useState<Boolean>();
     const [ responseEmpresa , setResponseEmpresa ] = useState();
     const [loadingCnpj, setLoadingCnpj ]= useState<boolean>(false);
-    const [ msgCnpjValidApi , setMsgCnpjValidApi ] = useState({});
+    const [ msgCnpjValidApi , setMsgCnpjValidApi ] = useState<{ cadastrada:boolean, msg:string } |null  >(null);
     const [ msgEmailValidApi , setMsgEmailValidApi ] = useState({});
 
     const [loadingEmail, setLoadingEmail ]= useState<boolean>(false);
@@ -96,20 +96,27 @@ export const Resgistrar_empresa = ({ navigation }) => {
     )
 */
 
+    async function delay(ms:number){
+        return new Promise(resolve => setTimeout( ()=> {resolve},ms))
+    }
+
     useEffect(
         ()=>{
 
             async function validaEmpresa(){
-                if(cnpjInput.length > 0 ){
-
-               setCnpjInput(String(cnpjInput));
-              console.log(String(cnpjInput))   
+               //console.log(cnpjInput.length)
+            if(cnpjInput.length > 11 ){
+            
+            
+              //  setCnpjInput(String(cnpjInput));
                 try{
                 setLoadingCnpj(true)
-                    let response = await api.post('/empresa/validacao',{ "cnpj": cnpjInput}  );
-                    console.log(response.data)
+                 //await delay(500);
+
+                    let response = await api.post('/empresa/validacao',{ "empresa":{ "cnpj": cnpjInput}}  );
+                    console.log(response.data.status.msg)
                     if(response.status === 200){
-                         setMsgCnpjValidApi(response.data)
+                         setMsgCnpjValidApi(response.data.status)
                     setLoadingCnpj(false);
                     }
                  
@@ -130,16 +137,16 @@ export const Resgistrar_empresa = ({ navigation }) => {
 async function register(   ) {
     setLoading(true);
 
-        setTimeout(   ()=>{  },2000 )
+        //setTimeout(   ()=>{  },2000 )
      if (!nomeEmpresa)  {
       setLoading(false);
-         return showAlert('É necessário informar o nome da empresa');
+         return showAlert('É Necessário Informar o Nome da Empresa!');
      }
-    if (!cnpj) return showAlert('É necessário informar o CNPJ da empresa');
-     if (!emailEmpresa) return showAlert('É necessário informar o email da empresa');
-     if (!nomeUsuario) return showAlert('É necessário informar o responsável da empresa');
-     if (!email) return showAlert('É necessário informar o email do responsável da empresa');
-     if (!senha) return showAlert('É necessário informar a senha do responsável da empresa');
+    if (!cnpj) return showAlert('É Necessário Informar o CNPJ da Empresa!');
+     if (!emailEmpresa) return showAlert('É Necessário Informar o Email da Empresa!');
+     if (!nomeUsuario) return showAlert('É Necessário Informar o Responsável da Empresa!');
+     if (!email) return showAlert('É Necessário Informar o Email do Responsável da Empresa!');
+     if (!senha) return showAlert('É Necessário Informar a Senha do Responsável da Empresa!');
      
             let empresa =
              { 
@@ -147,17 +154,21 @@ async function register(   ) {
                 "telefone_empresa":  telefone,
                 "email_empresa": emailEmpresa,
                 "cnpj": cnpjInput,
-                "usuario": nomeUsuario,
-                "email": email ,
-                "senha": senha
                 } 
-                
+            let usuarioEmpresa =
+            {
+                "nome":nomeUsuario,
+                "telefone": '',
+                "email":email,
+                "senha":senha
+            }
+
                 try {
-                    let response = await api.post('/empresa', empresa);
+                    let response = await api.post('/empresa', {empresa:empresa, usuario: usuarioEmpresa });
             
                     if (response.status === 200  ) {
                         //console.log(response.data);
-                            if(response.data.ok && response.data.ok === true && !response.data.erro  ){
+                            if(response.data.status.ok === true && !response.data.erro  ){
                                     let responsavel = response.data.codigo_usuario;
                                     let codigo_empresa = response.data.codigo_empresa;
                                     let cnpj  =   response.data.cnpj;
@@ -177,8 +188,8 @@ async function register(   ) {
 
                                     let userCad = await useQueryUsuario.createUser(user)
 
-                                    if( userCad > 0 ) console.log("usuario registrado") 
-                                         setTimeout(()=>{},2000);
+                                    if( userCad && userCad > 0 ) console.log("usuario registrado") 
+
                                         showAlert(response.data.msg);
                                         setNomeEmpresa('')
                                         setEmailEmpresa('')
@@ -197,9 +208,10 @@ async function register(   ) {
                             console.log(response)
                         throw new Error(response.data.message || 'Erro desconhecido ao registrar a empresa.');
                     }
-                } catch (e) {
-                    console.log('Erro:', e);
-                    showAlert(e.message); // Exibe a mensagem de erro na tela
+                } catch (e:any) {
+                    console.log('Erro:', e.response);
+                    if(e.status === 400)  showAlert(e.response.data.msg);   
+                
                 } finally {
                     setLoading(false);
                 }
@@ -242,13 +254,13 @@ async function register(   ) {
                             </View>
                         </View>
 
-                        <View style={{ width: '100%', marginTop: 5 }}>
+                  <View style={{ width: '100%', marginTop: 5 }}>
 
                              <View style={{flexDirection:'row'}}>
-                             <Text style={{ color: '#185FED', marginLeft: 10 }}> CNPJ/CPF: </Text>
+                                <Text style={{ color: '#185FED', marginLeft: 10 }}> CNPJ/CPF: </Text>
                              </View>
 
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
+                           <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
                                  <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="00.000.000/0000-00" 
                                     onChangeText={(v:any)=> setCnpjInput(v)}
                                  />
@@ -256,16 +268,17 @@ async function register(   ) {
                                  <MaterialCommunityIcons name="store" size={24} color="#185FED" />
                             </View>
 
+                  <View style={{ width: '100%', marginTop: 5 , alignItems:'center'}}>
                          
-                          { 
-                             
-                             loadingCnpj ? 
+                          {   loadingCnpj ? 
                              <ActivityIndicator /> :
                               
-                             msgCnpjValidApi.cadastrada    &&
+                             msgCnpjValidApi != null && msgCnpjValidApi.cadastrada ?
                                 ( <Text style={{color:'red'}}>{msgCnpjValidApi.msg}</Text>)   
-                              
-                             }                          
+                                :
+                                ( <Text style={{color:'green'}}>{msgCnpjValidApi && msgCnpjValidApi.msg}</Text>)   
+                            }                          
+                        </View>
 
                         </View>
 

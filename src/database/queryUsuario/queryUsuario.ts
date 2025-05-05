@@ -7,7 +7,7 @@ type Usuario = {
     nome:string,
     senha:string,
     email:string
-    cnpj:string,
+    token:string,
     lembrar:string
 }
 
@@ -61,7 +61,7 @@ async function selectRemember(): Promise<Usuario[] | undefined>{
  
 async function create ( user:Usuario ){
     console.log(user)
-    let  { codigo , nome, senha , email, cnpj, lembrar } = user;
+    let  { codigo , nome, senha , email, token, lembrar } = user;
    let verifyUser: any
    
    if( codigo){
@@ -85,8 +85,8 @@ async function create ( user:Usuario ){
                         try{
                             let result = await db.runAsync(
                                 ` INSERT INTO usuarios
-                                    ( codigo, nome, senha , email, cnpj, lembrar ) VALUES 
-                            ( ${codigo}, '${nome}', '${senha}', '${email}', '${cnpj}', '${lembrar}' ); `);
+                                    ( codigo, nome, senha , email, lembrar, token  ) VALUES 
+                            ( ${codigo}, '${nome}', '${senha}', '${email}', '${lembrar}', '${token}' ); `);
                            // console.log('Usuario cadastrado: ',result.lastInsertRowId);
                             return result.lastInsertRowId
     
@@ -105,7 +105,7 @@ async function createUser ( user:Usuario ){
             await updateRemember()
         }
 
-    let  { codigo , nome, senha , email ,cnpj , lembrar} = user;
+    let  { codigo , nome, senha , email ,token , lembrar} = user;
     let verifyUser: any = await selectByCode( codigo );
           
      if(verifyUser.length > 0 || verifyUser !== undefined ){
@@ -113,8 +113,8 @@ async function createUser ( user:Usuario ){
             try{
                 let result = await db.runAsync(
                     ` INSERT INTO usuarios
-                        ( codigo, nome, senha , email ,cnpj, lembrar ) VALUES 
-                ( ${codigo}, '${nome}', '${senha}', '${email}','${cnpj}', '${lembrar}' ); `);
+                        ( codigo, nome, senha , email , lembrar, token ) VALUES 
+                ( ${codigo}, '${nome}', '${senha}', '${email}',  '${lembrar}', '${token}' ); `);
 
               return result.lastInsertRowId
         }catch(e){
@@ -126,8 +126,8 @@ async function createUser ( user:Usuario ){
                          try{
                              let result = await db.runAsync(
                                  ` INSERT INTO usuarios
-                                     ( codigo, nome, senha , email, cnpj, lembrar ) VALUES 
-                             ( ${codigo}, '${nome}', '${senha}', '${email}', '${cnpj}', '${lembrar}' ); `);
+                                     ( codigo, nome, senha , email, lembrar, token ) VALUES 
+                             ( ${codigo}, '${nome}', '${senha}', '${email}','${lembrar}', '${token}' ); `);
                              console.log('Usuario cadastrado: ',result.lastInsertRowId);
                              return result.lastInsertRowId
                                 
@@ -140,7 +140,7 @@ async function createUser ( user:Usuario ){
 
 
 async function update ( user:Usuario ){
-    let  { codigo , nome, senha , email, cnpj, lembrar } = user;
+    let  { codigo , nome, senha , email,  lembrar, token } = user;
     
     let verifyUser: any = await selectByCode( codigo );
     
@@ -151,7 +151,7 @@ async function update ( user:Usuario ){
              let result = await db.runAsync(
                  ` UPDATE usuarios SET 
                          
-             codigo =  ${codigo},  nome = '${nome}', senha = '${senha}' email = '${email}' cnpj ='${cnpj}' lembrar='${lembrar}'  where codigo = ${codigo} `);
+             codigo =  ${codigo},  nome = '${nome}', senha = '${senha}' email = '${email}'  lembrar='${lembrar}' token ='${token}'  where codigo = ${codigo} `);
               console.log(`Usuario codigo:${codigo} atualizado ! ` );
 
               return result.lastInsertRowId

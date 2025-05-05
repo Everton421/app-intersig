@@ -1,11 +1,7 @@
 import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet,Animated, TouchableOpacity } from "react-native"
 import useApi from "../../services/api"
 import { useContext, useEffect, useState } from "react"
-import { TextInput } from "react-native-gesture-handler"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { ConnectedContext } from "../../contexts/conectedContext"
-import { useItemsPedido } from "../../database/queryPedido/queryItems"
-import { useParcelas } from "../../database/queryParcelas/queryParcelas"
 import { usePedidos } from "../../database/queryPedido/queryPedido"
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento"
 import { useClients } from "../../database/queryClientes/queryCliente"
@@ -77,6 +73,8 @@ export const Configurações = () => {
   const [ dataSelecionada, setDataSelecionada ] = useState(  );
   const [showPicker, setShowPicker] = useState(false);
 
+  const [msgApi , setMsgApi ] = useState('');
+
   const useGetOrders = receberPedidos();
   const useSendOrders = enviaPedidos();
 
@@ -91,21 +89,32 @@ export const Configurações = () => {
   };
 
   async function connect() {
+
     try {
-        const response = await api.get('/');
+      setLoading(true)
+      const response = await api.get('/', {
+      });
         if (response.status === 200 && response.data.ok) {
             setConectado(true)
             setConnected(true)
         console.log(response.data);
-
+setMsgApi('')
         } else {
             setConectado(false)
             setConnected(false)
             console.log({"err":"erro ao conectar"})
         }
         setError(undefined)
-    } catch (err) {
-        setError("Erro ao conectar na API. Por favor, tente novamente.")
+    } catch (err:any) {
+      setConectado(false)
+        setMsgApi(err.response.data.msg);
+        if(err.status === 400 ) Alert.alert("Erro!", err.response.data.msg);
+          setError(err.response.data.msg)
+
+        if(err.status !== 400 )
+          Alert.alert("Erro!", "Erro desconhecido!");
+        setError("Erro desconhecido!")
+
     } finally {
         setLoading(false)
     }
@@ -437,10 +446,22 @@ export const Configurações = () => {
       Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
       return;
     }
+    if (!conectado) {
+      Alert.alert(msgApi );
+      return;
+    }
     syncData();
   };
 
   async function syncOrders(){
+    if (!connected) {
+      Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
+      return;
+    }
+    if (!conectado) {
+      Alert.alert(msgApi );
+      return;
+    }
     try{
       setIsLoadingOrder(true)
       let aux:any = formatDate(date)
@@ -500,17 +521,18 @@ export const Configurações = () => {
   return (
     <View style={{ flex: 1 , backgroundColor:'#EAF4FE', alignItems:"center",   width:'98%' }}>
 
-    <View style={{flexDirection:"row"  }}>
-      <Text   > status api: </Text>{loading ? (
-            <Text>Conectando...</Text>
+    <View style={{flexDirection:"row" ,marginTop:10 }}>
+      {loading ? (
+            <ActivityIndicator size={20} color="#185FED" />
                     ) : (
                         <>
                             {error ? (
-                                <Text>{error}</Text>
+                                <Text> status api: {error}</Text>
                             ) : (
                                 <View  >
-                                {connected ? <Text style={{ color:'green' }}> Conectado! </Text> 
-                                : <Text style={{ color:'red',width:'100%' }}> Não conectado!</Text>}
+                                  
+                                {connected ? <Text style={{ color:'green' }}> status api:  Conectado! </Text> 
+                                : <Text style={{ color:'red',width:'100%' }}>status api:   Não conectado!</Text>}
                                 
                                 
                                 </View>
@@ -519,7 +541,7 @@ export const Configurações = () => {
                         </>
                     )}
     </View>
-    <TouchableOpacity  style={ { alignItems:"center",elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
+    <TouchableOpacity  style={ { alignItems:"center",marginTop:3,elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
                  <Text style={{ color:'#FFF' }} > testar conexão </Text>
       </TouchableOpacity>
     

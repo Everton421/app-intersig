@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { View, FlatList, Text, Alert, BackHandler, TouchableOpacity, StatusBar, Image, ActivityIndicator } from "react-native";
+import { View, FlatList, Text, Alert, BackHandler, TouchableOpacity, StatusBar, Image, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../contexts/auth";
 import { AntDesign } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -13,6 +13,7 @@ import { useProducts } from "../../database/queryProdutos/queryProdutos";
 import { useServices } from "../../database/queryServicos/queryServicos";
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import useApi from "../../services/api";
 
 type cadEmpre =
   {
@@ -26,6 +27,7 @@ type cadEmpre =
 
 export const Home = ({ navigation }: any) => {
   const { setLogado, setUsuario, usuario }: any = useContext(AuthContext);
+  const api = useApi();
 
   const [sair, setSair] = useState<boolean>(false)
   const [cadEmpresa, setCadEmpresa] = useState<cadEmpre>()
@@ -34,22 +36,43 @@ export const Home = ({ navigation }: any) => {
   let useQueryEmpresa = queryEmpresas();
   let restartDB = restartDatabaseService();
 
+
+async function buscaEmpresa (){
+  setLoadingEmpr(true)
+  let validEmpr:any  = await useQueryEmpresa.selectAll();
+  if(validEmpr?.length > 0 ){
+    setCadEmpresa(validEmpr[0]);
+  }else{
+    try{
+      let validEmpresa = await api.post("/empresa/validacao" ,
+        { Headers:{
+          token: usuario.token
+          }
+        }  );
+  
+      if (validEmpresa.data.status.cadastrada) {
+        let objEmpr = {
+          codigo_empresa: validEmpresa.data.data.codigo,
+          nome: validEmpresa.data.data.nome,
+          cnpj: validEmpresa.data.data.cnpj,
+          email: validEmpresa.data.data.email_empresa,
+          responsavel: validEmpresa.data.data.responsavel,
+        };
+       // let aux = await useQueryEmpresa.createByCode(objEmpr);
+        setCadEmpresa(validEmpresa.data.data)
+      }
+    }catch(e:any){
+      console.log( 'Ocorreu um erro ao tentar validar a empresa ',  e.response.data.msg )
+    } finally{
+      setLoadingEmpr(false)
+    }
+  }
+
+ 
+}
+
   useEffect(
     () => {
-      async function buscaEmpresa() {
-        try {
-          setLoadingEmpr(true);
-          let result: any = await useQueryEmpresa.findBycnpj(usuario.cnpj);
-          console.log(result)
-          if (result.length > 0) {
-            setCadEmpresa(result[0])
-          }
-        } catch (e) {
-          console.log(" Erro ao buscar os dados da empresa TELA HOME ", e)
-        } finally {
-          setLoadingEmpr(false);
-        }
-      }
 
       buscaEmpresa()
 
@@ -98,7 +121,7 @@ export const Home = ({ navigation }: any) => {
       "icon": <FontAwesome name="users" size={24} color="#185FED" />
     },
     {
-      "nome": "settings",
+      "nome": "ajustes",
       "icon": <FontAwesome5 name="sync-alt" size={24} color="#185FED" />
     }
 
@@ -121,7 +144,7 @@ export const Home = ({ navigation }: any) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#EAF4FE" }}>
+    <View style={{ flex: 1, backgroundColor: "#EAF4FE" , height:'auto'}}>
       <View style={{ alignItems: "center", justifyContent: "space-between", flexDirection: "row", backgroundColor: '#185FED', elevation: 7, padding: 5, }}>
         <View style={{ backgroundColor: '#FFF', borderRadius: 55, padding: 3, margin: 3 }}>
           <Image
@@ -134,7 +157,7 @@ export const Home = ({ navigation }: any) => {
 
         {
           loaidngEmpr ? (
-            <ActivityIndicator size={5} />
+            <ActivityIndicator size={20} color={'#FFF'} />
           ) : (
             <Text style={{ fontWeight: "bold", color: '#FFF', margin: 7 }}>
               {cadEmpresa?.nome}
@@ -144,70 +167,84 @@ export const Home = ({ navigation }: any) => {
         }
 
       </View>
-      <View style={{ margin: 10, alignItems: "center" }}>
-        <FlatList
-          horizontal={true}
-          data={data}
-          renderItem={({ item }) => <Item value={item} />}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
 
-      <View style={{ alignItems: "center", width: '100%', marginTop: 15 }}>
-
-
-        <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center" }}>
-          <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
-            onPress={() => { navigation.navigate('ViewTabProdutos') }} >
-            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-              <Foundation name="book" size={30} color="#185FED" />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '80%', textAlign: 'center' }} >Produtos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
-            onPress={() => { navigation.navigate('serviços') }} >
-            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-              <Feather name="tool" size={30} color="#185FED" />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '80%', textAlign: 'center' }} >Serviços</Text>
-          </TouchableOpacity>
+      <ScrollView style={{ flex:1}}>
+        <View style={{ margin: 10, alignItems: "center"   }}>
+          <FlatList
+            horizontal={true}
+            data={data}
+            renderItem={({ item }) => <Item value={item} />}
+            showsHorizontalScrollIndicator={false}
+          />
         </View>
 
+        <View style={{ alignItems: "center", width: '100%', marginTop: 15, marginBottom:60 }}>
 
+          <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center" }}>
+            <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
+              onPress={() => { navigation.navigate('ViewTabProdutos') }} >
+              <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+                <Foundation name="book" size={30} color="#185FED" />
+              </View>
+              <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '80%', textAlign: 'center' }} >Produtos</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-          onPress={() => { navigation.navigate('clientes') }}
-        >
-          <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-            <Feather name="users" size={30} color="#185FED" />
+            <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
+              onPress={() => { navigation.navigate('serviços') }} >
+              <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+                <Feather name="tool" size={30} color="#185FED" />
+              </View>
+              <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '80%', textAlign: 'center' }} >Serviços</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={{ fontWeight: "bold", fontSize: 18, color: '#333', width: '50%', textAlign: 'center' }} >clientes</Text>
-          <AntDesign name="caretdown" size={24} color="#185FED" />
-        </TouchableOpacity>
 
 
-        <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-          onPress={() => { navigation.navigate('formasPagamento') }}
-        >
-          <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-            <MaterialIcons name="payment" size={30} color="#185FED" />
-          </View>
-          <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '50%', textAlign: 'center' }} >formas de pagamento</Text>
-          <AntDesign name="caretdown" size={24} color="#185FED" />
-        </TouchableOpacity>
 
-      </View>
+          <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+            onPress={() => { navigation.navigate('clientes') }}
+          >
+            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+              <Feather name="users" size={30} color="#185FED" />
+            </View>
+            <Text style={{ fontWeight: "bold", fontSize: 18, color: '#333', width: '50%', textAlign: 'center' }} >Clientes</Text>
+            <AntDesign name="caretdown" size={24} color="#185FED" />
+          </TouchableOpacity>
 
-      <View style={{ flexDirection: "row", position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#185FED', padding: 10, justifyContent: "space-between", }}>
+
+          <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+          >
+            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+            <FontAwesome5 name="car" size={24} color="#185FED" />
+            </View>
+            <Text style={{ fontWeight: "bold", fontSize: 18, color: '#333', width: '50%', textAlign: 'center' }} >Veículos</Text>
+            <AntDesign name="caretdown" size={24} color="#185FED" />
+          </TouchableOpacity>
+          
+
+
+          <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+            onPress={() => { navigation.navigate('formasPagamento') }}
+          >
+            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+              <MaterialIcons name="payment" size={30} color="#185FED" />
+            </View>
+            <Text style={{ fontWeight: "bold", fontSize: 15, color: '#333', width: '50%', textAlign: 'center' }} >Formas De Pagamento</Text>
+            <AntDesign name="caretdown" size={24} color="#185FED" />
+          </TouchableOpacity>
+
+        </View>
+     </ScrollView> 
+
+      <View style={{  flexDirection: "row", position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#185FED', padding: 10, justifyContent: "space-between", }}>
         <Text style={{ color: '#FFF', fontSize: 20, fontWeight: "bold", width: '50%' }}>
           {usuario && usuario.nome}
         </Text>
 
         <TouchableOpacity onPress={() => alertSair()} style={{ flexDirection: "row" }}>
-          <MaterialCommunityIcons name="logout" size={24} color="white" />
           <Text style={{ color: '#FFF', fontWeight: "bold" }} >Sair</Text>
+          <MaterialCommunityIcons name="logout" size={24} color="white" />
         </TouchableOpacity>
+ 
       </View>
 
     </View>

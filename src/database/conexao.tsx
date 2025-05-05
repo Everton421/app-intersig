@@ -1,6 +1,5 @@
-import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
-import { Suspense, useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {  type SQLiteDatabase } from 'expo-sqlite';
+ 
 
 export async function construtor(db: SQLiteDatabase) {
     
@@ -25,8 +24,8 @@ export async function construtor(db: SQLiteDatabase) {
       nome TEXT NOT NULL,
       senha TEXT NOT NULL, 
       email TEXT NOT NULL,
-      cnpj TEXT ,
-      lembrar TEXT DEFAULT 'N'
+      lembrar TEXT DEFAULT 'N',
+      token TEXT
     ); 
 
 

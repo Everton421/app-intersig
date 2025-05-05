@@ -22,10 +22,10 @@ const useApi = () => {
     api.interceptors.request.use(
         async (config) => {
             // Adiciona o CNPJ se o usuário estiver definido
-            if (usuario && usuario.cnpj) {
-                config.headers["cnpj"] = usuario.cnpj;
+            if (usuario && usuario.token) {
+                config.headers["token"] = usuario.token;
             }
-                config.headers["authorization"] = `token h43895jt9858094bun6098grubn48u59dsgfg234543tf `;
+//config.headers["authorization"] = `token h43895jt9858094bun6098grubn48u59dsgfg234543tf `;
                 
             return config;
         },

@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Image, Animated, StatusBar } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useUsuario } from '../../database/queryUsuario/queryUsuario';
 
-export const Inicio = ({navigation}) => {
+export const Inicio = ({navigation}:any) => {
     const animatedValue = useRef(new Animated.Value(0)).current;
     const imageOpacity = animatedValue.interpolate({
         inputRange: [0, 1],
@@ -23,6 +24,8 @@ export const Inicio = ({navigation}) => {
         inputRange: [0, 1],
         outputRange: [100, 0], // Começa 100 unidades abaixo e termina na posição original
     });
+  const useQueryUsuario = useUsuario();
+  
 
     return (
         <View style={{ flex: 1, backgroundColor: '#EAF4FE' }}>
@@ -33,6 +36,7 @@ export const Inicio = ({navigation}) => {
                         style={{ width: 95, height: 95, resizeMode: 'stretch' }}
                         source={require('../../imgs/intersig120x120.png')}
                     />
+                  
                 </Animated.View>
 
                 <Animated.View
@@ -49,16 +53,20 @@ export const Inicio = ({navigation}) => {
                     }}
                 >
                     <View style={{ width: '100%', alignItems: "center", marginTop: 25 }}>
-                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#fff', width: '90%' }} 
-                         onPress={()=> navigation.navigate('registrar_empresa')}  >
-                            <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18 }}>Registrar Empresa</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#FFF', width: '90%', marginTop: 15   }}
+                        <TouchableOpacity style={{ alignItems: "center", padding: 10, borderRadius: 10, backgroundColor: '#FFF', width: '90%', marginTop: 15   }}
                          onPress={()=> navigation.navigate('login')}  >
                             <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18}}>Entrar</Text>
                         </TouchableOpacity>
+
+                        <TouchableOpacity style={{marginTop: 15 ,alignItems: "center", padding: 10, borderRadius: 10, backgroundColor: '#fff', width: '90%' }} 
+                           onPress={()=> navigation.navigate('registrar_empresa')}  >
+                             <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18 }}>Teste Grátis</Text>
+                        </TouchableOpacity>
+                        <Text style={{ marginTop:5 , color: '#FFF', fontWeight:"bold"}}> teste valido por 30 dias!</Text>
+
                     </View>
+            
+       
                 </Animated.View>
         </View>
     );

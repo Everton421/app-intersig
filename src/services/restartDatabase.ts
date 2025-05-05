@@ -31,8 +31,8 @@ export const restartDatabaseService = ()=>{
       nome TEXT NOT NULL,
       senha TEXT NOT NULL, 
       email TEXT NOT NULL,
-      cnpj TEXT ,
-      lembrar TEXT DEFAULT 'N'
+      lembrar TEXT DEFAULT 'N',
+      token TEXT
     ); 
 
 

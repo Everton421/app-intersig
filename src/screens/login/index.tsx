@@ -63,6 +63,12 @@ export const Login = ({ navigation }:any) => {
     buscaUser();
   }, []);
 
+
+  async function verUsuario(){
+    let aux = await useQueryUsuario.selectAll();
+    console.log(aux) 
+  }
+
   async function logar() {
     if (!email) return Alert.alert("é necessario informar o email!");
     if (!senha) return Alert.alert("é necessario informar a senha!");
@@ -82,52 +88,33 @@ export const Login = ({ navigation }:any) => {
     } else {
 
       try{
-        setLoading(true)
+       setLoading(true)
   
           let response: any = await api.post("/login", user);
+        
 
-            if (response.data.status.ok === true) {
+            if (response.status == 200) {
 
               let lembrarUsuario = lembrar ? "S" : "N";
               let userMobile = {
-                email: response.data.data.email,
-                senha: response.data.data.senha,
-                cnpj: response.data.data.empresa,
-                codigo: response.data.data.codigo,
-                nome: response.data.data.nome,
+                email: user.email,
+                senha: user.senha,
+                codigo: response.data.codigo,
+                nome: response.data.usuario,
                 lembrar: lembrarUsuario,
+                token: response.data.token
               };
+              
+             await useRestart.restart();
 
-              await useRestart.restart();
-              setUsuario(userMobile);
+             setUsuario(userMobile);
               setLogado(true);
 
               let codeUser = await useQueryUsuario.create(userMobile);
-
-                  try{
-
-                      let validEmpresa = await api.post("/empresa/validacao", {
-                        cnpj: response.data.data.empresa,
-                      });
-                      if (validEmpresa.data.status.cadastrada) {
-                        let objEmpr = {
-                          codigo_empresa: validEmpresa.data.data.codigo,
-                          nome: validEmpresa.data.data.nome,
-                          cnpj: validEmpresa.data.data.cnpj,
-                          email: validEmpresa.data.data.email_empresa,
-                          responsavel: validEmpresa.data.data.responsavel,
-                        };
-                        let aux = await useQueryEmpresa.createByCode(objEmpr);
-                      }
-                    }catch(e:any){
-                 console.log( 'Ocorreu um erro ao tentar validar a empresa ',  e.response.data.msg )
-               //  Alert.alert('Erro!', e.response.data.msg);
-                    }     
-
-              setTimeout(() => {}, 2000);
-
+            
+                  
             } else {
-              return Alert.alert(response.data.status.msg);
+              return Alert.alert(response.data.msg);
             }
 
         }catch(e:any){
@@ -139,7 +126,6 @@ export const Login = ({ navigation }:any) => {
         }finally{
           setLoading(false)
         }
-          
     }
   }
 
@@ -201,21 +187,26 @@ export const Login = ({ navigation }:any) => {
             </Text>
 
             <View style={{ width: "100%" }}>
+
               <Text style={{ color: "#185FED", fontWeight:"bold" }}> EMAIL </Text>
-              <TextInput
-                style={{ borderBottomWidth: 1, width: "90%" }}
-                placeholder="example@example.com"
-                onChangeText={(t) => setEmail(t)}
-                value={email}
-              />
+               <View style={{ width: "100%" , flexDirection:"row" }}>
+                  <TextInput
+                    style={{   borderBottomWidth: 1, width: "90%" }} 
+                    placeholder="example@example.com"
+                    onChangeText={(t) => setEmail(t)}
+                    value={email}
+                    autoComplete="email"
+                  />
+               </View>
             </View>
 
             <View style={{ width: "100%", marginTop: 50 }}>
               <Text style={{ color: "#185FED", fontWeight:"bold"  }}> SENHA </Text>
               <TextInput
                 style={{ borderBottomWidth: 1, width: "90%" }}
-                secureTextEntry
+                secureTextEntry={false}
                 onChangeText={(v) => setSenha(v)}
+                placeholder="*********"
                 value={senha}
               />
 
@@ -263,6 +254,9 @@ export const Login = ({ navigation }:any) => {
 
         <TouchableOpacity style={{ margin:6}} onPress={()=> navigation.navigate('enviar_codigo')}>
                 <Text style={{ color:'#185FED', fontWeight:"bold"}} > esqueci minha senha</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={{ margin:6}} onPress={()=> verUsuario()}>
+                <Text style={{ color:'#185FED', fontWeight:"bold"}} >  ver usuaario</Text>
         </TouchableOpacity>
 
           </View>

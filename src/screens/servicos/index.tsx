@@ -13,7 +13,7 @@ type servico  = {
     codigo:number | undefined,
     aplicacao:string | undefined,
     valor:number | undefined ,
-      data_cadastro : string,
+      data_cadastro : string| undefined,
       data_recadastro : string | undefined,
       tipo_serv : number | undefined ,
 }
@@ -102,6 +102,7 @@ async function gravar(){
         if(e.status === 400 ){
             return Alert.alert('Erro!', e.response.data.msg);
         } else{
+            console.log(e)
             return Alert.alert('Erro!', 'Erro desconhecido!');
 
         }  
@@ -167,10 +168,15 @@ async function gravar(){
             <View style={{ width:'96%',height:'97%', backgroundColor:'#FFF', borderRadius:10}} >
                 
                     <View style={{ margin:8}}>
-                        <Button
-                            onPress={()=>setVisible(false)}
-                            title="Voltar"
-                        />
+                         
+                                 <TouchableOpacity
+                                            onPress={()=>setVisible(false)}
+                                            style={{    margin: 10,  backgroundColor: "#009de2",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
+                                          >
+                                            <Text style={{ color: "#FFF", fontWeight: "bold" }}>
+                                              voltar
+                                            </Text>
+                                          </TouchableOpacity>
                     </View>
 
                     <View style={{ margin:10, gap:15, flexDirection:"row"}}>

@@ -1,21 +1,25 @@
 import { useSQLiteContext } from "expo-sqlite"
 
+export type  Veiculo = {
+    codigo : number,
+    cliente : number,
+    placa :  String,
+    marca : number,
+    modelo : number,
+    ano :  String,
+    cor : number,
+    combustivel :String,
+    data_cadastro:string,
+    data_recadastro:string 
+   ativo?: 'S'|'N'
+
+}
+
+
 export const useVeiculos = ()=>{
  
 const db = useSQLiteContext();
 
-type  Veiculo = {
-		 codigo : number,
-		 cliente : number,
-		 placa :  String,
-		 marca : number,
-		 modelo : number,
-		 ano :  String,
-		 cor : number,
-		 combustivel :String,
-         data_cadastro:string,
-         data_recadastro:string 
-}
 
 
 async function selectAll(){
@@ -31,9 +35,9 @@ async function selectAll(){
 }
  
 
-async function selectByCode( code:number ){
+async function selectByCode( code:number ):Promise<Veiculo[] | undefined>{
     try{
-        let result = await db.getAllAsync(`SELECT *,
+        let result:Veiculo[] = await db.getAllAsync(`SELECT *,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos where codigo = ${ code } `);
        // console.log(result);
@@ -55,7 +59,7 @@ async function selectByClient( cliente:number ){
     } 
 }
 
-async function update(veiculo   ){
+async function update(veiculo:Veiculo ){
     try{
 
         let result = await db.runAsync(
@@ -63,10 +67,10 @@ async function update(veiculo   ){
             UPDATE veiculos SET 
             cliente = ${veiculo.cliente}, 
             placa = '${veiculo.placa}',
-            marca =  ${veiculo.marca},
-            modelo = ${veiculo.modelo},
+            marca =  '${veiculo.marca}',
+            modelo = '${veiculo.modelo}',
             ano = '${veiculo.ano}',
-            cor = ${veiculo.cor},
+            cor = '${veiculo.cor}',
             data_cadastro ='${veiculo.data_cadastro}' ,
             data_recadastro = '${veiculo.data_recadastro}',
             combustivel = '${veiculo.combustivel}'
@@ -76,11 +80,11 @@ async function update(veiculo   ){
 
         console.log(` atualizado veiculo codigo: ${veiculo.codigo} `  );
         console.log('')
-    }catch(e   ){ console.log( `erro ao atualizar produto ${ veiculo.codigo} do orcamento` , e )}
+    }catch(e   ){ console.log( `erro ao  Veiculo ${ veiculo.codigo}  ` , e )}
 }
 
  
-async function create( veiculo ){
+async function create( veiculo:Veiculo ){
     try{
 
         let result = await db.runAsync(
@@ -101,14 +105,14 @@ async function create( veiculo ){
             ${veiculo.codigo},
             ${veiculo.cliente},
             '${veiculo.placa}',
-            ${veiculo.marca},
-            ${veiculo.modelo},
+            '${veiculo.marca}',
+            '${veiculo.modelo}',
             '${veiculo.ano}',
-            ${veiculo.cor},
+            '${veiculo.cor}',
             '${veiculo.combustivel}',
             '${veiculo.data_cadastro}',
             '${veiculo.data_recadastro}'           
-            ) `
+            );`
         )
 
         console.log(`veicuLo codigo ${veiculo.codigo} registrado com sucesso `);
@@ -119,7 +123,6 @@ async function selectByDescription( query:any, limit:number ) {
     const result = await db.getAllAsync(`SELECT *,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos WHERE  placa like ? OR codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
-     console.log(result);
     return result;
      }
 
@@ -136,5 +139,5 @@ async function createVeiculo( veiculo:Veiculo ){
  }
 
 
-return { selectAll, create,selectByClient, selectByCode, update, createVeiculo, selectByDescription } 
+return {   selectAll, create,selectByClient, selectByCode, update, createVeiculo, selectByDescription } 
 }

@@ -24,6 +24,8 @@ import { FormasPagamento } from "../../screens/formasDePagamento";
 import { Cadastro_FormaPagamento } from "../../screens/cadastro-FormaPagamento";
 import { Teste } from "../../components/teste";
 import { Cadastro_servico } from "../../screens/cadastro_servicos";
+import Veiculos from "../../screens/veiculos";
+import Cadastro_veiculo from "../../screens/cadastroVeiculo";
 
 const Stack = createStackNavigator();
 
@@ -51,6 +53,8 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="cadastro_cliente" component={Cadastro_cliente}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_marcas" component={Cadastro_Marcas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_categorias" component={ Cadastro_Categorias }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="veiculos" component={ Veiculos }  options={{headerShown:false}}/>
+                    <Stack.Screen name="cadastro_veiculos" component={ Cadastro_veiculo }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
 
                     <Stack.Screen name="Teste" component={ Teste }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
 

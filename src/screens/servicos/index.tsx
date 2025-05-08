@@ -34,9 +34,7 @@ export function Servicos({navigation}){
 
         async function filtrar(){
             const response = await useQueryServices.selectByDescription(pesquisa, 10);
-
             if(response.length > 0  ){
- 
                 setDados(response)
             }
         }
@@ -169,14 +167,13 @@ async function gravar(){
                 
                     <View style={{ margin:8}}>
                          
-                                 <TouchableOpacity
-                                            onPress={()=>setVisible(false)}
-                                            style={{    margin: 10,  backgroundColor: "#009de2",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
-                                          >
-                                            <Text style={{ color: "#FFF", fontWeight: "bold" }}>
-                                              voltar
-                                            </Text>
-                                          </TouchableOpacity>
+                             
+                                   <TouchableOpacity
+                                        style={{ backgroundColor: '#185FED', padding: 7, margin:5 ,width: '15%', alignItems: "center", justifyContent: "space-between", borderRadius: 10,   flexDirection:"row"  }}
+                                        onPress={()=>setVisible(false)}
+                                    >
+                                        <Text style={{ fontWeight: "bold", color: "#FFF"  }}>voltar</Text>
+                                 </TouchableOpacity>
                     </View>
 
                     <View style={{ margin:10, gap:15, flexDirection:"row"}}>

@@ -10,7 +10,6 @@ import { AuthContext } from "../../contexts/auth"
 import { useServices } from "../../database/queryServicos/queryServicos"
 import { useTipoOs } from "../../database/queryTipoOs/queryTipoOs"
 import {    useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
-import { formatItem } from "../../services/formatStrings"
 import { restartDatabaseService } from "../../services/restartDatabase"
 import { configMoment } from "../../services/moment"
 import { enviaPedidos } from "../../services/sendOrders"  
@@ -20,6 +19,8 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
+import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
+import { AxiosResponse } from "axios"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -35,7 +36,6 @@ const LoadingOrders = ({ isLoadingOrder        }:any) => (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#FFF" />
       <Text style={styles.loadingText}>Carregando  pedidos ...  </Text>
-      {/** <Animated.View style={[styles.progressBar, { width: `${1}%` }]} />*/}
     </View>
   </Modal>
 );
@@ -72,15 +72,16 @@ export const Configurações = () => {
   const [loadingOrders, setLoadingOrders] = useState<boolean>(true)
   const [ dataSelecionada, setDataSelecionada ] = useState(  );
   const [showPicker, setShowPicker] = useState(false);
-
   const [msgApi , setMsgApi ] = useState('');
+
+  const [ headerApi, setHeaderApi ] = useState<object | null>(null)
 
   const useGetOrders = receberPedidos();
   const useSendOrders = enviaPedidos();
 
-  const formataDados =  formatItem();
-
-  const formatDate = (date) => {
+    const useQueryConfigApi = queryConfig_api();
+  
+  const formatDate = (date:any) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -120,25 +121,27 @@ setMsgApi('')
     }
 }
 
-  const fetchClientes = async () => {
+  const fetchClientes = async (data:string) => {
+    let params:any = '';
     try {
         setItem('clientes');
-        const aux = await api.get(`/offline/clientes?vendedor=${usuario.codigo}` , 
-       
+        const aux = await api.get(`/offline/clientes`, 
+          { 
+            params:{
+              vendedor:usuario.codigo, 
+              data_recadastro: data
+            } 
+          }    
         );
         const dados = aux.data;
-
           const totalClientes = dados.length;
+        if( totalClientes > 0 ){
 
-        
-              for (let v = 0;  v<= totalClientes; v++) {
+              for (let v = 0;  v <= totalClientes; v++) {
                 
                 let result:any  = await useQueryClientes.selectByCnpjAndCode(dados[v]);
-                
                     if(result?.length > 0  ){
-
                       const data_recadastro =   useMoment.formatarDataHora(dados[v].data_recadastro)
-
                         if(   data_recadastro > result[0].data_recadastro ){
                           await useQueryClientes.update(dados[v],dados[v].codigo)
                         }else{
@@ -151,284 +154,334 @@ setMsgApi('')
             const progressPercentage = Math.floor(((v + 1) / totalClientes) * 100);
            setProgress(progressPercentage);  
               }
+            }else{
+              console.log("Clientes : ", dados)
+            }
+
         } catch (e) {
         console.log(e);
+        console.log(e);
+
     }
   };
 
-  const fetchProdutos = async () => {
+  const fetchProdutos = async (data:string) => {
     try {
       setItem('produtos');
   
-      const aux = await api.get('/offline/produtos');
+      const aux = await api.get('/offline/produtos',  { 
+        params :{ data_recadastro : data}
+      } );
       const dados = aux.data;
       const totalProdutos = dados.length;
-  
-      for (let v = 0; v < totalProdutos; v++) {
-        const verifyProduct:any = await useQueryProdutos.selectByCode(dados[v].codigo);
-        if (verifyProduct.length > 0) {
-          let data_recadastro = useMoment.formatarDataHora( dados[v].data_recadastro ); // Ajuste se necessário
-   
-          console.log(`${data_recadastro } > ${verifyProduct[0].data_recadastro}` )
+      if(totalProdutos > 0 ){
+        for (let v = 0; v < totalProdutos; v++) {
+          const verifyProduct:any = await useQueryProdutos.selectByCode(dados[v].codigo);
+          if (verifyProduct.length > 0) {
+            let data_recadastro = useMoment.formatarDataHora( dados[v].data_recadastro ); // Ajuste se necessário
+    
+            console.log(`${data_recadastro } > ${verifyProduct[0].data_recadastro}` )
 
-          if (data_recadastro > verifyProduct[0].data_recadastro ) {
+            if (data_recadastro > verifyProduct[0].data_recadastro ) {
 
-            await useQueryProdutos.update(dados[v], dados[v].codigo);
+              await useQueryProdutos.update(dados[v], dados[v].codigo);
+            }
+          } else {
+            await useQueryProdutos.createByCode(dados[v], dados[v].codigo );
           }
-        } else {
-          await useQueryProdutos.createByCode(dados[v], dados[v].codigo );
+          const progressPercentage = Math.floor(((v + 1) / totalProdutos) * 100);
+          setProgress(progressPercentage); // Atualiza progresso
         }
-        const progressPercentage = Math.floor(((v + 1) / totalProdutos) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
+      }else{
+        console.log("Produtos: ", dados);        
       }
+
     } catch (e) {
       console.log(e);
     }
   };
 
-  const fetchFpgt = async () => {
+  const fetchFpgt = async (data:string) => {
     setItem('formas de pagamento');
 
     try {
-      const aux = await api.get('/offline/formas_pagamento');
-      const data = aux.data;
+      const aux = await api.get('/offline/formas_pagamento',{ params :{ data_recadastro : data}});
+      const dados = aux.data;
 
-      const totalFormas = data.length
-      for (let f =0; f <  data.length; f++ ) {
-        const verifiFpgt:any = await useQueryFpgt.selectByCode( data[f].codigo);
+      const totalFormas = dados.length
+          if( totalFormas > 0 ){
+           for (let f =0; f <  dados.length; f++ ) {
+            const verifiFpgt:any = await useQueryFpgt.selectByCode( dados[f].codigo);
 
-              if (verifiFpgt.length > 0) {
+                  if (verifiFpgt.length > 0) {
 
-          let data_recadastro =  useMoment.formatarDataHora( data[f].data_recadastro);
-          console.log(`fpgt:  ${data_recadastro } > ${verifiFpgt[0].data_recadastro}` )
+              let data_recadastro =  useMoment.formatarDataHora( dados[f].data_recadastro);
+              console.log(`fpgt:  ${data_recadastro } > ${verifiFpgt[0].data_recadastro}` )
 
-              if (data_recadastro > verifiFpgt[0].data_recadastro ) {
-                await useQueryFpgt.update(data[f], data[f].codigo);
-              }
+                  if (data_recadastro > verifiFpgt[0].data_recadastro ) {
+                    await useQueryFpgt.update(dados[f], dados[f].codigo);
+                  }
 
-              } else {
-                await useQueryFpgt.create(data[f]);
-              }
-        const progressPercentage = Math.floor(((f + 1) / totalFormas) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-      }
-       
+                  } else {
+                    await useQueryFpgt.create(dados[f]);
+                  }
+            const progressPercentage = Math.floor(((f + 1) / totalFormas) * 100);
+            setProgress(progressPercentage); // Atualiza progresso
+           }
+         }else{
+          console.log("Formas de pagamento: ", dados);
+         }
     } catch (e) {
       console.log(e);
     }
   };
 
-  const fetchServices = async () => {
+  const fetchServices = async ( data:string) => {
     try {
     setItem('serviços');
 
-      const aux = await api.get('/offline/servicos');
+      const aux = await api.get('/offline/servicos',{ params :{ data_recadastro : data}});
       const dados:any = aux.data;
         const totalServicos = dados.length;
-      for (let v = 0; v <  totalServicos; v++ ) {
-        
-        const verifyServices:any = await useQueryServices.selectByCode(dados[v].codigo);
-        if (verifyServices.length > 0) {
-        
-          let data_recadastro =  useMoment.formatarDataHora( dados[v].data_recadastro);
-
-          console.log(`servicos: ${data_recadastro } > ${verifyServices[0].data_recadastro}` )
-
-          if (data_recadastro > verifyServices[0].data_recadastro ) {
-             await useQueryServices.update(dados[v])
+        if(totalServicos > 0 ){
+         for (let v = 0; v <  totalServicos; v++ ) {
+          const verifyServices:any = await useQueryServices.selectByCode(dados[v].codigo);
+          if (verifyServices.length > 0) {
+            let data_recadastro =  useMoment.formatarDataHora( dados[v].data_recadastro);
+            console.log(`servicos: ${data_recadastro } > ${verifyServices[0].data_recadastro}` )
+            if (data_recadastro > verifyServices[0].data_recadastro ) {
+              await useQueryServices.update(dados[v])
+            }
+          }else{
+            await useQueryServices.createByCode2(dados[v], dados[v].codigo);
           }
+          const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
+          setProgress(progressPercentage); // Atualiza progresso
 
-        }else{
-          await useQueryServices.createByCode2(dados[v], dados[v].codigo);
+         }
+       }else{
+        console.log("Serviços: ", dados);
 
-        }
-        const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
+       }
 
-      }
     } catch (e) {
       console.log(e);
     }
   };
 
-  const fetchTiposOs = async () => {
+  const fetchTiposOs = async (data:string) => {
     setItem('tipo de os');
     try {
-      const aux = await api.get('/offline/tipo_os');
-      const data = aux.data;
+      const aux = await api.get('/offline/tipo_os',
+        { params :{ data_recadastro : data}}
+      );
+      const dados = aux.data;
       let totalTipos_os = data.length
-      for (let i = 0; i < data.length; i++ ) {
-        const verifiTipOs:any = await useQueryTipoOs.selectByCode(data[i].codigo);
-        
-        if (verifiTipOs.length > 0) {
-        
-          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
-
-          console.log(`tipo de os: ${data_recadastro } > ${verifiTipOs[0].data_recadastro}` )
-          
-          if (data_recadastro > verifiTipOs[0].data_recadastro ) {
-            await useQueryTipoOs.update( data[i], data[i].codigo);
-          
+      if( totalTipos_os > 0 ){
+        for (let i = 0; i < data.length; i++ ) {
+          const verifiTipOs:any = await useQueryTipoOs.selectByCode(dados[i].codigo);
+          if (verifiTipOs.length > 0) {
+            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
+            console.log(`tipo de os: ${data_recadastro } > ${verifiTipOs[0].data_recadastro}` )
+            if (data_recadastro > verifiTipOs[0].data_recadastro ) {
+              await useQueryTipoOs.update( dados[i], dados[i].codigo);
+            }
+          } else {
+            await useQueryTipoOs.create(dados[i]);
           }
-        } else {
-          await useQueryTipoOs.create(data[i]);
-        }
-      
-        const progressPercentage = Math.floor(((i + 1) / totalTipos_os) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
+        
+          const progressPercentage = Math.floor(((i + 1) / totalTipos_os) * 100);
+          setProgress(progressPercentage); // Atualiza progresso
 
+        }
+      }else{
+        console.log("Tipo de OS: ", dados);
       }        
     } catch (e) {
       console.log(e);
     }
   };
 
-  const fetchCategorias = async () => {
+  const fetchCategorias = async (data:string) => {
     setItem('categorias');
     try {
-      const aux = await api.get('/offline/categorias');
+      const aux = await api.get('/offline/categorias',
+        { params :{ data_recadastro : data}}
+      );
       console.log("request categorias ", aux.data )
-      const data = aux.data;
-      let TotalCategorias = data.length
-      for (let i = 0; i < data.length; i++ ) {
-        const verifiCategoria:any = await useQueryCategoria.selectByCode(data[i].codigo);
-        
-        if (verifiCategoria.length > 0) {
-        
-          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
-
-          console.log(`categoria: ${data_recadastro } > ${verifiCategoria[0].data_recadastro}` )
-          
-          if (data_recadastro > verifiCategoria[0].data_recadastro ) {
-            await useQueryCategoria.update( data[i], data[i].codigo);
-          
+      const dados = aux.data;
+      let TotalCategorias = dados.length
+      if( TotalCategorias > 0 ){
+        for (let i = 0; i < dados.length; i++ ) {
+          const verifiCategoria:any = await useQueryCategoria.selectByCode(dados[i].codigo);
+          if (verifiCategoria.length > 0) {
+            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
+            console.log(`categoria: ${data_recadastro } > ${verifiCategoria[0].data_recadastro}` )
+            if (data_recadastro > verifiCategoria[0].data_recadastro ) {
+              await useQueryCategoria.update( dados[i], dados[i].codigo);
+            }
+          } else {
+            await useQueryCategoria.create(dados[i]);
           }
-        } else {
-          await useQueryCategoria.create(data[i]);
-        }
-        const progressPercentage = Math.floor(((i + 1) / TotalCategorias) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-
-      }        
+          const progressPercentage = Math.floor(((i + 1) / TotalCategorias) * 100);
+          setProgress(progressPercentage); // Atualiza progresso
+        }        
+      }else{
+        console.log("Categorias: ", dados);
+      }
     } catch (e) {
       console.log(" ocorreu um erro ao processar as categorias", e);
     }
   };
 
-  const fetchMarcas = async () => {
+  const fetchMarcas = async (data:string) => {
     setItem('marcas');
     try {
-      const aux = await api.get('/offline/marcas');
-      const data = aux.data;
-      let TotalMarcas = data.length
-      for (let i = 0; i < data.length; i++ ) {
-        const verifiMarca:any = await useQueryMarcas.selectByCode(data[i].codigo);
+      const aux = await api.get('/offline/marcas',
+        { params :{ data_recadastro : data}}
+
+      );
+      const dados = aux.data;
+      let TotalMarcas = dados.length
+      if(TotalMarcas > 0 ){
+      for (let i = 0; i < dados.length; i++ ) {
+        const verifiMarca:any = await useQueryMarcas.selectByCode(dados[i].codigo);
         
         if (verifiMarca.length > 0) {
-           let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
+           let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
        console.log(`marca: ${data_recadastro } > ${verifiMarca[0].data_recadastro}` )
           
           if (data_recadastro > verifiMarca[0].data_recadastro ) {
-            await useQueryMarcas.update( data[i], data[i].codigo);
+            await useQueryMarcas.update( dados[i], dados[i].codigo);
           
           }
         } else {
-          await useQueryMarcas.create(data[i]);
+          await useQueryMarcas.create(dados[i]);
         }
         const progressPercentage = Math.floor(((i + 1) / TotalMarcas) * 100);
         setProgress(progressPercentage); // Atualiza progresso
 
-      }        
+      }     
+      }else{
+       console.log("Marcas: ", dados);
+    }   
     } catch (e) {
       console.log(" ocorreu um erro ao processar as marcas", e);
     }
   };
 
-  const fetchVeiculos = async () => {
+  const fetchVeiculos = async (data:string ) => {
     setItem('veiculos');
 
     try {
-      const aux = await api.get('/offline/veiculos');
-      const data = aux.data;
+      const aux = await api.get('/offline/veiculos',
+        { params :{ data_recadastro : data}}
+      );
+      const dados = aux.data;
 
-      const totalVeiculos = data.length
-
-      for (let i = 0; i < data.length; i++ ) {
-        const verifiVeic:any = await useQueryVeiculos.selectByCode(data[i].codigo);
-        
+      const totalVeiculos = dados.length
+       if( totalVeiculos > 0 ){
+        for (let i = 0; i < dados.length; i++ ) {
+        const verifiVeic:any = await useQueryVeiculos.selectByCode(dados[i].codigo);
         if (verifiVeic.length > 0) {
-
-          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
-
+          let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
           console.log(`Veiculos: ${data_recadastro } > ${verifiVeic[i].data_recadastro}` )
-
           if (data_recadastro > verifiVeic[0].data_recadastro ) {
-            await useQueryVeiculos.update( data[i] );
+            await useQueryVeiculos.update( dados[i] );
           }
-
         } else {
-          await useQueryVeiculos.create(data[i]);
+          await useQueryVeiculos.create(dados[i]);
         }
 
         const progressPercentage = Math.floor(((i + 1) / totalVeiculos) * 100);
         setProgress(progressPercentage); // Atualiza progresso
       
-      } 
-    } catch (e) {
+        } 
+      }else{
+        console.log("Veiculos: ", dados)
+      }
+    } catch (e:any) {
       console.log(e);
+      console.log(e.response.data.msg);
+
     }
   };
 
-  const fetchImgs = async () => {
+  const fetchImgs = async (data:string) => {
     setItem('fotos');
 
     try {
-      const aux = await api.get('/offline/fotos');
-      const data = aux.data;
+      const aux = await api.get('/offline/fotos',
+        { params :{ data_recadastro : data}}
+      );
+      const dados = aux.data;
 
-      const totalimgs = data.length
-
-      for (let i = 0; i < data.length; i++ ) {
-        const verifiImg:any = await useQueryFotos.selectByCodeAndSequenci(data[i].produto, data[i].sequencia);
-        
-        if (verifiImg.length > 0) {
-
-          let data_recadastro =  useMoment.formatarDataHora( data[i].data_recadastro);
-
-          console.log(`foto: ${data_recadastro } > ${verifiImg[i].data_recadastro}` )
-
-          if (data_recadastro > verifiImg[0].data_recadastro ) {
-            await useQueryFotos.update( data[i], data[i].produto );
+      const totalimgs = dados.length
+      if ( totalimgs > 0 ){
+        for (let i = 0; i < dados.length; i++ ) {
+          const verifiImg:any = await useQueryFotos.selectByCodeAndSequenci(dados[i].produto, dados[i].sequencia);
+          if (verifiImg.length > 0) {
+            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
+            console.log(`foto: ${data_recadastro } > ${verifiImg[i].data_recadastro}` )
+            if (data_recadastro > verifiImg[0].data_recadastro ) {
+              await useQueryFotos.update( dados[i], dados[i].produto );
+            }
+          } else {
+            await useQueryFotos.create(dados[i]);
           }
-
-        } else {
-          await useQueryFotos.create(data[i]);
+          const progressPercentage = Math.floor(((i + 1) / totalimgs) * 100);
+          setProgress(progressPercentage); // Atualiza progresso
         }
+      }else{
+        console.log("Imagens: ", dados)
+      }
 
-        const progressPercentage = Math.floor(((i + 1) / totalimgs) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-      
-      } 
-    } catch (e) {
-      console.log(e);
+    } catch (e:any) {
+      console.log( "erro : ",e);
+      if(e.status === 400){
+      console.log( "erro : ",e.response.data.msg);
+      }
     }
   };
 
+  const verifyDateSinc = async ()=>{
+    let validConfig = await useQueryConfigApi.select(1)
+    let dataUltSinc:string;
+    let data =
+    {
+     codigo:1,
+     url:'',
+     porta:3306,
+     token:'',
+     data_sinc: useMoment.dataHoraAtual()
+   }
+
+      if( validConfig && validConfig?.length > 0   ){
+          dataUltSinc = validConfig[0].data_sinc
+          console.log("Ultima Sincronizacao : ", validConfig[0].data_sinc )
+          useQueryConfigApi.update(data)
+      }else{
+       let aux = await useQueryConfigApi.create(data);
+       dataUltSinc ='';
+       console.log("Executando primeira sincronizacao")
+      }
+        return dataUltSinc;
+  }
 
   const syncData = async () => {
+ let dataSinc =  await verifyDateSinc();
     setIsLoading(true);
     setProgress(0);
-
     try {
-      await fetchClientes();
-      await fetchProdutos();
-      await fetchFpgt();
-      await fetchServices();
-      await fetchTiposOs();
-      await fetchVeiculos();
-      await fetchCategorias();
-      await fetchMarcas();
-      await fetchImgs(),
+      await fetchClientes(dataSinc);
+       await fetchProdutos(dataSinc);
+       await fetchFpgt(dataSinc);
+       await fetchServices(dataSinc);
+       await fetchTiposOs(dataSinc);
+       await fetchVeiculos(dataSinc);
+       await fetchCategorias(dataSinc);
+       await fetchMarcas(dataSinc);
+       await fetchImgs(dataSinc),
       setData([]); // Atualiza o estado para mostrar dados após a sincronização
     } catch (e) {
       console.log(e);
@@ -486,11 +539,6 @@ setMsgApi('')
         connect();
        }, []);
 
-      async function teste(){
-        let aux = await useQueryPedidos.selectAll();
-        console.log(aux)
-       }
-
 
        const handleEvent = (event:any, selectedDate:any) => {
         const currentDate = selectedDate || date;
@@ -501,9 +549,7 @@ setMsgApi('')
       };
 
 
-
       function restart(){
-
           Alert.alert('Atenção', `Será necessario uma nova sincronização, deseja concluir esta operação ?`,[
               { text:'Não',
                   onPress: ()=> console.log('nao excluido o item'),
@@ -584,7 +630,7 @@ setMsgApi('')
                     display="calendar"
                     mode="date"
                     onChange={handleEvent}
-                    locale="pt-BR"
+                   // locale="pt-BR"
                   />
               )
               }
@@ -593,26 +639,10 @@ setMsgApi('')
                  <Text style={{ color:'#FFF' }} > enviar/receber pedidos</Text>
                 </TouchableOpacity>
            </View >
-
-     
            <TouchableOpacity  style={ { marginTop:50, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
                  <Text style={{ color:'#FFF' }} > limpar base de dados</Text>
                 </TouchableOpacity>
-
-       
-        
-           
-          {/**  <View style={{margin:5}} >
-            <Button title='clean Clients' onPress={() => useQueryClientes.deleteAll()} />
-           </View >
-    
-          <View style={{margin:5}} >
-            <Button title='clean products' onPress={() => useQueryProdutos.deleteAll()} />
-          </View>
-         */}
-
- 
-
+              
     </View>
   );
 }

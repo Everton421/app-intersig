@@ -58,44 +58,48 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     const [produto, setProduto] = useState<produtoBancoLocal>();
     const [ imgs, setImgs] = useState<typeFotoProduto[]>();
     const [ loading, setLoading ] = useState<boolean>(false);
-
+    const [ dados , setDados ] = useState('');
     const useQueryProdutos = useProducts();
     const api = useApi();
     const {connected,  setConnected} = useContext(ConnectedContext)
     const useQueryFotos = useFotosProdutos();
 
+    const [ loading2, setLoading2 ] = useState(false);
+
     let { codigo_produto } =   route.params || { codigo_produto : 0};
 
- 
-
-    function delay(ms:number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-      }
-      
 
     async function carregarProduto(){
-        if( codigo_produto && codigo_produto > 0 ){
-        let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
-            
-            console.log(dataProd)
+        try{
+            setLoading(true)
 
-            let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
-            dataProd[0].fotos = dadosFoto;
-            setImgs(dadosFoto)
-        let prod:produtoBancoLocal = dataProd[0]  
-        setProduto(prod)
-        if(dataProd.length > 0 ){
-                setCategoriaSelecionada(prod.grupo);
-                setMarcaSelecionada(prod.marca);
-                setReferencia(prod.num_original)
-                setEstoque(prod.estoque);
-                setPreco( Number(prod.preco));
-                setSku(prod.sku);
-                setDescricao(prod.descricao)
-                setGtim(prod.num_fabricante)
-            }
+            if( codigo_produto && codigo_produto > 0 ){
+            let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
+                
+                let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
+                dataProd[0].fotos = dadosFoto;
+                
+                setDados(dataProd);
 
-        }
+                setImgs(dadosFoto)
+            let prod:produtoBancoLocal = dataProd[0]  
+            setProduto(prod)
+            if(dataProd.length > 0 ){
+                    setCategoriaSelecionada(prod.grupo);
+                    setMarcaSelecionada(prod.marca);
+                    setReferencia(prod.num_original)
+                    setEstoque(prod.estoque);
+                    setPreco( Number(prod.preco));
+                    setSku(prod.sku);
+                    setDescricao(prod.descricao)
+                    setGtim(prod.num_fabricante)
+                }
+            } 
+    }catch(e) {
+    }finally{
+        setLoading(false)
+    }
+
     }
 
 
@@ -118,16 +122,13 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
    
 
     async function gravar (){
-      
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
-
         if(!preco) setPreco(0);
         if(!estoque) setEstoque(0);
         if(!sku) setSku('');
         if(!referencia) setReferencia('');
         if(!marcaSelecionada) return Alert.alert('É necessario informar uma marca para gravar o produto!');
         if(!categoriaSelecionada) return Alert.alert('É necessario informar uma categoria para gravar o produto!');
-
 
         if( codigo_produto > 0 || codigo_produto){
             let responseApi
@@ -168,11 +169,9 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                     }catch(e:any){
                         console.log(e);
                         if( e.status === 400 ){
-
                             return Alert.alert('Erro ao processar imagens!', e.response.data.msg)
                         }
                     }
-
                      
                   let  responseProdutoApi = await api.put('/produto', data);
                         if(responseProdutoApi.status === 200 && responseProdutoApi.data.codigo > 0 ){
@@ -199,15 +198,11 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                                  observacoes3: responseProdutoApi.data.observacoes3,
                                  tipo: responseProdutoApi.data.tipo
                             }
-                            
-
                             useQueryProdutos.update(objResponse, objResponse.codigo);
-                        
                             navigation.goBack();
                             return Alert.alert('', `Produto ${responseProdutoApi.data.codigo} Alterado Com Sucesso! `)     
                         }
 
-            
             }catch(e:any){
                 if(e.status === 400 ){
                 Alert.alert("Erro!" , e.response.data.msg );
@@ -216,10 +211,7 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                 setLoading(false)
             } 
         
-        }
-        /*
-        else{
-
+        }  else{
         let data =   { 
                     "preco":preco,
                     "estoque":estoque,
@@ -229,7 +221,6 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                     "marca":  marcaSelecionada ,
                     "grupo":categoriaSelecionada 
                 }
-
              try{
                     setLoading(true)
                 let response =   await api.post('/produto', data)
@@ -261,7 +252,6 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                     try{
                            await useQueryProdutos.createByCode(objResponse, response.data.codigo)
                            Alert.alert('',`Produto ${descricao} registrado com sucesso!`)
-                             setTimeout(()=>{},1000)
                         navigation.goBack()
                     }catch(e){
                         console.log(" ocorreu um erro ao cadastrar o produto ",e)
@@ -280,7 +270,7 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                 }
 
         }
-        */
+    
     }
     const renderImgs = ({ item }: { item: typeFotoProduto }) => {
         return (
@@ -336,7 +326,7 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
     return (
         <View style={{ flex: 1 }}>
              <LodingComponent isLoading={loading} />
-
+     
           <View style={{ flex: 1 ,width: '100%',  backgroundColor: '#EAF4FE' }} >
                 <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
                     
@@ -418,24 +408,27 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
 
 
 
-                    <View style={{ gap:10}}>
+                    <View style={{ gap:10, width:'100%'}}>
                             <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' , padding:2,borderRadius: 5,  elevation: 5}}>
-                                    <Text style={{fontWeight:"bold"}} > codigo: {codigo_produto} </Text>
-                            </View>
-
-                        <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
-                        <Text style={{fontWeight:"bold"}} > Preço:$ </Text>
-                                    <TextInput
-                                    onChangeText={(v)=> setPreco( Number(v) )}
-                                    style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
-                                    keyboardType="numeric"
-                                    defaultValue={ String(preco)  }
-                                    />
+                                    <Text style={{ fontWeight:"bold" , color:'#868686' }} > codigo: {codigo_produto} </Text>
+          
 
                             </View>
 
                             <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
-                                <Text style={{fontWeight:"bold"}} > Estoque: </Text>
+                          <Text style={{fontWeight:"bold", color:'#868686'}} > Preço:$ </Text>
+                                    <TextInput
+                                    onChangeText={(v)=> setPreco( Number(v) )}
+                                    style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
+
+                                    keyboardType="numeric"
+                                    defaultValue={ String(preco)  }
+                                    />
+
+                           </View>
+
+                            <View style={{ alignItems:"center", flexDirection:"row", width: '50%',backgroundColor: '#fff' ,borderRadius: 5,  elevation: 5}}>
+                                <Text style={{fontWeight:"bold" , color:'#868686'}} > Estoque: </Text>
                                     <TextInput
                                     onChangeText={(value)=> setEstoque( value )}
                                     style={{ height:30,backgroundColor:'#FFF', width: '50%'}}
@@ -459,34 +452,34 @@ export const Cadastro_produto: React.FC  = ( { route, navigation }:any ) => {
                 </View>
                
                 <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
-                    <Text > SKU: </Text>
+                    <Text style={{ fontWeight:"bold", color:'#868686'}}> SKU: </Text>
                         <TextInput
                                 onChangeText={(value)=> setSku( value )}
                                 value={String(sku)}
                             />
                     </View>
                 <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
-                    <Text > Cod.Barras: </Text>
+                <Text style={{ fontWeight:"bold", color:'#868686'}}> Cod.Barras: </Text>
                         <TextInput
                                 onChangeText={(value)=> setGtim( value )}
                                 value={String(gtim)}
                         />
                 </View>
                 <View style={{ margin: 7, backgroundColor: '#fff', alignItems: "center", justifyContent: "flex-start", flexDirection: "row", borderRadius: 5, height: 35, elevation: 5 }}>
-                    <Text > Referencia: </Text>
+                <Text style={{ fontWeight:"bold", color:'#868686'}}>  Referencia: </Text>
                             <TextInput
                                 onChangeText={(value)=> setReferencia( value )}
                                 value={ referencia ? String(referencia) : '' }
                             />
                 </View>
 
-                <Text style={{marginLeft:5}} > { marcaSelecionada && 'Marca:'}</Text> 
-
+                <Text style={{marginLeft:5 ,fontWeight:"bold", color:'#868686'  }} > { marcaSelecionada && 'Marca:'}</Text> 
+                 
                  <View style={{ flexDirection:"row" }}>
                     <RenderModalMarcas codigoMarca={  marcaSelecionada ? marcaSelecionada : 0  } setMarca={setMarcaSelecionada} />
                  </View>  
 
-                <Text style={{marginLeft:5}} > { categoriaSelecionada && 'Categoria:'}</Text> 
+                 <Text style={{marginLeft:5 ,fontWeight:"bold", color:'#868686'  }} > { categoriaSelecionada && 'Categoria:'}</Text> 
 
                  <View style={{ flexDirection:"row" }}>
                     <RenderModalCategorias  codigoCategoria={ categoriaSelecionada ? categoriaSelecionada  : 0}  setCategoria={setCategoriaSelecionada}  />

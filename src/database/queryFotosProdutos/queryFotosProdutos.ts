@@ -70,7 +70,7 @@ async function selectAll(){
         }catch(e){ console.log( "erro ao buscar as fotos ",e) }
 }
 
-async function selectByCode ( codigo:number):Promise< typeFotoProduto[]    > {
+async function selectByCode ( codigo:number):Promise< typeFotoProduto[]   |undefined > {
     try{
         let result:typeFotoProduto[] = await db.getAllAsync(`SELECT *,
               strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,

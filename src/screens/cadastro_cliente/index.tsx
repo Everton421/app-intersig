@@ -7,8 +7,9 @@ import { AntDesign } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
+import { configMoment } from "../../services/moment";
 
-export const Cadastro_cliente = ({ navigation }: any) => {
+export const Cadastro_cliente = ({ route, navigation }: any) => {
     const [cnpj, setCnpj] = useState<string>();
     const [ie, setIe] = useState<string>();
     const [nome, setNome] = useState<string>();
@@ -16,31 +17,24 @@ export const Cadastro_cliente = ({ navigation }: any) => {
     const [cep, setCep] = useState<string>();
     const [cidade, setCidade] = useState<string>();
     const [estado, setEstado] = useState<string>();
+    const [endereco, setEndereco] = useState<string>();
     const [bairro, setBairro] = useState<string>();
     const [numero, setNumero] = useState<string>();
+    const [data_cadastro, setData_cadastro] = useState<string>();
+
     const [ visibleEndereco, setVisibleEndereco] = useState<boolean>(false); 
     const [ loading, setLoading] = useState<boolean>(false);
 
     const api = useApi();
     const useQueryClient = useClients();
     const { usuario }: any = useContext(AuthContext);
+    const useMoment = configMoment();
 
     const {connected,  setConnected} = useContext(ConnectedContext)
+    let { codigo_cliente } =   route.params || { codigo_cliente : 0};
 
-    useEffect(() => {
-        function setConexao(){
-           const unsubscribe = NetInfo.addEventListener((state) => {
-                   setConnected(state.isConnected);
-                   console.log('conexao com a internet :', state.isConnected);
-              });
-           return () => {
-               unsubscribe();
-           };
-       }
-       setConexao();
-       }, []);
-   
-       type client = {
+    type client = {
+        codigo?:number
         cnpj: string | undefined
         ie: string | undefined
         nome: string | undefined
@@ -50,22 +44,75 @@ export const Cadastro_cliente = ({ navigation }: any) => {
         estado: string | undefined
         bairro: string | undefined
         numero: string | undefined
+        endereco: string | undefined
         vendedor: number
+        data_cadastro?:string
+        data_recadastro?:string
+
     }
+//////
+useEffect(() => {
+    function setConexao(){
+       const unsubscribe = NetInfo.addEventListener((state) => {
+               setConnected(state.isConnected);
+               console.log('conexao com a internet :', state.isConnected);
+          });
+       return () => {
+           unsubscribe();
+       };
+   }
+   setConexao();
+ carregarCliente()   
+}, []);
+
+//////
+
+    async function carregarCliente(){
+        if( !codigo_cliente ) return  
+                try{
+                    setLoading(true)
+                    let result:any = await useQueryClient.selectByCode(codigo_cliente)
+                    console.log(result)
+                    if( result && result?.length > 0 ){
+                        let dados:client = result[0];
+                        setCnpj(dados.cnpj)
+                        setIe(dados.ie)
+                        setNome(dados.nome)
+                        setCelular(dados.celular)
+                        setCep(dados.cep)
+                        setCidade(dados.cidade)
+                        setEndereco(dados.endereco)
+                        setEstado(dados.estado)
+                        setBairro(dados.bairro)
+                        setNumero(dados.numero)
+                        setData_cadastro(dados.data_cadastro)
+                    }
+                }catch(e){
+                    console.log("erro ao consultar cliente ", e )
+                }finally{
+                    setLoading(false)
+
+                }
+
+    }
+
+
 
     async function gravar() {
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
-        if (!cnpj || cnpj === '') return Alert.alert('É necessario informar o cpnj/cpf para gravar!');
-        if (!ie || ie === '') return Alert.alert('É necessario informar a ie/rg para gravar!');
-        if (!nome || nome === '') return Alert.alert('É necessario informar a razao/nome da empresa para gravar!');
-        if (!celular || celular === '') return Alert.alert('É necessario informar o celular para gravar!');
-        if (!cep || cep === '') return Alert.alert('É necessario informar o cep para gravar!');
-        if (!cidade || cidade === '') return Alert.alert('É necessario informar a cidade para gravar!');
-        if (!estado || estado === '') return Alert.alert('É necessario informar o estado para gravar!');
-        if (!bairro || bairro === '') return Alert.alert('É necessario informar o bairro para gravar!');
-        if (!numero || numero === '') return Alert.alert('É necessario informar o numero para gravar!');
-        let aux: client =
+        if (!cnpj || cnpj === '') return Alert.alert("",'É necessario informar o cpnj/cpf para gravar!');
+        if (!ie || ie === '') return Alert.alert("",'É necessario informar a ie/rg para gravar!');
+        if (!nome || nome === '') return Alert.alert("",'É necessario informar a razao/nome da empresa para gravar!');
+        if (!celular || celular === '') return Alert.alert("",'É necessario informar o celular para gravar!');
+        if (!cep || cep === '') return Alert.alert("",'É necessario informar o cep para gravar!');
+        if (!cidade || cidade === '') return Alert.alert("",'É necessario informar a cidade para gravar!');
+        if (!endereco || endereco === '') return Alert.alert("",'É necessario informar o endereco para gravar!');
+
+        if (!estado || estado === '') return Alert.alert("",'É necessario informar o estado para gravar!');
+        if (!bairro || bairro === '') return Alert.alert("",'É necessario informar o bairro para gravar!');
+        if (!numero || numero === '') return Alert.alert("",'É necessario informar o numero para gravar!');
+        let novoCliente: client =
         {
             cnpj: cnpj,
             bairro: bairro,
@@ -74,33 +121,78 @@ export const Cadastro_cliente = ({ navigation }: any) => {
             cidade: cidade,
             estado: estado,
             numero: numero,
+            endereco:endereco,
             nome: nome,
             ie: ie,
             vendedor: usuario.codigo
         }
 
-      try{
-        setLoading(true);
-
-        let result: any = await api.post('/cliente', aux)
-        //console.log("resultado api:", result.data);
-
-        if (  result.status ===200 && result.data.codigo > 0  ) {
-            let resultSqlite: any = await useQueryClient.createByCode(result.data);
-            Alert.alert('',"Cliente Registrado Com Sucesso!")
-            setTimeout(() => { }, 2000)
-            navigation.goBack()
-        }
-
-      } catch(e){
-            if(e.status === 400) {
-             return Alert.alert( e.response.data.msg)
-            }else{
-             return Alert.alert('Erro!',"erro desconhecido" )
+          if(codigo_cliente > 0 ){
+         
+            let putCliente    =
+            {
+                codigo: codigo_cliente,
+                cnpj: cnpj,
+                bairro: bairro,
+                celular: celular,
+                cep: cep,
+                cidade: cidade,
+                estado: estado,
+                numero: numero,
+                endereco:endereco,
+                nome: nome,
+                ie: ie,
+                vendedor: usuario.codigo,
+                data_cadastro: usuario.data_cadastro,
+                data_recadastro:  useMoment.dataHoraAtual()
             }
-      }finally{
-        setLoading(false);
-      }     
+            try{
+                 
+                setLoading(true);
+
+                let result: any = await api.put('/cliente', putCliente)
+                //console.log("resultado api:", result.data);
+
+                if (  result.status ===200 && result.data.codigo > 0  ) {
+                    let resultSqlite: any = await useQueryClient.update(putCliente, codigo_cliente);
+                    Alert.alert('',"Cliente Alterado Com Sucesso!")
+                    setTimeout(() => { }, 2000)
+                    navigation.goBack()
+                }
+
+            } catch(e){
+                    if(e.status === 400) {
+                    return Alert.alert( " Erro!",e.response.data.msg)
+                    }else{
+                    return Alert.alert('Erro!',"erro desconhecido" )
+                    }
+            }finally{
+                setLoading(false);
+            }  
+            }else{
+            try{
+                setLoading(true);
+
+                let result: any = await api.post('/cliente', novoCliente)
+                //console.log("resultado api:", result.data);
+
+                if (  result.status ===200 && result.data.codigo > 0  ) {
+                    let resultSqlite: any = await useQueryClient.createByCode(result.data);
+                    Alert.alert('',"Cliente Registrado Com Sucesso!")
+                    setTimeout(() => { }, 2000)
+                    navigation.goBack()
+                }
+
+            } catch(e){
+                    if(e.status === 400) {
+                    return Alert.alert( " Erro!",e.response.data.msg)
+                    }else{
+                    return Alert.alert('Erro!',"erro desconhecido" )
+                    }
+            }finally{
+                setLoading(false);
+            }     
+        }
        
     }
 
@@ -115,35 +207,45 @@ export const Cadastro_cliente = ({ navigation }: any) => {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
 
-                <View style={{ width: '100%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+        {
+                codigo_cliente && (
+                    <Text style={{ fontWeight: "bold" }} > Código: {codigo_cliente}</Text>
+
+                )
+        }
+                <View style={{ width: '97%', margin: 7,  backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
                     <Text style={{ fontWeight: "bold" }} > CPF/CNPJ:</Text>
                     <TextInput
-                        style={{ padding: 5, backgroundColor: '#FFF' }}
+                        style={{ padding: 5,width:'80%' }}
                         placeholder="00.000.000/0000-00"
                         onChangeText={(value) => setCnpj(value)}
+                        defaultValue={cnpj}
                     />
                 </View>
-                <View style={{ width: '100%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+                <View style={{ width: '97%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                     <Text style={{ fontWeight: "bold" }} > IE/RG:</Text>
                     <TextInput
-                        style={{ padding: 5, backgroundColor: '#FFF' }}
+                         style={{ padding: 5,width:'80%' }}
                         onChangeText={(value) => setIe(value)}
+                        defaultValue={ie}
                     />
                 </View>
 
-                <View style={{ width: '100%', margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
+                <View style={{ width: '97%', margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
                     <Text style={{ fontWeight: "bold" }} >Razao social:</Text>
                     <TextInput
-                        style={{ padding: 5, backgroundColor: '#FFF' }}
+                        style={{ padding: 5,width:'80%' }}
                         onChangeText={(value) => setNome(value)}
+                        defaultValue={nome}
                     />
                 </View>
 
-                <View style={{ width: '100%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+                <View style={{ width: '97%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                     <Text style={{ fontWeight: "bold" }} > celular:</Text>
                     <TextInput
-                        style={{ padding: 5, backgroundColor: '#FFF' }}
+                        style={{ padding: 5,width:'80%' }}
                         onChangeText={(value) => setCelular(value)}
+                        defaultValue={celular}
                     />
                 </View>
 
@@ -166,44 +268,56 @@ export const Cadastro_cliente = ({ navigation }: any) => {
                                         <Text style={{ fontWeight: "bold", color: "#FFF"  }}>voltar</Text>
                                  </TouchableOpacity>
 
-                          <Text style={{ fontWeight: "bold", fontSize: 15 }} >  Endereço </Text>
+                          
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                  <Text style={{ fontWeight: "bold" }} > cep:</Text>
                                 <TextInput
-                                    style={{ padding: 5, backgroundColor: '#FFF' }}
+                                     style={{ padding: 5,width:'80%' }}
                                     placeholder="0000.00.00"
                                     onChangeText={(value) => setCep(value)}
+                                    defaultValue={cep}
                                 />
                             </View>
 
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > cidade:</Text>
                                 <TextInput
-                                    style={{ padding: 5, backgroundColor: '#FFF' }}
+                                     style={{ padding: 5,width:'80%' }}
                                     onChangeText={(value) => setCidade(value)}
+                                    defaultValue={cidade}
                                 />
                             </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > estado:</Text>
-                                <TextInput style={{ padding: 5, backgroundColor: '#FFF' }}
+                                <TextInput  style={{ padding: 5,width:'80%' }}
                                     onChangeText={(value) => setEstado(value)}
-                                    placeholder="PR" />
+                                    placeholder="PR" 
+                                    defaultValue={estado}
+                                    />
                             </View>
-
+                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+                                <Text style={{ fontWeight: "bold" }} > Endereço:</Text>
+                                <TextInput
+                                     style={{ padding: 5,width:'80%' }}
+                                    onChangeText={(value) => setEndereco(value)}
+                                    placeholder="Avenida."
+                                    defaultValue={endereco}
+                                />
+                            </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > bairro:</Text>
                                 <TextInput
-                                    style={{ padding: 5, backgroundColor: '#FFF' }}
+                                     style={{ padding: 5,width:'80%' }}
                                     onChangeText={(value) => setBairro(value)}
-
+                                    defaultValue={bairro}
                                 />
                             </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > numero:</Text>
                                 <TextInput
-                                    style={{ padding: 5, backgroundColor: '#FFF' }}
+                                     style={{ padding: 5,width:'80%' }}
                                     onChangeText={(value) => setNumero(value)}
-
+                                    defaultValue={numero}
                                 />
                             </View>
 

@@ -72,6 +72,8 @@ export async function construtor(db: SQLiteDatabase) {
       numero TEXT,
       cnpj TEXT,
       cidade TEXT,
+      bairro TEXT,
+      estado TEXT,
       data_cadastro TEXT NOT NULL,
       data_recadastro TEXT NOT NULL,
       vendedor INTEGER NOT NULL DEFAULT 0
@@ -153,8 +155,8 @@ export async function construtor(db: SQLiteDatabase) {
        codigo INTEGER PRIMARY KEY NOT NULL,
        cliente INTEGER  NOT NULL DEFAULT 0,
        placa TEXT NOT NULL,
-       marca INTEGER  NOT NULL DEFAULT 0,
-       modelo INTEGER  NOT NULL DEFAULT 0,
+       marca TEXT,
+       modelo  TEXT,
        ano TEXT NOT NULL,
        cor INTEGER  NOT NULL DEFAULT 0,
         data_cadastro TEXT NOT NULL,
@@ -166,7 +168,8 @@ export async function construtor(db: SQLiteDatabase) {
        codigo INTEGER PRIMARY KEY NOT NULL,
        url TEXT NOT NULL,
        porta INTEGER  NOT NULL DEFAULT 3000,
-       token TEXT NOT NULL 
+       token TEXT NOT NULL,
+       data_sinc TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS empresas (
        codigo INTEGER PRIMARY KEY NOT NULL,

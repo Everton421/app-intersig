@@ -25,8 +25,9 @@ export const restartDatabaseService = ()=>{
       DROP TABLE IF EXISTS marcas;
       DROP TABLE IF EXISTS categorias;
       DROP TABLE IF EXISTS fotos_produtos;
-
-  CREATE TABLE IF NOT EXISTS usuarios (
+      DROP TABLE IF EXISTS api_config;
+  
+      CREATE TABLE IF NOT EXISTS usuarios (
       codigo INTEGER  NOT NULL, 
       nome TEXT NOT NULL,
       senha TEXT NOT NULL, 
@@ -68,9 +69,8 @@ export const restartDatabaseService = ()=>{
       tipo_serv INTEGER DEFAULT 0 
        );
      
-     
 
-    CREATE TABLE IF NOT EXISTS clientes (
+   CREATE TABLE IF NOT EXISTS clientes (
       codigo INTEGER PRIMARY KEY NOT NULL,
       celular TEXT,
       nome TEXT NOT NULL,
@@ -80,6 +80,8 @@ export const restartDatabaseService = ()=>{
       numero TEXT,
       cnpj TEXT,
       cidade TEXT,
+      bairro TEXT,
+      estado TEXT,
       data_cadastro TEXT NOT NULL,
       data_recadastro TEXT NOT NULL,
       vendedor INTEGER NOT NULL DEFAULT 0
@@ -174,7 +176,9 @@ export const restartDatabaseService = ()=>{
        codigo INTEGER PRIMARY KEY NOT NULL,
        url TEXT NOT NULL,
        porta INTEGER  NOT NULL DEFAULT 3000,
-       token TEXT NOT NULL 
+       token TEXT NOT NULL,
+       data_sinc TEXT NOT NULL
+
       );
     CREATE TABLE IF NOT EXISTS empresas (
        codigo INTEGER PRIMARY KEY NOT NULL,

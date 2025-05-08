@@ -13,7 +13,9 @@ export const  useClients = ()=>{
         cep: string,
         cidade:string,
         cnpj:string,
-        endereco:string,    
+        endereco:string,   
+        estado:string,
+        bairro:string, 
         ie: string,
         nome: string,
         numero: string,
@@ -107,6 +109,8 @@ export const  useClients = ()=>{
                    cidade,
                    cnpj,
                    endereco,
+                   bairro,
+                   estado,
                    ie,
                    nome,
                    numero,
@@ -122,6 +126,8 @@ export const  useClients = ()=>{
                      '${cidade}',
                      '${client.cnpj}',
                      '${endereco}',
+                     '${client.bairro}',
+                     '${client.estado}',
                      '${client.ie}',
                      '${nome}',
                      '${client.numero}',
@@ -144,11 +150,24 @@ export const  useClients = ()=>{
       let cidade = normalizeString(client.cidade);
       let nome = normalizeString(client.nome);
         let endereco = normalizeString(client.endereco);
+        let bairro =  normalizeString(client.bairro)
 
         try{
             const result = await db.execAsync( 
-                ` UPDATE clientes SET celular = '${client.celular}', cep = '${client.cep}', cidade = '${cidade}', cnpj = '${client.cnpj}',
-                endereco ='${endereco}', ie = '${client.ie}', nome = '${nome}', numero = '${client.numero}', data_cadastro ='${client.data_cadastro}', data_recadastro='${data_recadastro}' 
+                ` UPDATE clientes
+                  SET celular = '${client.celular}',
+                  cep = '${client.cep}',
+                  cidade = '${cidade}', 
+                  cnpj = '${client.cnpj}',
+                  endereco ='${endereco}',
+                  bairro = '${bairro}',
+                  estado= '${client.estado}',
+                  ie = '${client.ie}',
+                  nome = '${nome}',
+                  numero = '${client.numero}', 
+                  data_cadastro ='${client.data_cadastro}',
+                  data_recadastro='${data_recadastro}'
+
                 WHERE codigo = ${code}                
                 ` 
             )
@@ -188,35 +207,38 @@ export const  useClients = ()=>{
                         try{
                         const result = await db.runAsync( 
                             ` INSERT INTO clientes (
-                              codigo,
-                              celular,
-                              cep,
-                              cidade,
-                              cnpj,
-                              endereco,
-                              ie, 
-                              nome,
-                              numero ,
-                              data_cadastro,
-                              data_recadastro,
-                              vendedor 
-                              )
-                               VALUES 
-                                ( 
-                                '${client.codigo}',
-                                '${client.celular}', 
-                                '${client.cep}',
-                                '${cidade}', 
-                                '${client.cnpj}', 
-                                '${endereco}',
-                                '${client.ie}',
-                                '${nome}',
-                                '${client.numero}', 
-                                '${client.data_cadastro}',
-                                '${data_recadastro}',
-                                '${client.vendedor}' 
-
-                                );`
+                                codigo,
+                                celular,
+                                cep,
+                                cidade,
+                                cnpj,
+                                endereco,
+                                bairro,
+                                estado,
+                                ie,
+                                nome,
+                                numero,
+                                data_cadastro,
+                                data_recadastro,
+                                vendedor
+                                )
+                                  VALUES 
+                                 (
+                                  '${client.codigo}',
+                                  '${client.celular}',
+                                  '${client.cep}',
+                                  '${cidade}',
+                                  '${client.cnpj}',
+                                  '${endereco}',
+                                  '${client.bairro}',
+                                  '${client.estado}',
+                                  '${client.ie}',
+                                  '${nome}',
+                                  '${client.numero}',
+                                  '${client.data_cadastro}',
+                                  '${data_recadastro}',
+                                  '${client.vendedor}' 
+                                  );`
                         )
                         console.log( `cliente cadastrado `,result.lastInsertRowId)
                         return result.lastInsertRowId;

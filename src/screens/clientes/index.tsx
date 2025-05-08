@@ -57,14 +57,12 @@ export function Clientes({navigation}:any){
     ////////////////
   
     function handleSelect(item:client){
-                setcSelecionado(item);
-                setVisible(true)
-            }
-    
+                //setcSelecionado(item);
+                //setVisible(true)
+            navigation.navigate('cadastro_cliente',{ codigo_cliente: item.codigo})
+            }       
             
-            
-
-
+             
             return(
                 <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
                 <View style={{ backgroundColor:'#185FED', }}> 
@@ -89,6 +87,7 @@ export function Clientes({navigation}:any){
                    </View>
                        <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Clientes </Text>
                  </View>
+                        {/*
                         <Modal transparent={true} visible={ visible }>
                             <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
                                 
@@ -144,16 +143,13 @@ export function Clientes({navigation}:any){
                                                      <Text>numero: {cSelecionado?.numero}</Text>
                                                 </View>
                                                 
-                                                
                                  </View>    
-        
                             </View>
-        
                         </Modal>
-        
+                        */}
                      <FlatList
                          data={dados}
-                         renderItem={(item)=> RenderItensClients(item)}
+                         renderItem={({item})=> RenderItensClients({item, handleSelect})}
                          keyExtractor={(i)=> i.codigo.toString() }
                      />
 

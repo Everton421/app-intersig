@@ -112,9 +112,8 @@ export const Login = ({ navigation }:any) => {
 
               let codeUser = await useQueryUsuario.create(userMobile);
             
-                  
+              return Alert.alert(response.data.status.msg);
             } else {
-              return Alert.alert(response.data.msg);
             }
 
         }catch(e:any){
@@ -200,7 +199,7 @@ export const Login = ({ navigation }:any) => {
                </View>
             </View>
 
-            <View style={{ width: "100%", marginTop: 50 }}>
+            <View style={{ width: "100%", marginTop: 50,   }}>
               <Text style={{ color: "#185FED", fontWeight:"bold"  }}> SENHA </Text>
               <TextInput
                 style={{ borderBottomWidth: 1, width: "90%" }}
@@ -211,11 +210,12 @@ export const Login = ({ navigation }:any) => {
               />
 
               <View style={{ margin: 10 }}>
+
                 <TouchableOpacity
                   style={{
                     alignItems: "center",
                     padding: 10,
-                    borderRadius: 20,
+                    borderRadius:10,
                     backgroundColor: "#185FED",
                   }}
                   onPress={() => logar()}

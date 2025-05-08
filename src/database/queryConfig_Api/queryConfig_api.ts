@@ -6,16 +6,17 @@ export const queryConfig_api = ()=>{
 
     type ApiConfig = {
         codigo?:number
-        url: String,
+        url: string,
         porta: number,
-        token: String
+        token: string
+        data_sinc:string
     }
 
-    async function  select( codigo:number ) {
+    async function  select( codigo:number ):Promise<ApiConfig[] | undefined> {
 
         try{
 
-            let data = await db.execAsync(
+            let data:ApiConfig[] = await db.getAllAsync(
                 ` select * from api_config where codigo = ${codigo} `
             )
             return data;
@@ -29,7 +30,8 @@ export const queryConfig_api = ()=>{
          await db.runAsync( ` update api_config set  
                      url   ='${api.url}',
                      porta = ${api.porta},
-                     token = '${api.token}'
+                     token = '${api.token}',
+                     data_sinc = '${api.data_sinc}'
                      where codigo = ${api.codigo}
                     ` )
             }catch(e){ console.log(`Erro ao tentar atualizar as configurações da api `, e)}
@@ -41,8 +43,8 @@ export const queryConfig_api = ()=>{
     try{
         let aux = await db.runAsync(
             `INSERT INTO api_config 
-            ( codigo, url, porta , token )
-             VALUES ( ${api.codigo}, ${api.porta}, '${api.token}','${api.url}' ) 
+            ( codigo, url, porta , token, data_sinc )
+             VALUES ( ${api.codigo}, ${api.porta}, '${api.token}','${api.url}','${api.data_sinc}'  ) 
             `)
             return aux;
     } catch ( e) { console.log(' erro ao cadastrar a configuracao da api ',e)} 

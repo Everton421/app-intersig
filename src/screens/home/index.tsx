@@ -212,6 +212,7 @@ async function buscaEmpresa (){
 
 
           <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+            onPress={() => { navigation.navigate('veiculos') }}
           >
             <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
             <FontAwesome5 name="car" size={24} color="#185FED" />

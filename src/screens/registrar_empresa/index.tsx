@@ -12,7 +12,7 @@ import { cpf,   cnpj } from 'cpf-cnpj-validator';
 import { restartDatabaseService } from '../../services/restartDatabase';
 import { ConnectedContext } from '../../contexts/conectedContext';
 
-export const Resgistrar_empresa = ({ navigation }) => {
+export const Resgistrar_empresa = ({ navigation }:any) => {
     const api = useApi();
 
     const [nomeEmpresa, setNomeEmpresa] = useState('');
@@ -23,39 +23,10 @@ export const Resgistrar_empresa = ({ navigation }) => {
     const [senha, setSenha] = useState('');
     const [telefone, setTelefone] = useState('');
     const [loading, setLoading] = useState(false);
-    const [ validaEmpresa , setValidaEMpresa ] = useState(false);
-    const [ msgValidaEmpresa , setMsgValidaEMpresa ] = useState();
-    const [ cnpjValid , setCnpjValid ] = useState<Boolean>();
-    const [ responseEmpresa , setResponseEmpresa ] = useState();
-    const [loadingCnpj, setLoadingCnpj ]= useState<boolean>(false);
-    const [ msgCnpjValidApi , setMsgCnpjValidApi ] = useState<{ cadastrada:boolean, msg:string } |null  >(null);
-    const [ msgEmailValidApi , setMsgEmailValidApi ] = useState({});
-
-    const [loadingEmail, setLoadingEmail ]= useState<boolean>(false);
-
-    const {connected,  setConnected} = useContext(ConnectedContext)
-
-    const useRestart = restartDatabaseService();
-
+    const [ telefoneUsuario, setTelefoneUsuario ] = useState('');
 
     let useQueryUsuario = useUsuario();
     let useQueryEmpresa = queryEmpresas();
-
-    const validateInputCnpj = (input:string) => {
-        if (input.length === 11) {
-            setCnpjValid(cpf.isValid(input))
-            return cpf.isValid(input)  
-
-        } else if (input.length === 14) {
-            setCnpjValid(cpf.isValid(input))
-            return cnpj.isValid(input) ;
-        } else {
-            setCnpjValid( false )
-            return false ;
-      } 
-    }
-
-
 
 
     const showAlert = (message:any) => { 
@@ -71,68 +42,8 @@ export const Resgistrar_empresa = ({ navigation }) => {
         responsavel:string
     }
 
-    /*
-    useEffect(
-        ()=>{
-            async function validaEmail(){
-                
-               try{
-                    setTimeout(()=>{},3000);
-                setLoadingEmail(true)
-                let response = await api.post('/usuario/validacao',{ "email": email}  );
-                  
-                    if(response.status === 200){ 
-                         setLoadingEmail(false)
-                         setMsgEmailValidApi(response.data);
-                        } 
-              }catch(e){
-                 console.log(` Erro ao validar cadastro do usuario na api!`, e)
-                }finally{ 
-                setLoadingEmail(false)
-              }
-        }
-        validaEmail(); 
-        },[ email ]
-    )
-*/
 
-    async function delay(ms:number){
-        return new Promise(resolve => setTimeout( ()=> {resolve},ms))
-    }
-
-    useEffect(
-        ()=>{
-
-            async function validaEmpresa(){
-               //console.log(cnpjInput.length)
-            if(cnpjInput.length > 11 ){
-            
-            
-              //  setCnpjInput(String(cnpjInput));
-                try{
-                setLoadingCnpj(true)
-                 //await delay(500);
-
-                    let response = await api.post('/empresa/validacao',{ "empresa":{ "cnpj": cnpjInput}}  );
-                    console.log(response.data.status.msg)
-                    if(response.status === 200){
-                         setMsgCnpjValidApi(response.data.status)
-                    setLoadingCnpj(false);
-                    }
-                 
-              }catch(e){
-                 console.log(` Erro ao validar cadastro da empresa na api!`, e)
-                }finally{
-                    setLoadingCnpj(false);
-                }
-            }
-        }
-            validaEmpresa();
-           
-    
-        },[ cnpjInput ]
-    )
-
+ 
 
 async function register(   ) {
     setLoading(true);
@@ -158,7 +69,7 @@ async function register(   ) {
             let usuarioEmpresa =
             {
                 "nome":nomeUsuario,
-                "telefone": '',
+                "telefone": telefoneUsuario,
                 "email":email,
                 "senha":senha
             }
@@ -184,12 +95,6 @@ async function register(   ) {
                                 let resCadEmpr=  await useQueryEmpresa.createByCode(empMobile);
                                 if( resCadEmpr > 0 )console.log("empresa rgistrada") 
                                 
-                                        let  user =  { codigo:codigo_usuario , nome:usuario, senha:senha , email:email_usuario, cnpj:cnpj, lembrar:'S' }  
-
-                                    let userCad = await useQueryUsuario.createUser(user)
-
-                                    if( userCad && userCad > 0 ) console.log("usuario registrado") 
-
                                         showAlert(response.data.msg);
                                         setNomeEmpresa('')
                                         setEmailEmpresa('')
@@ -201,7 +106,6 @@ async function register(   ) {
                                  }else{
                                   showAlert(response.data.msg)
                             }
-
 
                     } else {
                         // Aqui você lança um erro com a mensagem da resposta da API
@@ -270,14 +174,6 @@ async function register(   ) {
 
                   <View style={{ width: '100%', marginTop: 5 , alignItems:'center'}}>
                          
-                          {   loadingCnpj ? 
-                             <ActivityIndicator /> :
-                              
-                             msgCnpjValidApi != null && msgCnpjValidApi.cadastrada ?
-                                ( <Text style={{color:'red'}}>{msgCnpjValidApi.msg}</Text>)   
-                                :
-                                ( <Text style={{color:'green'}}>{msgCnpjValidApi && msgCnpjValidApi.msg}</Text>)   
-                            }                          
                         </View>
 
                         </View>
@@ -318,6 +214,16 @@ async function register(   ) {
                                 <FontAwesome name="user" size={24} color="#185FED" />
                             </View>
                         </View>
+                        
+                        <View style={{ width: '100%', marginTop: 20 }}>
+                            <Text style={{ color: '#185FED', marginLeft: 10 }}> Telefone: </Text>
+                            <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
+                                <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="(44) 0000-0000"
+                                    onChangeText={(v:any)=> setTelefoneUsuario(v)}
+                                    />
+                                <MaterialIcons name="phone" size={24} color="#185FED" />
+                            </View>
+                        </View>
 
                         <View style={{ width: '100%', marginTop: 20 }}>
                             <Text style={{ color: '#185FED', marginLeft: 10 }}> Email: </Text>
@@ -328,15 +234,6 @@ async function register(   ) {
                                 <MaterialIcons name="email" size={24} color="#185FED" />
                             </View>
                         
-                            { 
-                             
-                             loadingEmail ? 
-                             <ActivityIndicator /> :
-                              
-                                 msgEmailValidApi.cadastrada    &&
-                                ( <Text style={{color:'red'}}>{msgEmailValidApi.msg}</Text>)   
-                              
-                             }  
                         </View>
 
                         <View style={{ width: '100%', marginTop: 20 }}>

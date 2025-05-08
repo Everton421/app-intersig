@@ -1,9 +1,9 @@
-import { createContext, useState } from "react";
+import React ,{ createContext, useState,Dispatch } from "react";
 
 
 export const ConnectedContext = createContext({
     connected: false,
-    setConnected: () => {} // Função vazia por padrão
+    setConnected: React.Dispatch<React.SetStateAction<boolean>> 
   });
   
 

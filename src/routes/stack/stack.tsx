@@ -26,6 +26,7 @@ import { Teste } from "../../components/teste";
 import { Cadastro_servico } from "../../screens/cadastro_servicos";
 import Veiculos from "../../screens/veiculos";
 import Cadastro_veiculo from "../../screens/cadastroVeiculo";
+import { CadastroUsuario } from "../../screens/cadastrarUsuarios";
 
 const Stack = createStackNavigator();
 
@@ -48,7 +49,10 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="novoOrcamento" component={NovoOrcamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}}  />
                     <Stack.Screen name="orçamentos" component={OrcamentosRegistrados}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}}  />
                     <Stack.Screen name="NovaOs" component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    <Stack.Screen name="usuarios" component={Usuarios}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                   
+                    <Stack.Screen name="usuarios" component={Usuarios}  options={{headerShown:false}} />
+                    <Stack.Screen name="cadastro_usuario" component={CadastroUsuario}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                   
                     <Stack.Screen name="cadastro_produto" component={Cadastro_produto}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_cliente" component={Cadastro_cliente}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="cadastro_marcas" component={Cadastro_Marcas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />

@@ -279,6 +279,15 @@ useEffect(() => {
                                 />
                             </View>
 
+                            <View style={{ width:'100%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+                                 <Text style={{ fontWeight: "bold" }} >Estado:</Text>
+
+                                <TextInput  style={{ padding: 5,width:'80%' }}
+                                    onChangeText={(value) => setEstado(value)}
+                                    placeholder="PR" 
+                                    defaultValue={estado}
+                                    />
+                            </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > cidade:</Text>
                                 <TextInput
@@ -287,14 +296,7 @@ useEffect(() => {
                                     defaultValue={cidade}
                                 />
                             </View>
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" }} > estado:</Text>
-                                <TextInput  style={{ padding: 5,width:'80%' }}
-                                    onChangeText={(value) => setEstado(value)}
-                                    placeholder="PR" 
-                                    defaultValue={estado}
-                                    />
-                            </View>
+                             
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
                                 <Text style={{ fontWeight: "bold" }} > Endereço:</Text>
                                 <TextInput

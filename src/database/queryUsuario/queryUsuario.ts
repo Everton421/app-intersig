@@ -98,6 +98,23 @@ async function create ( user:Usuario ){
         }
 }
 
+
+async function insert ( user:Usuario ){
+    let  { codigo , nome, senha , email ,token , lembrar} = user;
+
+    try{
+        let result = await db.runAsync(
+            ` INSERT INTO usuarios
+                ( codigo, nome, senha , email , lembrar, token ) VALUES 
+        ( ${codigo}, '${nome}', '${senha}', '${email}',  '${lembrar}', '${token}' ); `);
+
+      return result.lastInsertRowId
+}catch(e){
+    console.log('Erro ao criar o usuario: ', codigo,' nome: ', nome ,' ', e)
+}
+}
+
+
 async function createUser ( user:Usuario ){
 
     let verifyRemember:any = await selectRemember()
@@ -203,6 +220,6 @@ async function deleteAll(){
 
 
 
-return  { deleteAll, updateRemember,signin ,selectRemember ,createUser, selectAll, create, update, selectByCode, selectByName  } 
+return  { insert,deleteAll, updateRemember,signin ,selectRemember ,createUser, selectAll, create, update, selectByCode, selectByName  } 
 
 }

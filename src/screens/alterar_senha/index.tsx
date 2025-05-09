@@ -26,7 +26,7 @@ export const Alterar_senha = ({navigation}:any)=>{
                     Alert.alert('Atenção', result.data.msg)
                 } 
           }catch(e){
-            console.log
+            console.log 
             }
         }   
 
@@ -79,7 +79,7 @@ export const Alterar_senha = ({navigation}:any)=>{
                                 textAlign: "center",
                                 }}
                             >
-                                Alterar Senha 
+                                alterar senha 
                             </Text>
                         </TouchableOpacity>
 

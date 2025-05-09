@@ -78,11 +78,13 @@ export const Marcas = ({navigation}:any)=>{
 
 
 async function gravar(){
+  if( !marcaSelecionada?.descricao ) return Alert.alert("Erro!", "É necessario informar a descrição para poder gravar!") 
+
     try{
         
         setLoading(true);
-        let objmarca = {
-                    "codigo": marcaSelecionada.codigo,
+        let objmarca:any = {
+                    "codigo": marcaSelecionada && marcaSelecionada.codigo,
                     "descricao": marcaSelecionada.descricao,
                     "data_cadastro": marcaSelecionada.data_cadastro,
                     "data_recadastro": dateService.dataHoraAtual(),
@@ -152,7 +154,7 @@ async function gravar(){
                              <View style={{ margin:8}}>
                                           <TouchableOpacity
                                                      onPress={()=>setVisible(false)}
-                                                     style={{    margin: 10,  backgroundColor: "#009de2",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
+                                                     style={{    margin: 10,  backgroundColor:"#185FED",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
                                                    >
                                                      <Text style={{ color: "#FFF", fontWeight: "bold" }}>
                                                        voltar

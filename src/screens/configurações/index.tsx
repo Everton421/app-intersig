@@ -21,6 +21,7 @@ import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
 import { AxiosResponse } from "axios"
+import { useUsuario } from "../../database/queryUsuario/queryUsuario"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -59,6 +60,7 @@ export const Configurações = () => {
   const useQueryCategoria = useCategoria() 
   const useQueryMarcas = useMarcas();
   const useQueryFotos = useFotosProdutos();
+  const useQueryUsuario = useUsuario();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
@@ -444,6 +446,44 @@ setMsgApi('')
     }
   };
 
+
+
+
+
+
+  
+  const fetchUsers = async (data:string ) => {
+    setItem('usuarios');
+
+    try {
+      const aux = await api.get('/usuarios',
+        { params :{ data_recadastro : data} }
+      );
+      const dados = aux.data;
+
+      const totalUsers = dados.length
+       if( totalUsers > 0 ){
+        for (let i = 0; i < dados.length; i++ ) {
+        const verifyUser:any = await useQueryUsuario.selectByCode(dados[i].codigo);
+        if (verifyUser.length > 0) {
+         
+          await useQueryUsuario.create(dados[i]);
+        }
+
+        const progressPercentage = Math.floor(((i + 1) / totalUsers) * 100);
+        setProgress(progressPercentage); // Atualiza progresso
+      
+        } 
+      }else{
+        console.log("Usuários: ", dados)
+      }
+    } catch (e:any) {
+      console.log(e);
+      console.log(e.response.data.msg);
+
+    }
+  };
+
   const verifyDateSinc = async ()=>{
     let validConfig = await useQueryConfigApi.select(1)
     let dataUltSinc:string;
@@ -481,7 +521,8 @@ setMsgApi('')
        await fetchVeiculos(dataSinc);
        await fetchCategorias(dataSinc);
        await fetchMarcas(dataSinc);
-       await fetchImgs(dataSinc),
+       await fetchImgs(dataSinc);
+       await fetchUsers(dataSinc);
       setData([]); // Atualiza o estado para mostrar dados após a sincronização
     } catch (e) {
       console.log(e);

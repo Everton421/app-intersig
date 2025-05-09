@@ -5,7 +5,6 @@ import { useVeiculos, Veiculo } from "../../database/queryVceiculos/queryVeiculo
 import { ConnectedContext } from "../../contexts/conectedContext";
 import NetInfo from '@react-native-community/netinfo';
 import { configMoment } from "../../services/moment";
-import { FlatList } from "react-native-gesture-handler";
 import { SelectCliente } from "../../components/selectCliente";
 import { LodingComponent } from "../../components/loading";
 
@@ -14,17 +13,21 @@ import { LodingComponent } from "../../components/loading";
 export default function Cadastro_veiculo({ route, navigation}:any){
     
     const api = useApi();
-    const [ loading, setLoading] = useState(false);
     const useQueryVeiculos = useVeiculos();
-    const [visibleModalClientes, setVisibleModalClientes] = useState(false);   
-
-      const [ codigoCliente, setCodigoCliente] = useState<number | null>(null);
-     const [ dados, setDados ] = useState <Veiculo>();
     const {connected,  setConnected} = useContext(ConnectedContext)
-    const useMoment = configMoment()
 
-    let { codigo_veiculo } =   route.params || { codigo_veiculo : 0};
+    const [ loading, setLoading] = useState(false);
+    const [ placa, setPlaca ] = useState<string>('');
+    const [ modelo, setModelo ] = useState<string>('');
+    const [ combustivel, setCombustivel ] = useState<string>('');
+    const [ cor, setCor ] = useState<string>('');
+    const [ ano, setAno ] = useState<string>('');
+    const [ marca, setMarca ] = useState<string>('')
+      const [ codigoCliente, setCodigoCliente] = useState<number | null>(null);
+      const [ dados, setDados ] = useState <Veiculo>();
+ 
 
+    let {  codigo_veiculo  }  =   route.params || { codigo_veiculo : 0};
 
 ////////////////////////////
     useEffect(() => {
@@ -46,13 +49,30 @@ export default function Cadastro_veiculo({ route, navigation}:any){
        useEffect(()=>{
 
             async function buscaDados(){
+
+                try{
                 if(codigo_veiculo){
-                    let result  = await useQueryVeiculos.selectByCode(codigo_veiculo);
-                    if( result && result?.length > 0 ){
-                        setDados(result[0])
-                        setCodigoCliente(result[0].cliente)
-                    }
-                }
+                        setLoading(true)
+
+                        let result  = await useQueryVeiculos.selectByCode(codigo_veiculo);
+                        if( result && result?.length > 0 ){
+                            setDados(result[0])
+                            setPlaca(result[0].placa)
+                            setModelo(result[0].modelo)
+                            setCombustivel(result[0].combustivel)
+                            setCodigoCliente(result[0].cliente)
+                            setAno(result[0].ano)
+                            setCor(result[0].cor)
+                            setMarca(result[0].marca)
+                        }
+                    } 
+                }catch(e){
+                    console.log("Erro ao tentar carregar o veiculo!", e)
+                          return Alert.alert('Erro!',"Erro ao tentar carregar o veiculo!" )
+                }finally{
+                        setLoading(false)
+                            
+              }
             }
             buscaDados();
        },[])
@@ -64,18 +84,32 @@ export default function Cadastro_veiculo({ route, navigation}:any){
        }
 
        async function gravar(){
+            if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para concluir o cadastro !');
+                if(!placa ) return Alert.alert('Erro!','É necessario informar a placa do veículo!');
+                if(!codigoCliente) return Alert.alert('Erro!','É necessario informar o cliente do veículo!');
+        
+        let postData:any =
+        {
+            codigo:  codigo_veiculo   ,    
+            placa:placa,
+            modelo:modelo,
+            combustivel:combustivel,
+            cor:cor,
+            marca:marca,
+            ano:ano,
+            cliente:codigoCliente
+        }
         if(codigo_veiculo && dados){
                   try{
                     setLoading(true)
 
-                          let result = await api.put('/veiculo', dados);
+                          let result = await api.put('/veiculo', postData);
                             if(result.status === 200 ){
-                                await useQueryVeiculos.update(dados)
-                             setLoading(false)
+                                await useQueryVeiculos.update(postData)
                             navigation.goBack();
                             return Alert.alert('', "Veiculo alterado com sucesso!")
                             }
-                    }catch(e){
+                    }catch(e:any){
                         if(e.status === 400 ){
                           return Alert.alert('Erro ao Atualizar Veiculo!', e.response.data.msg)
                         }
@@ -86,50 +120,60 @@ export default function Cadastro_veiculo({ route, navigation}:any){
        }else{
             try{
                 setLoading(true)
-                     let result = await api.post('/veiculo', dados);
+                     let result = await api.post('/veiculo', postData);
 
                      if(result.status === 200 ){
                         await useQueryVeiculos.create(result.data)
-                        setLoading(false)
-                        navigation.goBack();
+                                navigation.goBack();
                         return Alert.alert('', "Veiculo Registrado com sucesso!")
                     }
-            }catch(e){
+            }catch(e:any){
                 if(e.status === 400 ){
                   return Alert.alert('Erro ao Cadastrar Veiculo!', e.response.data.msg)
                 }
                 console.log(`Erro ao Cadastrar o veiculo ${codigo_veiculo}`, e)
             }finally{
-
                     setLoading(false)
             }
-                }  
+        }  
+    
     }
 
     return(
         <View style={{ flex:1 ,    backgroundColor:'#EAF4FE'  }}>
+                                {  
+                                  <LodingComponent isLoading={loading} />
+                               }
 
-                {
-                     codigo_veiculo &&  !dados  || loading ?
-                     ( <LodingComponent isLoading={true} /> ) 
-                     :(
-          <>
+                  
+               <Text style={{ marginLeft:10,fontWeight:"bold", fontSize:15}}> Veículo: { codigo_veiculo && codigo_veiculo > 0 ? codigo_veiculo : null }</Text>
+
                <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
                <Text style={{ fontWeight:"bold"}}> Placa: </Text>
                      <TextInput
-                          onChangeText={(value:any)=>  setDados( (prev:any)=> ({...prev, placa:value})) }
-                            defaultValue={ dados?.placa}
+                          onChangeText={(value:any)=>  setPlaca(value) }
+                            defaultValue={   placa}
                         style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
                         placeholder="Placa:"
+                    />
+                </View>
+                <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
+                 <Text style={{ fontWeight:"bold"}}> Marca: </Text>
+
+                     <TextInput
+                           onChangeText={(value:any)=>  setMarca(value)}
+                           style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
+                           defaultValue={ marca}
+                        placeholder="Marca:"
                     />
                 </View>
                 <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
                  <Text style={{ fontWeight:"bold"}}> Modelo: </Text>
 
                      <TextInput
-                           onChangeText={(value:any)=> setDados((prev)=>({...prev, modelo:value }))}
+                           onChangeText={(value:any)=>  setModelo(value)}
                            style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
-                           defaultValue={ dados?.modelo}
+                           defaultValue={ modelo}
                         placeholder="Modelo:"
                     />
                 </View>
@@ -137,9 +181,9 @@ export default function Cadastro_veiculo({ route, navigation}:any){
                  <Text style={{ fontWeight:"bold"}}> Combustivel: </Text>
 
                      <TextInput
-                         onChangeText={(value:any)=> setDados((prev)=>({...prev, combustivel:value }))}
+                         onChangeText={(value:any)=> setCombustivel(value) }
                        style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
-                       defaultValue={ dados?.combustivel}
+                       defaultValue={ combustivel}
                         placeholder="Combustivel:"
                     />
                 </View>
@@ -149,8 +193,8 @@ export default function Cadastro_veiculo({ route, navigation}:any){
                    <View style={{width:'40%' ,marginLeft:'5%' }}>
                     <Text style={{ fontWeight:"bold", marginLeft:'5%',}}>Cor: </Text>
                         <TextInput
-                         onChangeText={(value:any)=> setDados((prev)=>({...prev, cor:value }))}
-                           defaultValue={ dados?.cor}
+                         onChangeText={(value:any)=> setCor(value) }
+                           defaultValue={ cor}
                             style={{ padding: 5, backgroundColor: '#FFF',   marginLeft:'5%',elevation:2,borderRadius:5 }}
                             placeholder="Cor:"
                         />
@@ -158,8 +202,8 @@ export default function Cadastro_veiculo({ route, navigation}:any){
                    <View style={{width:'40%' ,marginLeft:'5%' }}>
                     <Text style={{ fontWeight:"bold", marginLeft:'5%'  }}>Ano: </Text>
                        <TextInput
-                         onChangeText={(value:any)=> setDados((prev)=>({...prev, ano:value }))}
-                         defaultValue={ dados?.ano}
+                         onChangeText={(value:any)=> setAno(value) }
+                         defaultValue={ ano}
                         style={{ padding: 5, backgroundColor: '#FFF',  marginLeft:'5%', elevation:2, borderRadius:5 }}
                         placeholder="Ano:"
                     />
@@ -179,9 +223,7 @@ export default function Cadastro_veiculo({ route, navigation}:any){
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
                     </TouchableOpacity>
                 </View> 
-          </>
-           )
-        }
+        
         </View>
     )
 

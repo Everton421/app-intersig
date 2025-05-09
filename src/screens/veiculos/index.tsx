@@ -2,14 +2,14 @@ import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState } from "react";
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { useVeiculos } from "../../database/queryVceiculos/queryVeiculos";
+import { useVeiculos, Veiculo } from "../../database/queryVceiculos/queryVeiculos";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 
 
  export default function Veiculos({navigation}:any ){
         const [ pesquisa, setPesquisa ] = useState<string | number >('1');
-        const [ dados, setDados ] = useState([]);
+        const [ dados, setDados ] = useState<Veiculo[] | []>([]);
         const useQueryVeiculos = useVeiculos();
 
     async function busca(){ 
@@ -17,7 +17,6 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
         if( result && result.length > 0  ){
             setDados(result);
-            console.log(result)
         }
     }
 
@@ -28,7 +27,7 @@ import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 /////////////
 
 
-function renderItem({item}){
+function renderItem({item}:any) {
     return(
         <TouchableOpacity 
             onPress={ ()=>  navigation.navigate('cadastro_veiculos', { codigo_veiculo: item.codigo}) }
@@ -66,16 +65,16 @@ function renderItem({item}){
                    </Text>
                 </View>
 
-                <View style={{ flexDirection:"row", gap:2, marginLeft:20}}>
+               
+            </View>
+             <View style={{ flexDirection:"row", gap:2 }}>
                   <Text style={{ fontWeight:"bold" }}>
                       Cliente: 
                   </Text>
                   <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                     {item.cliente}
+                     {item.nome}
                    </Text>
                 </View>
-            </View>
-
         </TouchableOpacity>
     )
 }
@@ -112,7 +111,7 @@ function renderItem({item}){
                 <FlatList
                      data={dados}
                      renderItem={(item)=> renderItem(item)}
-                     keyExtractor={(i)=> i.codigo}
+                     keyExtractor={(i:any)=>  i.codigo}
                  />
         
         <TouchableOpacity

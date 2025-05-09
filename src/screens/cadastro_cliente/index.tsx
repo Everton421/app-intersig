@@ -160,7 +160,7 @@ useEffect(() => {
                     navigation.goBack()
                 }
 
-            } catch(e){
+            } catch(e:any){
                     if(e.status === 400) {
                     return Alert.alert( " Erro!",e.response.data.msg)
                     }else{
@@ -183,7 +183,7 @@ useEffect(() => {
                     navigation.goBack()
                 }
 
-            } catch(e){
+            } catch(e:any){
                     if(e.status === 400) {
                     return Alert.alert( " Erro!",e.response.data.msg)
                     }else{
@@ -203,16 +203,16 @@ useEffect(() => {
            // keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} // Ajuste fino para o ios
         >
             <LodingComponent isLoading={loading} />
-
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
-
-        {
+      {
                 codigo_cliente && (
-                    <Text style={{ fontWeight: "bold" }} > Código: {codigo_cliente}</Text>
+                    <Text style={{marginLeft:10,marginTop:5, fontWeight: "bold", fontSize:15 }} > Código: {codigo_cliente}</Text>
 
                 )
         }
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
+
+  
                 <View style={{ width: '97%', margin: 7,  backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
                     <Text style={{ fontWeight: "bold" }} > CPF/CNPJ:</Text>
                     <TextInput

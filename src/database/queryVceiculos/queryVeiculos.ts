@@ -3,12 +3,12 @@ import { useSQLiteContext } from "expo-sqlite"
 export type  Veiculo = {
     codigo : number,
     cliente : number,
-    placa :  String,
-    marca : number,
-    modelo : number,
-    ano :  String,
-    cor : number,
-    combustivel :String,
+    placa :  string,
+    marca : string,
+    modelo : string,
+    ano :  string,
+    cor : string,
+    combustivel :string,
     data_cadastro:string,
     data_recadastro:string 
    ativo?: 'S'|'N'
@@ -27,7 +27,6 @@ async function selectAll(){
         let result = await db.getAllAsync(`SELECT * ,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos `);
-        //console.log(result);
         return result;
     }catch( e){
         console.log(`erro ao buscar veiculos `, e);
@@ -40,7 +39,6 @@ async function selectByCode( code:number ):Promise<Veiculo[] | undefined>{
         let result:Veiculo[] = await db.getAllAsync(`SELECT *,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos where codigo = ${ code } `);
-       // console.log(result);
         return result;
     }catch( e){
         console.log(`erro ao buscar veiculo codigo : ${ code }`, e);
@@ -52,14 +50,13 @@ async function selectByClient( cliente:number ){
         let result = await db.getAllAsync(`SELECT * ,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos where cliente = '${ cliente }' `);
-        //console.log(result);
         return result;
     }catch( e){
         console.log(`erro ao buscar veiculos do cliente ${cliente} `, e);
     } 
 }
 
-async function update(veiculo:Veiculo ){
+async function update(veiculo:Partial<Veiculo> ){
     try{
 
         let result = await db.runAsync(
@@ -119,18 +116,23 @@ async function create( veiculo:Veiculo ){
     }catch(e   ){ console.log( `erro ao inserir veicuLo codigo ${veiculo.codigo}` , e )}
 }
 
-async function selectByDescription( query:any, limit:number ) {
-    const result = await db.getAllAsync(`SELECT *,
-                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
-                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  FROM veiculos WHERE  placa like ? OR codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
+async function selectByDescription( query:any, limit:number ):Promise<Veiculo[] | undefined>{
+    const result = await db.getAllAsync(
+        `SELECT v.*, c.nome,
+                  strftime('%Y-%m-%d',  v.data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S', v.data_recadastro) AS data_recadastro 
+                   FROM veiculos v 
+                    join clientes c on c.codigo = v.cliente   
+                   WHERE v.placa like ?
+                    OR v.codigo like ?
+                    OR c.nome like ?
+                    LIMIT ?`, `%${query}%`, `%${query}%`, `%${query}%`,`${limit}` );
     return result;
      }
 
 
 async function createVeiculo( veiculo:Veiculo ){
-
     let verifyVeic: any = await selectByCode( veiculo.codigo );
-          
      if(verifyVeic.length > 0 ){
             await update(veiculo)
          }else{

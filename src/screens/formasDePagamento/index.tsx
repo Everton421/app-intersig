@@ -4,11 +4,12 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 
-
 import { useEffect, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
-import { useCategoria } from "../../database/queryCategorias/queryCategorias";
-import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
+import { fpgt, useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
+
+type IFptg={
+    item:fpgt
+}
 
 export const FormasPagamento = ({navigation}:any)=>{
 
@@ -17,9 +18,10 @@ export const FormasPagamento = ({navigation}:any)=>{
 
         const useQueryFormasDePagamento = useFormasDePagamentos();
 
+
+//////////////////////
         useEffect(
                     ()=>{
-                        
                         async function busca(){ 
                                 let data:any  = await useQueryFormasDePagamento.selectAll();
                                 if( data?.length > 0  ){
@@ -45,11 +47,17 @@ export const FormasPagamento = ({navigation}:any)=>{
                 }
                 },[ pesquisa ]
             )
+//////////////////////
 
-        function renderItem({item}:any){
+
+            function handleSelect(item:fpgt){
+                navigation.navigate('cadastro_formaPagamento', { codigo_formaPagamento: item.codigo})
+            }
+
+function renderItem({item}:IFptg){
             return(
                 <TouchableOpacity 
-                   // onPress={ ()=> handleSelect(item) }
+                onPress={ ()=> handleSelect(item) }
                     style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
                  >
 

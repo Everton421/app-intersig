@@ -1,11 +1,6 @@
 import { useSQLiteContext } from "expo-sqlite"
 
-export const useFormasDePagamentos = ()=> {
-
-
-const db = useSQLiteContext();
-
-type fpgt = {
+export type fpgt = {
          codigo : number, 
 		 descricao : string,   
 		 desc_maximo : number,   
@@ -15,6 +10,13 @@ type fpgt = {
          data_cadastro:string,
          data_recadastro:string 
 }
+
+export const useFormasDePagamentos = ()=> {
+
+
+const db = useSQLiteContext();
+
+
 
     async function create( forma:fpgt  ) {
             try{
@@ -64,7 +66,7 @@ type fpgt = {
        
     }
 
-    async function selectByCode( code:number ){
+    async function selectByCode( code:number ):Promise<fpgt[] | undefined >{
         let aux = 0;
         if( isNaN(code)){
             aux = Number(code);
@@ -72,10 +74,10 @@ type fpgt = {
             aux = code ; 
         }
         try{
-            let result   = await db.getAllAsync   ( `SELECT *   ,
+            let result:fpgt[]   = await db.getAllAsync   ( `SELECT *   ,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro 
-                   FROM forma_pagamento WHERE codigo = ${aux} `)
+                   FROM forma_pagamento WHERE codigo = ${aux} `) 
             //console.log(result);
             return result;
         }catch(e){ console.log(`erro ao consultar a forma de pagamento com o codigo :  ${code}`,e)}

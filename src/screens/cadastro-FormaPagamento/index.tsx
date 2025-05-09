@@ -9,13 +9,12 @@ import { useFormasDePagamentos } from "../../database/queryFormasPagamento/query
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
-export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
 
 
-    const [ input , setInput ] = useState('');
-    const [ marcaApi, setMarcaApi ] = useState<boolean>(false);
+export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
      
-    const [ quantidade, setQuantidade ] = useState() ;
+    const [ codigo, setCodigo ] = useState();
+    const [ quantidade, setQuantidade ] = useState(1) ;
     const [ intervalo, setIntervalo ] = useState(1);
     const [ parcelas, setParcelas ] = useState<parcela[]>();
     const [ descricao, setDescricao ] = useState<string>(); 
@@ -24,6 +23,8 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
     let api = useApi();
     let useQueryfpgt = useFormasDePagamentos();
     const {connected,  setConnected} = useContext(ConnectedContext)
+
+    let {  codigo_formaPagamento  }  =   route.params || { codigo_formaPagamento : 0};
 
      type parcela = {
         parcela:number
@@ -42,6 +43,22 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
            };
        }
        setConexao();
+
+        async function busca(){
+            let aux = await useQueryfpgt.selectByCode(codigo_formaPagamento);
+                if(aux && aux?.length > 0){
+                    console.log(aux)
+                    setCodigo(codigo_formaPagamento);
+                    setIntervalo(aux[0].intervalo)
+                    setDescricao(aux[0].descricao)
+                    setQuantidade(aux[0].parcelas)
+                }
+        }
+       if(codigo_formaPagamento){
+          busca();
+       }
+
+
        }, []);
 
     const Gerar = () => {
@@ -74,41 +91,58 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
     async function gravar() {
         if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
 
-        if(!intervalo || intervalo === null) return Alert.alert('É necessario informar o intervalo para gravar!')
          if(!quantidade || quantidade === null) return Alert.alert('É necessario informar a quantidade de parcelas para gravar!')
             let data =
-         {
+         {  
+            codigo:codigo_formaPagamento,
             intervalo:Number(intervalo),
             parcelas:Number(quantidade),
             descricao:descricao
         }
-        console.log(data);
+        if( codigo_formaPagamento > 0){
+           
+            try{
+                setLoading(true)
+               let response = await api.put('/formas_pagamento',   data  );
+                if( response.status === 200 && response.data.codigo > 0  ){
+                    let result:any = await useQueryfpgt.update(response.data, response.data.codigo)
+                            navigation.goBack()
+                            return  Alert.alert('',`Forma De Pagamento Atualizada com sucesso!`) 
+                }
 
-        try{
-            setLoading(true)
-          let response = await api.post('/formas_pagamento',   data  );
-
-            if( response.status === 200 && response.data.codigo > 0  ){
-                let result:any = await useQueryfpgt.create(response.data)
-                 if(result > 0  ) {
-                         setTimeout(()=>{},3000);
-                         navigation.goBack()
-                         return  Alert.alert('',`Forma De Pagamento registrada com sucesso!`) 
-
-                     }
+            }catch(e:any){
+                if(e.status === 400 ){
+                    return  Alert.alert(`Erro!`, e.response.data.msg); 
+                }else{
+                    return Alert.alert(`Erro!`, 'Erro Desconhecido!');
+                } 
+            }finally{
+                setLoading(false)
             }
+        }else{
+                try{
+                        setLoading(true)
+                    let response = await api.post('/formas_pagamento',   data  );
 
-        }catch(e){
-            if(e.status === 400 ){
-                return  Alert.alert(`Erro!`, e.response.data.msg); 
-            }else{
-                return Alert.alert(`Erro!`, 'Erro Desconhecido!');
-            } 
-         }finally{
-            setLoading(false)
-         }
+                        if( response.status === 200 && response.data.codigo > 0  ){
+                            let result:any = await useQueryfpgt.create(response.data)
+                            if(result > 0  ) {
+                                    navigation.goBack()
+                                    return  Alert.alert('',`Forma De Pagamento registrada com sucesso!`) 
+                                }
+                        }
 
-
+                    }catch(e:any){
+                        if(e.status === 400 ){
+                            return  Alert.alert(`Erro!`, e.response.data.msg); 
+                        }else{
+                            return Alert.alert(`Erro!`, 'Erro Desconhecido!');
+                        } 
+                    }finally{
+                        setLoading(false)
+                    }
+        }
+      
          
         }
 
@@ -138,6 +172,7 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
                                     style={{ elevation:2, borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF' }}
                                     placeholder="ex. 2"
                                      onChangeText={(v:any)=> setQuantidade(v)}
+                                     defaultValue={String(quantidade)}
                                      keyboardType="numeric"
                                 />
                             </View>
@@ -148,6 +183,7 @@ export const Cadastro_FormaPagamento = ( {navigation}:any ) => {
                                     style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF' }}
                                     placeholder="ex. 30"
                                      onChangeText={(v:any)=> setIntervalo(v)}
+                                     defaultValue={String(intervalo)}
                                      keyboardType="numeric"
                                 />
                             </View>

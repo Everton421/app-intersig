@@ -264,7 +264,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     
     
     return (
-        <View style={{ flex:1, backgroundColor:'#FFF', width:'100%'}} >
+        <View style={{ flex:1, backgroundColor:'#EAF4FE', width:'100%'}} >
             <View style={{  padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
                 <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                     <Ionicons name="arrow-back" size={25} color="#FFF" />

@@ -3,11 +3,7 @@ import { formatItem } from "../../services/formatStrings";
 import { construtor } from "../conexao";
 
 
-export const  useClients = ()=>{
-
-
-
-    type cliente = {
+   export type cliente = {
         codigo: number,
         celular: string,   
         cep: string,
@@ -23,13 +19,17 @@ export const  useClients = ()=>{
         data_recadastro:string,
         vendedor:number
         }
+export const  useClients = ()=>{
+
+
+ 
 
 
     const formataDados =  formatItem();
     const db = useSQLiteContext();
 
 
-    function normalizeString(str) {
+    function normalizeString(str:string) {
         if (!str) return str; // Retorna undefined ou null sem alteração
         return str
             .normalize("NFD") // Normaliza para remover acentos

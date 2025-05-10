@@ -1,17 +1,21 @@
 import { useSQLiteContext } from "expo-sqlite"
 
-export const useMarcas = ()=> {
 
 
-const db = useSQLiteContext();
 
- type marca = {
+export type marca = {
     codigo:number,
     descricao:string,
      data_cadastro:string,
      data_recadastro:string 
  }
 
+export const useMarcas = ()=> {
+
+
+const db = useSQLiteContext();
+
+ 
  
   
     async function create(  marca:marca ) {

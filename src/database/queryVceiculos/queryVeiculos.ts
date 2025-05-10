@@ -117,7 +117,7 @@ async function create( veiculo:Veiculo ){
 }
 
 async function selectByDescription( query:any, limit:number ):Promise<Veiculo[] | undefined>{
-    const result = await db.getAllAsync(
+    const result:Veiculo[] = await db.getAllAsync(
         `SELECT v.*, c.nome,
                   strftime('%Y-%m-%d',  v.data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S', v.data_recadastro) AS data_recadastro 

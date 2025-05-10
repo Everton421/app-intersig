@@ -1,9 +1,18 @@
 import { useSQLiteContext } from "expo-sqlite";
 
+   export  type servico = {
+        codigo:number,
+        valor?:number,
+        aplicacao:string,
+        tipo_serv?:number,
+        data_cadastro:string,
+        data_recadastro:string 
+    }
+    
 
 export const useServices = ()=>{
 
-  function normalizeString(str) {
+  function normalizeString(str:string) {
     if (!str) return str; // Retorna undefined ou null sem alteração
     return str
         .normalize("NFD") // Normaliza para remover acentos
@@ -13,15 +22,7 @@ export const useServices = ()=>{
 
     const db = useSQLiteContext();
  
-      type servico = {
-        codigo:number,
-        valor?:number,
-        aplicacao:string,
-        tipo_serv?:number,
-        data_cadastro:string,
-        data_recadastro:string 
-    }
-    
+  
    
         async function selectByCode( codigo:number ) {
             let aux = 0;

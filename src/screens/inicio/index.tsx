@@ -57,6 +57,8 @@ export const Inicio = ({navigation}:any) => {
                          onPress={()=> navigation.navigate('login')}  >
                             <Text style={{ color: '#185FED', fontWeight:'bold', width: '100%',textAlign:'center', fontSize:18}}>Entrar</Text>
                         </TouchableOpacity>
+ 
+
 
                         <TouchableOpacity style={{marginTop: 15 ,alignItems: "center", padding: 10, borderRadius: 10, backgroundColor: '#fff', width: '90%' }} 
                            onPress={()=> navigation.navigate('registrar_empresa')}  >

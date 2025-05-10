@@ -1,4 +1,4 @@
-import { TextInput, Text, Button, TouchableOpacity, View, Image, Alert, Modal, ActivityIndicator, Animated,  ScrollView, } from "react-native";
+import { TextInput, Text, Button, TouchableOpacity, View, Image, Alert, Modal, ActivityIndicator, Animated, ScrollView, } from "react-native";
 import useApi from "../../services/api";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -10,11 +10,11 @@ import { restartDatabaseService } from "../../services/restartDatabase";
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
 
 
-type propsLoadingLogin = { isLoading:boolean}
+type propsLoadingLogin = { isLoading: boolean }
 
-const LoadingLogin = ({ isLoading }:propsLoadingLogin) => (
+const LoadingLogin = ({ isLoading }: propsLoadingLogin) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
-    <View style={ {
+    <View style={{
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
@@ -27,9 +27,9 @@ const LoadingLogin = ({ isLoading }:propsLoadingLogin) => (
     </View>
   </Modal>
 );
-  
 
-export const Login = ({ navigation }:any) => {
+
+export const Login = ({ navigation }: any) => {
   const useQueryEmpresa = queryEmpresas();
   const api = useApi();
 
@@ -41,8 +41,8 @@ export const Login = ({ navigation }:any) => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [lembrar, setLembrar] = useState<Boolean>(false);
-  
-  const [ loading, setLoading ] = useState(false);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function buscaUser() {
@@ -64,9 +64,9 @@ export const Login = ({ navigation }:any) => {
   }, []);
 
 
-  async function verUsuario(){
+  async function verUsuario() {
     let aux = await useQueryUsuario.selectAll();
-    console.log(aux) 
+    console.log(aux)
   }
 
   async function logar() {
@@ -75,7 +75,7 @@ export const Login = ({ navigation }:any) => {
 
     let user = { email: email, senha: senha };
 
-    let userRemember: any  = await useQueryUsuario.selectRemember();
+    let userRemember: any = await useQueryUsuario.selectRemember();
 
     if (userRemember.length > 0 && userRemember[0].email === user.email) {
       if (lembrar === false) {
@@ -87,54 +87,54 @@ export const Login = ({ navigation }:any) => {
       return;
     } else {
 
-      try{
-       setLoading(true)
-  
-          let response: any = await api.post("/login", user);
-        
+      try {
+        setLoading(true)
 
-            if (response.status == 200) {
+        let response: any = await api.post("/login", user);
 
-              let lembrarUsuario = lembrar ? "S" : "N";
-              let userMobile = {
-                email: user.email,
-                senha: user.senha,
-                codigo: response.data.codigo,
-                nome: response.data.usuario,
-                lembrar: lembrarUsuario,
-                token: response.data.token
-              };
-              
-             await useRestart.restart();
 
-             setUsuario(userMobile);
-              setLogado(true);
+        if (response.status == 200) {
 
-              let codeUser = await useQueryUsuario.create(userMobile);
-            
-              return Alert.alert(response.data.status.msg);
-            } else {
-            }
+          let lembrarUsuario = lembrar ? "S" : "N";
+          let userMobile = {
+            email: user.email,
+            senha: user.senha,
+            codigo: response.data.codigo,
+            nome: response.data.usuario,
+            lembrar: lembrarUsuario,
+            token: response.data.token
+          };
 
-        }catch(e:any){
-          
-          if(e.response.status === 400){
-            console.log(   e.response.data.msg )
-            Alert.alert('Erro!', e.response.data.msg);
-          }
-        }finally{
-          setLoading(false)
+          await useRestart.restart();
+
+          setUsuario(userMobile);
+          setLogado(true);
+
+          let codeUser = await useQueryUsuario.create(userMobile);
+
+          return Alert.alert(response.data.status.msg);
+        } else {
         }
+
+      } catch (e: any) {
+
+        if (e.response.status === 400) {
+          console.log(e.response.data.msg)
+          Alert.alert('Erro!', e.response.data.msg);
+        }
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
- 
+
 
   return (
     <View style={{ flex: 1, backgroundColor: "#EAF4FE" }}>
-      
-      <LoadingLogin  isLoading={loading} />
-      
+
+      <LoadingLogin isLoading={loading} />
+
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, backgroundColor: "#EAF4FE" }}
       >
@@ -187,20 +187,20 @@ export const Login = ({ navigation }:any) => {
 
             <View style={{ width: "100%" }}>
 
-              <Text style={{ color: "#185FED", fontWeight:"bold" }}> EMAIL </Text>
-               <View style={{ width: "100%" , flexDirection:"row" }}>
-                  <TextInput
-                    style={{   borderBottomWidth: 1, width: "90%" }} 
-                    placeholder="example@example.com"
-                    onChangeText={(t) => setEmail(t)}
-                    value={email}
-                    autoComplete="email"
-                  />
-               </View>
+              <Text style={{ color: "#185FED", fontWeight: "bold" }}> EMAIL </Text>
+              <View style={{ width: "100%", flexDirection: "row" }}>
+                <TextInput
+                  style={{ borderBottomWidth: 1, width: "90%" }}
+                  placeholder="example@example.com"
+                  onChangeText={(t) => setEmail(t)}
+                  value={email}
+                  autoComplete="email"
+                />
+              </View>
             </View>
 
-            <View style={{ width: "100%", marginTop: 50,   }}>
-              <Text style={{ color: "#185FED", fontWeight:"bold"  }}> SENHA </Text>
+            <View style={{ width: "100%", marginTop: 50, }}>
+              <Text style={{ color: "#185FED", fontWeight: "bold" }}> SENHA </Text>
               <TextInput
                 style={{ borderBottomWidth: 1, width: "90%" }}
                 secureTextEntry={false}
@@ -215,7 +215,7 @@ export const Login = ({ navigation }:any) => {
                   style={{
                     alignItems: "center",
                     padding: 10,
-                    borderRadius:10,
+                    borderRadius: 10,
                     backgroundColor: "#185FED",
                   }}
                   onPress={() => logar()}
@@ -252,12 +252,12 @@ export const Login = ({ navigation }:any) => {
               </Text>
             </TouchableOpacity>
 
-        <TouchableOpacity style={{ margin:6}} onPress={()=> navigation.navigate('enviar_codigo')}>
-                <Text style={{ color:'#185FED', fontWeight:"bold"}} > esqueci minha senha</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={{ margin:6}} onPress={()=> verUsuario()}>
-                <Text style={{ color:'#185FED', fontWeight:"bold"}} >  ver usuaario</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={{ margin: 6 }} onPress={() => navigation.navigate('enviar_codigo')}>
+              <Text style={{ color: '#185FED', fontWeight: "bold" }} > esqueci minha senha</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ margin: 6 }} onPress={() => verUsuario()}>
+              <Text style={{ color: '#185FED', fontWeight: "bold" }} >  ver usuaario</Text>
+            </TouchableOpacity>
 
           </View>
         </View>

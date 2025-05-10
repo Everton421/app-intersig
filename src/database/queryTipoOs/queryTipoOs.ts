@@ -1,16 +1,19 @@
 import { useSQLiteContext } from "expo-sqlite"
 
-export const useTipoOs = ()=> {
 
-
-const db = useSQLiteContext();
-
- type tipoOs= {
+export type tipoOs= {
     codigo:number,
     descricao:string,
      data_cadastro:string,
      data_recadastro:string 
  }
+
+export const useTipoOs = ()=> {
+
+ 
+const db = useSQLiteContext();
+
+ 
 
     async function create(  tipoOs:tipoOs ) {
             try{

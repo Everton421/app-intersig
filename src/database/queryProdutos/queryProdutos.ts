@@ -2,16 +2,7 @@ import { useSQLiteContext } from "expo-sqlite";
 import { formatItem } from "../../services/formatStrings";
 import { useFotosProdutos } from "../queryFotosProdutos/queryFotosProdutos";
 
-
-export const useProducts = ()=>{
-
-
-    const db = useSQLiteContext();
-    const formataDados =  formatItem();
-
-    const useQueryFotos = useFotosProdutos()
-
-       type produto = {
+ export type produto = {
         codigo:number,
         estoque?:number,
         preco?:number,
@@ -32,6 +23,15 @@ export const useProducts = ()=>{
         tipo?:string
 
     }
+    
+export const useProducts = ()=>{
+ 
+    const db = useSQLiteContext();
+    const formataDados =  formatItem();
+
+    const useQueryFotos = useFotosProdutos()
+
+      
     
         async function selectByCode( codigo:number ) {
             let aux = 0;

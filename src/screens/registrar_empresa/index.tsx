@@ -70,6 +70,7 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
             "telefone_empresa": telefone,
             "email_empresa": emailEmpresa,
             "cnpj": cnpjInput,
+            dados_teste: dadosFic
         }
         let usuarioEmpresa =
         {
@@ -129,9 +130,9 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                     setEmail('')
                     setSenha('');
 
-                if( dadosFic ){
-                      (await useDataFic).main()
-                                }
+             //   if( dadosFic ){
+             //         (await useDataFic).main()
+             //                   }
                                 showAlert(apiResult.status.msg);
 
                                 setUsuario(userMobile);

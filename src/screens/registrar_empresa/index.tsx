@@ -7,12 +7,11 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import useApi from '../../services/api';
 import { useUsuario } from '../../database/queryUsuario/queryUsuario';
 import { queryEmpresas } from '../../database/queryEmpresas/queryEmpresas';
-import { cpf, cnpj } from 'cpf-cnpj-validator';
  
 import Foundation from '@expo/vector-icons/Foundation';
 import { insertDataFic } from '../../services/insertDataFic';
 import { AuthContext } from '../../contexts/auth';
-
+import { cpf as  cpfValid , cnpj as cnpjValid} from 'cpf-cnpj-validator'
 
 export const Resgistrar_empresa = ({ navigation }: any) => {
     const api = useApi();
@@ -50,15 +49,27 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
         responsavel: string
     }
 
- 
 
     async function register() {
         
+        let validCnpjInput = false; 
+         if( cnpjValid.isValid(cnpjInput)) {
+            validCnpjInput = cnpjValid.isValid(cnpjInput)
+         }
+         if( cpfValid.isValid(cnpjInput)){
+            validCnpjInput = cpfValid.isValid(cnpjInput)
+         }
+         
+        if(!validCnpjInput ){
+            return Alert.alert('Erro!',"CNPJ/CPF invalido!")
+        }
+
+
        if (!nomeEmpresa) {
             setLoading(false);
             return showAlert('É Necessário Informar o Nome da Empresa!');
         }
-        if (!cnpj) return showAlert('É Necessário Informar o CNPJ da Empresa!');
+        if (!cnpjInput) return showAlert('É Necessário Informar o CNPJ da Empresa!');
         if (!emailEmpresa) return showAlert('É Necessário Informar o Email da Empresa!');
         if (!nomeUsuario) return showAlert('É Necessário Informar o Responsável da Empresa!');
         if (!email) return showAlert('É Necessário Informar o Email do Responsável da Empresa!');
@@ -79,34 +90,28 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
             "email": email,
             "senha": senha
         }
-  
 
         try {
               setLoading(true);
             let response = await api.post('/empresa', { empresa: empresa, usuario: usuarioEmpresa });
-
             if (response.status === 200) {
                  console.log(response.data);
                 const apiResult = response.data;
+                const resultEmpresa = response.data.data.empresa 
+                 const resultUsuario =  response.data.data.usuario
 
-                 if (apiResult.status.ok ) {
-
-                     
-                    let responsavel = apiResult.data.usuario.codigo_usuario;
-                    let codigo_empresa = apiResult.data.empresa.codigo_empresa;
-                    let cnpj = apiResult.data.empresa.cnpj;
-                    let nome_empresa = apiResult.data.empresa.nome_empresa;
-                   
-                    let email_empresa = apiResult.data.empresa.email_empresa;
+                    let responsavel = resultUsuario.codigo_usuario;
+                    let codigo_empresa = resultEmpresa.codigo_empresa;
+                    let cnpj = resultEmpresa.cnpj;
+                    let nome_empresa = resultEmpresa.nome_empresa;
+                    let email_empresa = resultEmpresa.email_empresa;
                    
                     const empMobile: EmpresaMobile = { codigo_empresa: codigo_empresa, nome: nome_empresa, cnpj: cnpj, email: email_empresa, responsavel: responsavel };
-
-
                        
-                    let email_usuario = apiResult.data.usuario.email_usuario;
-                    let senha  = apiResult.data.usuario.senha;
-                    let usuario = apiResult.data.usuario.usuario // nome do usuario
-                    let token = apiResult.data.usuario.token
+                    let email_usuario = resultUsuario.email_usuario;
+                    let senha  = resultUsuario.senha;
+                    let usuario = resultUsuario.usuario // nome do usuario
+                    let token = resultUsuario.token
 
                     let userMobile = {
                                 email: email_usuario,
@@ -119,33 +124,22 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                      let codeUser = await useQueryUsuario.create(userMobile);
 
 
-                    let resCadEmpr = await useQueryEmpresa.createByCode(empMobile);
+                    let resCadEmpr = await useQueryEmpresa.create(empMobile);
                     if (resCadEmpr > 0) console.log("empresa rgistrada")
-
-                     
                     setNomeEmpresa('')
                     setEmailEmpresa('')
                     setCnpjInput('')
                     setNomeUsuario('')
                     setEmail('')
                     setSenha('');
-
-             //   if( dadosFic ){
-             //         (await useDataFic).main()
-             //                   }
                                 showAlert(apiResult.status.msg);
-
                                 setUsuario(userMobile);
-              setLogado(true);
- 
-                }  
-               
-            }  
-        } catch (e: any) {
-            console.log('Erro:', e.response.data.msg);
+                      setLogado(true);
+               }  
+            } catch (e: any) {
+               console.log('Erro:', e.response.data.msg);
             if (e.status === 400) showAlert(e.response.data.msg);
-
-        } finally {
+           } finally {
             setLoading(false);
         }
 
@@ -154,71 +148,71 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
 
     return (
         <View style={{ flex: 1 }}>
-        {/*************** */}
+            {/*************** */}
             <Modal transparent={true} visible={visible}>
                 <View style={{ width: '100%', height: '100%', alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(50,50,50, 0.6)' }} >
-                    <View style={{ width: '90%', height: '80%', backgroundColor: '#FFF', borderRadius: 10 , alignItems:'center'}} > 
-                            <Foundation name="alert" size={50} color="#185FED" />
-                                <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686", fontSize:20 }}>
-                                    Atenção!
+                    <View style={{ width: '90%', height: '80%', backgroundColor: '#FFF', borderRadius: 10, alignItems: 'center' }} >
+                        <Foundation name="alert" size={50} color="#185FED" />
+                        <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686", fontSize: 20 }}>
+                            Atenção!
+                        </Text>
+                        <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
+                            Ao utilizar dados fictícios, serão adicionados exemplos dos itens a serem usados no App, como produtos, clientes, etc. Após efetuar o login, execute uma sincronização para obter os dados.
+                        </Text>
+
+
+                        <View style={{ marginTop: 20 }}>
+                            <TouchableOpacity
+                                style={{ margin: 5, alignItems: "center" }}
+                                onPress={() => {
+                                    dadosFic === false ? setDadosFic(true) : setDadosFic(false)
+                                }}
+                            >
+                                <View style={[{ padding: 8, borderWidth: 2, borderRadius: 2 }]}>
+                                    {dadosFic && (
+                                        <View style={{ position: "absolute", left: -2, top: -9 }}>
+                                            <FontAwesome name="check" size={26} color="#185FED" />
+                                        </View>
+                                    )}
+                                </View>
+                                <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
+                                    {" "}
+                                    Desejo utilizar fictícios.
                                 </Text>
-                              <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
-    Ao utilizar dados fictícios, serão adicionados exemplos dos itens a serem usados no App, como produtos, clientes, etc. Após efetuar o login, execute uma sincronização para obter os dados.
-</Text>
+                            </TouchableOpacity>
+                        </View>
 
-
-                            <View style={{ marginTop:20}}>  
-                                <TouchableOpacity
-                                    style={{ margin: 5, alignItems: "center" }}
-                                    onPress={() => {
-                                        dadosFic === false ? setDadosFic(true) : setDadosFic(false)
-                                    }}
-                                >
-                                    <View style={[{ padding: 8, borderWidth: 2, borderRadius: 2 }]}>
-                                        {dadosFic && (
-                                            <View style={{ position: "absolute", left: -2, top: -9 }}>
-                                                <FontAwesome name="check" size={26} color="#185FED" />
-                                            </View>
-                                        )}
+                        <TouchableOpacity
+                            style={{ margin: 5, alignItems: "center" }}
+                            onPress={() => {
+                                dadosFic ? setDadosFic(false) : setDadosFic(true)
+                            }}
+                        >
+                            <View style={[{ padding: 8, borderWidth: 2, borderRadius: 2 }]}>
+                                {dadosFic === false && (
+                                    <View style={{ position: "absolute", left: -2, top: -9 }}>
+                                        <FontAwesome name="check" size={26} color="#185FED" />
                                     </View>
-                                    <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
-                                        {" "}
-                                        Desejo utilizar fictícios.
-                                    </Text>
-                                </TouchableOpacity>
+                                )}
                             </View>
+                            <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
 
-                                <TouchableOpacity
-                                    style={{ margin: 5, alignItems: "center" }}
-                                    onPress={() => {
-                                        dadosFic ? setDadosFic(false) : setDadosFic(true)
-                                    }}
-                                >
-                                    <View style={[{ padding: 8, borderWidth: 2, borderRadius: 2 }]}>
-                                        {dadosFic === false && (
-                                            <View style={{ position: "absolute", left: -2, top: -9 }}>
-                                                <FontAwesome name="check" size={26} color="#185FED" />
-                                            </View>
-                                        )}
-                                    </View>
-                                    <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
+                                {" "}
+                                Desejo cadastrar os dados da minha empresa.
+                            </Text>
+                        </TouchableOpacity>
 
-                                        {" "}
-                                        Desejo cadastrar os dados da minha empresa.
-                                    </Text>
-                                </TouchableOpacity>
+                        <TouchableOpacity
+                            style={{ marginTop: 20, backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 10, padding: 5, }}
+                            onPress={() => setVisible(false)}
 
-              <TouchableOpacity
-                    style={{marginTop:20 ,backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 10, padding: 5,  }}
-            onPress={()=>setVisible(false)}
-            
-              >
-                <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Continuar</Text>
-              </TouchableOpacity>
+                        >
+                            <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Continuar</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </Modal>
-        {/*************** */}
+            {/*************** */}
 
             <KeyboardAvoidingView
                 style={{ flex: 1 }}
@@ -232,7 +226,7 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                 ) : (
                     <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: '#EAF4FE' }}>
                         <View style={{ width: '100%', marginTop: 10 }}>
-                            <TouchableOpacity onPress={() => navigation.goBack()} style={{ margin: 10 }}>
+                            <TouchableOpacity onPress={() => navigation.goBack()} style={{ margin: 10, flexDirection:'row' }}>
                                 <Ionicons name="arrow-back" size={30} color="#185FED" />
                             </TouchableOpacity>
 
@@ -278,6 +272,8 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
                                         <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="example@example.com"
                                             onChangeText={(v: any) => setEmailEmpresa(v)}
+                                            keyboardType="email-address"
+                                             autoCapitalize="none"
                                         />
                                         <MaterialIcons name="email" size={24} color="#185FED" />
                                     </View>
@@ -343,11 +339,12 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                                 </View>
                             </View>
                             <TouchableOpacity
-                                style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#185FED', margin: 15, elevation: 3 }}
+                                style={{ alignItems: "center", padding: 10, borderRadius: 5, backgroundColor: '#185FED', margin: 15, elevation: 3 }}
                                 onPress={() => register()}
                             >
                                 <Text style={{ color: '#FFF', fontSize: 20 }}>Registrar </Text>
                             </TouchableOpacity>
+
                         </View>
 
                     </ScrollView>

@@ -42,6 +42,7 @@ async function buscaEmpresa (){
   let validEmpr:any  = await useQueryEmpresa.selectAll();
   if(validEmpr?.length > 0 ){
     setCadEmpresa(validEmpr[0]);
+  setLoadingEmpr(false)
   }else{
     try{
       let validEmpresa = await api.post("/empresa/validacao" ,

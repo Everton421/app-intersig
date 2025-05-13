@@ -1,4 +1,4 @@
-import { useSQLiteContext } from "expo-sqlite";
+import { SQLiteRunResult, useSQLiteContext } from "expo-sqlite";
 
 export const queryEmpresas = ()=>{
 
@@ -11,7 +11,7 @@ export const queryEmpresas = ()=>{
         responsavel:string
     }
 
-    async function create(empresa:EmpresaMobile){
+    async function create(empresa:EmpresaMobile):Promise<SQLiteRunResult | any>{
  
         try{
             const result = await db.runAsync(

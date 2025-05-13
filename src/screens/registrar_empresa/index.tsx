@@ -162,9 +162,9 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                                 <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686", fontSize:20 }}>
                                     Atenção!
                                 </Text>
-                                <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
-                                    Ao utilizar dados ficticios, será adicionado exemplos dos itens usado no App.
-                                </Text>
+                              <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
+    Ao utilizar dados fictícios, serão adicionados exemplos dos itens a serem usados no App, como produtos, clientes, etc. Após efetuar o login, execute uma sincronização para obter os dados.
+</Text>
 
 
                             <View style={{ marginTop:20}}>  
@@ -183,7 +183,7 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                                     </View>
                                     <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
                                         {" "}
-                                        Carregar dados fictícios
+                                        Desejo utilizar fictícios.
                                     </Text>
                                 </TouchableOpacity>
                             </View>
@@ -204,7 +204,7 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                                     <Text style={{ width: "100%", textAlign: "center", fontWeight: "bold", color: "#868686" }}>
 
                                         {" "}
-                                        Desejo Registrar meus dados
+                                        Desejo cadastrar os dados da minha empresa.
                                     </Text>
                                 </TouchableOpacity>
 

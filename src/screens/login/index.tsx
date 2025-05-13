@@ -255,9 +255,7 @@ export const Login = ({ navigation }: any) => {
             <TouchableOpacity style={{ margin: 6 }} onPress={() => navigation.navigate('enviar_codigo')}>
               <Text style={{ color: '#185FED', fontWeight: "bold" }} > esqueci minha senha</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ margin: 6 }} onPress={() => verUsuario()}>
-              <Text style={{ color: '#185FED', fontWeight: "bold" }} >  ver usuaario</Text>
-            </TouchableOpacity>
+        
 
           </View>
         </View>

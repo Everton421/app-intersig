@@ -58,7 +58,7 @@ async function buscaEmpresa (){
           email: validEmpresa.data.data.email_empresa,
           responsavel: validEmpresa.data.data.responsavel,
         };
-       // let aux = await useQueryEmpresa.createByCode(objEmpr);
+      let aux = await useQueryEmpresa.createByCode(objEmpr);
         setCadEmpresa(validEmpresa.data.data)
       }
     }catch(e:any){
@@ -76,7 +76,7 @@ async function buscaEmpresa (){
 
       buscaEmpresa()
 
-    }, []
+    }, [usuario.token]
   )
 
 

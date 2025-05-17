@@ -21,7 +21,7 @@ export const Cadastro_cliente = ({ route, navigation }: any) => {
     const [bairro, setBairro] = useState<string>();
     const [numero, setNumero] = useState<string>();
     const [data_cadastro, setData_cadastro] = useState<string>();
-
+    const [ codigo, setCodigo ] = useState(0);
     const [ visibleEndereco, setVisibleEndereco] = useState<boolean>(false); 
     const [ loading, setLoading] = useState<boolean>(false);
 
@@ -70,11 +70,13 @@ useEffect(() => {
     async function carregarCliente(){
         if( !codigo_cliente ) return  
                 try{
-                    setLoading(true)
+                 setLoading(true)
+
                     let result:any = await useQueryClient.selectByCode(codigo_cliente)
                     console.log(result)
                     if( result && result?.length > 0 ){
                         let dados:client = result[0];
+                        setCodigo(result[0].codigo)
                         setCnpj(dados.cnpj)
                         setIe(dados.ie)
                         setNome(dados.nome)
@@ -87,6 +89,8 @@ useEffect(() => {
                         setNumero(dados.numero)
                         setData_cadastro(dados.data_cadastro)
                     }
+                    setLoading(false)
+
                 }catch(e){
                     console.log("erro ao consultar cliente ", e )
                 }finally{
@@ -203,12 +207,7 @@ useEffect(() => {
            // keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} // Ajuste fino para o ios
         >
             <LodingComponent isLoading={loading} />
-      {
-                codigo_cliente && (
-                    <Text style={{marginLeft:10,marginTop:5, fontWeight: "bold", fontSize:15 }} > Código: {codigo_cliente}</Text>
-
-                )
-        }
+    
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
 

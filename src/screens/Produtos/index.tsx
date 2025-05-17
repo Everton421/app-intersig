@@ -13,7 +13,7 @@ export function Produtos ( {navigation}:any ){
     const useQueryProdutos = useProducts();
     const useQueryFotos = useFotosProdutos();
 
-const [ pesquisa, setPesquisa ] = useState();
+const [ pesquisa, setPesquisa ] = useState<string>('');
 const [ dados , setDados ] = useState();
 const [ pSelecionado, setpSelecionado ] = useState();
 const [ visible, setVisible ] = useState(false);
@@ -44,7 +44,7 @@ data_recadastro:string
         if(response.length > 0  ){
             setDados(response)
         }
-        console.log('useEffect1 carregando produtos ....');
+        console.log('filterByDescription carregando produtos ....');
 
     }
 
@@ -59,7 +59,7 @@ data_recadastro:string
         if(response.length > 0  ){
             setDados(response)
         }
-        console.log('useEffect2 carregando produtos ....');
+        console.log('  filterAll carregando produtos ....');
     }
 
 
@@ -68,22 +68,27 @@ data_recadastro:string
     const unsubscribe = navigation.addListener('focus', () => {
       if( pesquisa !== null || pesquisa !== '' ){
         filterByDescription()
+      }else{
+        filterAll()
+
       }
     });
 
     return unsubscribe;
   }, [navigation]);
 
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-        filterAll()
-    });
-
-    return unsubscribe;
-  }, [navigation]);
 ///////
  
 
+useEffect(()=>{
+
+    filterByDescription()
+
+},[  pesquisa])
+
+    function mudarPesquisa(value:string){
+        setPesquisa(value)
+    }
 
         function handleSelect(item){
                 setpSelecionado(item);

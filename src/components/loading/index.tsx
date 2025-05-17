@@ -11,10 +11,8 @@ export const LodingComponent = ({ isLoading }:props) => (
       alignItems: 'center',
       backgroundColor: 'rgba(0,0,0,0.5)',
     }}>
-      <ActivityIndicator size="large" color="#FFF" />
-      {/**
-      <Text style={styles.loadingText}>Carregando  pedidos ...  </Text>
-       <Animated.View style={[styles.progressBar, { width: `${1}%` }]} />*/}
+      <ActivityIndicator size={50} color="#FFF" />
+      
     </View>
   </Modal>
 );

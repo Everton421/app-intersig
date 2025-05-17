@@ -64,9 +64,19 @@ function renderItem({item}:any) {
                      {item.ano}
                    </Text>
                 </View>
-
-               
             </View>
+
+             <View style={{ flexDirection:"row", gap:2 }}>
+                <View style={{ flexDirection:"row", gap:2}}>
+                  <Text style={{ fontWeight:"bold" }}>
+                      Modelo: 
+                  </Text>
+                  <Text style={{ fontWeight:"bold" , color:'#868686'}}>
+                     {item.modelo}
+                   </Text>
+                </View>
+            </View>
+            
              <View style={{ flexDirection:"row", gap:2 }}>
                   <Text style={{ fontWeight:"bold" }}>
                       Cliente: 

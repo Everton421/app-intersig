@@ -1,4 +1,4 @@
-import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet,Animated, TouchableOpacity } from "react-native"
+import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet,Animated, TouchableOpacity, Linking, ScrollView } from "react-native"
 import useApi from "../../services/api"
 import { useContext, useEffect, useState } from "react"
 import { ConnectedContext } from "../../contexts/conectedContext"
@@ -20,7 +20,7 @@ import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
-import { AxiosResponse } from "axios"
+import Feather from '@expo/vector-icons/Feather';
 import { useUsuario } from "../../database/queryUsuario/queryUsuario"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
@@ -119,7 +119,8 @@ setMsgApi('')
         setError("Erro desconhecido!")
 
     } finally {
-        setLoading(false)
+      setLoading(false)
+
     }
 }
 
@@ -446,11 +447,6 @@ setMsgApi('')
     }
   };
 
-
-
-
-
-
   
   const fetchUsers = async (data:string ) => {
     setItem('usuarios');
@@ -513,16 +509,16 @@ setMsgApi('')
     setIsLoading(true);
     setProgress(0);
     try {
-      await fetchClientes(dataSinc);
-       await fetchProdutos(dataSinc);
-       await fetchFpgt(dataSinc);
-       await fetchServices(dataSinc);
-       await fetchTiposOs(dataSinc);
-       await fetchVeiculos(dataSinc);
-       await fetchCategorias(dataSinc);
-       await fetchMarcas(dataSinc);
+        await fetchClientes(dataSinc);
+        await fetchProdutos(dataSinc);
+        await fetchFpgt(dataSinc);
+        await fetchServices(dataSinc);
+        await fetchTiposOs(dataSinc);
+        await fetchVeiculos(dataSinc);
+        await fetchCategorias(dataSinc);
+        await fetchMarcas(dataSinc);
        await fetchImgs(dataSinc);
-       await fetchUsers(dataSinc);
+        await fetchUsers(dataSinc);
       setData([]); // Atualiza o estado para mostrar dados após a sincronização
     } catch (e) {
       console.log(e);
@@ -605,85 +601,109 @@ setMsgApi('')
 
       }
 
+ const openUrl = async (url:string) => {
+    const supported = await Linking.canOpenURL(url);
+    if (supported) {
+      await Linking.openURL(url);
+    } else {
+      Alert.alert(`Não foi possível abrir esta URL: ${url}`);
+    }
+  };
+
   return (
-    <View style={{ flex: 1 , backgroundColor:'#EAF4FE', alignItems:"center",   width:'98%' }}>
+    <View style={{ flex: 1 , backgroundColor:'#EAF4FE', alignItems:"center",   width:'100%' }}>
+        <View style={{flexDirection:"row" ,marginTop:10 }}>
+          {loading ? (
+                 <View>
+                     <Text> status api:  <ActivityIndicator size={20} color="#185FED" /></Text>
+                  </View>
+                        ) : (
+                            <>
+                                {error ? (
+                                    <Text> status api: {error}</Text>
+                                ) : (
+                                    <View  >
+                                      
+                                    {connected ? <Text style={{ color:'green' }}> status api:  Conectado! <Feather name="wifi" size={24} color="green" /> </Text> 
+                                    : <Text style={{ color:'red',width:'100%' }}>status api:   Não conectado! <Feather name="wifi-off" size={24} color="red" /> </Text>}
+                                    </View>
 
-    <View style={{flexDirection:"row" ,marginTop:10 }}>
-      {loading ? (
-            <ActivityIndicator size={20} color="#185FED" />
-                    ) : (
-                        <>
-                            {error ? (
-                                <Text> status api: {error}</Text>
-                            ) : (
-                                <View  >
-                                  
-                                {connected ? <Text style={{ color:'green' }}> status api:  Conectado! </Text> 
-                                : <Text style={{ color:'red',width:'100%' }}>status api:   Não conectado!</Text>}
-                                
-                                
-                                </View>
-
-                            )}
-                        </>
-                    )}
-    </View>
-    <TouchableOpacity  style={ { alignItems:"center",marginTop:3,elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
-                 <Text style={{ color:'#FFF' }} > testar conexão </Text>
-      </TouchableOpacity>
-    
-    {/** */}
-    <LoadingData isLoading={isLoading} item={item} progress={progress} />
-
-    <LoadingOrders isLoadingOrder={isLoadingOrder}  />
-    {/** */}
-           
-     
-
-          {/***** enviar cadastros  */}
-           <View style={{ marginTop:15, margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:' 98%', alignItems:"center", justifyContent:"center"  }} >
-           <Text> cadastrar/atualizar cadastros </Text>
-            <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ handleSync()}}>
-                 <Text style={{ color:'#FFF' }} > cadastrar/atualizar </Text>
-                </TouchableOpacity>
-
-           </View >
-
-
-      {/***** enviar/receber pedidos */}
-           <View style={{margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:'98%', alignItems:"center", justifyContent:"center"  }} >
-                  <Text>
-                    enviar/receber pedidos a partir de :
-                  </Text>
-                  
-                <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
-                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-                      { dataSelecionada  || formatDate(new Date()) }
-                    </Text>
-                  <Fontisto name="date" size={24} color="black" />
-
-                </TouchableOpacity>
-
-              {
-                showPicker && (
-                  <DateTimePicker
-                    value={date}
-                    display="calendar"
-                    mode="date"
-                    onChange={handleEvent}
-                   // locale="pt-BR"
-                  />
-              )
-              }
+                                )}
+                            </>
+                        )}
+        </View>
+          <TouchableOpacity  style={ { alignItems:"center",marginTop:3,elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
+            <Text style={{ color:'#FFF' }} > testar conexão </Text>
+          </TouchableOpacity>
+      
+          {/** */}
+          <LoadingData isLoading={isLoading} item={item} progress={progress} />
+          <LoadingOrders isLoadingOrder={isLoadingOrder}  />
+          {/** */}
                 
-                <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ syncOrders()}}>
-                 <Text style={{ color:'#FFF' }} > enviar/receber pedidos</Text>
+      
+            {/***** enviar cadastros  */}
+            <View style={{ marginTop:15, margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:' 98%', alignItems:"center", justifyContent:"center"  }} >
+                <Text> cadastrar/atualizar cadastros </Text>
+                  <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ handleSync()}}>
+                    <Text style={{ color:'#FFF' }} > cadastrar/atualizar </Text>
+                  </TouchableOpacity>
+            </View >
+
+          {/***** enviar/receber pedidos */}
+              <View style={{margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:'98%', alignItems:"center", justifyContent:"center"  }} >
+                      <Text>
+                        enviar/receber pedidos a partir de :
+                      </Text>
+                      
+                    <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+                          { dataSelecionada  || formatDate(new Date()) }
+                        </Text>
+                      <Fontisto name="date" size={24} color="black" />
+
+                    </TouchableOpacity>
+
+                  {
+                    showPicker && (
+                      <DateTimePicker
+                        value={date}
+                        display="calendar"
+                        mode="date"
+                        onChange={handleEvent}
+                      // locale="pt-BR"
+                      />
+                  )
+                  }
+                    
+                    <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ syncOrders()}}>
+                    <Text style={{ color:'#FFF' }} > enviar/receber pedidos</Text>
+                    </TouchableOpacity>
+              </View >
+              <TouchableOpacity  style={ { marginTop:50, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
+                  <Text style={{ color:'#FFF' }} > limpar base de dados</Text>
+              </TouchableOpacity>
+      <ScrollView style={styles.contentArea}>
+
+     </ScrollView>
+
+             <View style={styles.footer}>
+                <TouchableOpacity   style={styles.linkButton}
+                    onPress={()=> openUrl("https://www.intersig.com.br/termos-de-uso-app/")}
+                  >
+                    <Text style={styles.linkText} > 
+                        Termos de uso
+                      </Text>
                 </TouchableOpacity>
-           </View >
-           <TouchableOpacity  style={ { marginTop:50, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
-                 <Text style={{ color:'#FFF' }} > limpar base de dados</Text>
+
+                  <TouchableOpacity   style={styles.linkButton}
+                    onPress={()=> openUrl("https://intersig.com.br/politicas-privacidade-app/")} >
+                    <Text style={styles.linkText} > 
+                        Políticas de Privacidade
+                      </Text>
                 </TouchableOpacity>
-              
+              </View>
+  
     </View>
   );
 }
@@ -695,6 +715,23 @@ const styles = StyleSheet.create({
     color:'#FFF',
      width:'100%',
      textAlign:'center'
+  },
+    contentArea: {
+    flex: 1, // Faz a área de conteúdo expandir para preencher o espaço disponível, empurrando o footer para baixo
+    paddingHorizontal: 20,
+    paddingTop: 20, // Adiciona um pouco de espaço no topo do conteúdo
+  },
+    footer: {
+    flexDirection: 'row',  
+    justifyContent: 'space-around',  
+    alignItems: 'center',  
+    paddingVertical: 15,  
+    borderTopColor: '#ccc',
+    backgroundColor: 'white',
+    elevation:3,
+    borderRadius:5,
+    paddingHorizontal:15
+    
   },
   progressBar: {
     height: 10,
@@ -708,5 +745,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)', // Cor de fundo com opacidade
+  },
+    linkButton: {
+    paddingHorizontal: 10, // Espaçamento para o toque ser mais fácil
+  },
+   linkText: {
+    color: 'blue',
+    textDecorationLine: 'underline',
   },
 });

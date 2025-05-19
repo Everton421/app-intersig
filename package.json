@@ -34,6 +34,7 @@
     "date-fns": "^3.6.0",
     "expo": "~51.0.14",
     "expo-camera": "~15.0.14",
+    "expo-checkbox": "^4.1.4",
     "expo-crypto": "~13.0.2",
     "expo-sqlite": "~14.0.6",
     "expo-status-bar": "~1.12.1",

@@ -99,8 +99,10 @@ export const restartDatabaseService = ()=>{
       );
    
        -- Create the orders table 
-    CREATE TABLE IF NOT EXISTS pedidos (
+   CREATE TABLE IF NOT EXISTS pedidos (
       codigo INTEGER PRIMARY KEY ,
+      id TEXT NOT NULL,
+      id_externo  TEXT NOT NULL,
       vendedor INTEGER NOT NULL DEFAULT 0,   
       situacao TEXT NOT NULL DEFAULT 'EA',
       contato TEXT ,
@@ -119,6 +121,7 @@ export const restartDatabaseService = ()=>{
       enviado TEXT NOT NULL DEFAULT 'N',
       tipo INTEGER NOT NULL DEFAULT 1   --1 = Orçamento (gerado no sistema); 2 = Orçamento (gerado fora do sistema); 3 = Ordem de Serviço; 4 = Contrato de Prestação de Serviços; 5 = Devolução
     ); 
+  
   
     -- Create the order items table
     CREATE TABLE IF NOT EXISTS produtos_pedido (

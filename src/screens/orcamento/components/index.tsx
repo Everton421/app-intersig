@@ -44,6 +44,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
     const codigo = parseInt(secret);
     return codigo;
   };
+  
 
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {

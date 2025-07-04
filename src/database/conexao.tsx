@@ -93,6 +93,8 @@ export async function construtor(db: SQLiteDatabase) {
        -- Create the orders table 
     CREATE TABLE IF NOT EXISTS pedidos (
       codigo INTEGER PRIMARY KEY ,
+      id  TEXT NOT NULL,
+      id_externo  TEXT NOT NULL,
       vendedor INTEGER NOT NULL DEFAULT 0,   
       situacao TEXT NOT NULL DEFAULT 'EA',
       contato TEXT ,

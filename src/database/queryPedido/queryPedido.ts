@@ -4,6 +4,7 @@ import { useParcelas } from "../queryParcelas/queryParcelas";
 import { useProducts } from "../queryProdutos/queryProdutos";
 import { useClients } from "../queryClientes/queryCliente";
 import { useServicosPedido } from "./queryServicosPedido";
+import { parcela, pedido, pedidoApi, produto_pedido, servico_pedido } from "./types/types-pedido";
 
 
 export const usePedidos = () =>{
@@ -15,48 +16,7 @@ export const usePedidos = () =>{
   const queryClientes       = useClients();
   const queryServicosPedido =  useServicosPedido();
       
-  type produto_pedido = {
-        codigo:number,
-        desconto:number,
-        quantidade:number,
-        preco:number,
-        total:number 
-    }
-    type parcela = {
-      pedido:number,
-      parcela:number,
-      valor:number,
-      vencimento:string
-    } 
-    type servico_pedido = {
-      codigo:number,
-      desconto:number,
-      quantidade:number,
-      valor:number,
-      total:number 
-  }
-  type pedido ={ 
-    codigo?:number,
-    situacao:string,
-    descontos:number,
-    vendedor:number,
-    forma_pagamento:number,
-    enviado:string,
-    observacoes:string,
-    quantidade_parcelas:number,
-    total_geral:number,
-    total_produtos:number,
-    total_servicos:number,
-    cliente:number ,
-    produtos:produto_pedido[],
-    parcelas:parcela[], 
-    data_cadastro:string,
-    data_recadastro:string,
-    veiculo:number,
-    tipo_os:number,
-    tipo:number,
-    contato:string
-}
+ 
 
 const getCurrentDate = () => {
   const now = new Date();
@@ -67,7 +27,7 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-    async function create( pedido:pedido ){
+    async function create( pedido:pedidoApi ){
 
       let data = getCurrentDate();
       try{
@@ -77,6 +37,8 @@ const getCurrentDate = () => {
             ` INSERT INTO pedidos 
             (
             codigo,
+            id,
+            id_externo,
             situacao,
             contato,
             vendedor,
@@ -96,6 +58,8 @@ const getCurrentDate = () => {
               tipo  
             ) VALUES (
              ${ pedido.codigo}, 
+            '${ pedido.id}', 
+            '${ pedido.id_externo}', 
             '${pedido.situacao}',
             '${ pedido.contato}',
              ${ pedido.vendedor},
@@ -124,7 +88,7 @@ const getCurrentDate = () => {
         
       }
 
-      async function createByCode( pedido:pedido , code:number){
+      async function createByCode( pedido:pedidoApi , code:number){
 
         let data = getCurrentDate();
         try{
@@ -136,6 +100,8 @@ const getCurrentDate = () => {
               ` INSERT INTO pedidos 
               (
               codigo,
+              p.id,
+              p.id_externo,
               situacao,
               contato,
               vendedor,
@@ -155,6 +121,8 @@ const getCurrentDate = () => {
                 tipo  
               ) VALUES (
                ${ code}, 
+               '${pedido.id}',
+               '${pedido.id_externo}',
               '${pedido.situacao}',
               '${ pedido.contato}',
                ${ pedido.vendedor},
@@ -188,6 +156,8 @@ const getCurrentDate = () => {
         let result = await db.getAllAsync(
           `SELECT
           p.codigo,
+              p.id,
+          p.id_externo,
           c.codigo as codigo_cliente,
           p.contato,
           p.quantidade_parcelas,
@@ -219,6 +189,8 @@ const getCurrentDate = () => {
       let result = await db.getAllAsync(
         `SELECT
          codigo,
+             p.id,
+          p.id_externo,
          contato,
          quantidade_parcelas,
          situacao,
@@ -247,6 +219,8 @@ const getCurrentDate = () => {
         try{ 
         let result = await db.getAllAsync(`SELECT 
           p.codigo,
+          p.id,
+          p.id_externo,
           c.nome,
           p.contato,
           c.codigo as codigo_cliente,
@@ -275,6 +249,8 @@ const getCurrentDate = () => {
         try{ 
         let result = await db.getAllAsync(`SELECT 
           p.codigo,
+          p.id,
+          p.id_externo
           c.nome,
           p.contato,
           c.codigo as codigo_cliente,
@@ -305,34 +281,10 @@ const getCurrentDate = () => {
     async function findByTipeAndDate( tipo:number, vendedor:number, data:any ){
       try{ 
 
-//console.log(`SELECT 
-//        p.codigo,
-//        c.nome,
-//        p.contato,
-//        c.codigo as codigo_cliente,
-//        p.situacao,
-//        p.observacoes,
-//        p.descontos,
-//        p.forma_pagamento,
-//        p.enviado,
-//        p.total_geral,
-//        p.total_produtos, 
-//        p.total_servicos,
-//        p.data_cadastro,
-//        p.veiculo,
-//        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
-//        strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
-//        p.vendedor,
-//        p.tipo_os,
-//        p.tipo
-//        FROM pedidos p
-//        JOIN  clientes c on c.codigo = p.cliente
-//        WHERE p.tipo ='${tipo}' AND p.vendedor =  ${vendedor} 
-//        AND p.data_cadastro = '${data}'  `
-//       )
-
       let result = await db.getAllAsync(`SELECT 
         p.codigo,
+        p.id,
+        p.id_externo
         c.nome,
         p.contato,
         c.codigo as codigo_cliente,
@@ -366,6 +318,8 @@ const getCurrentDate = () => {
       try{ 
       let result = await db.getAllAsync(`SELECT 
         p.codigo,
+        p.id,
+        p.id_externo
         c.nome,
         p.contato,
         c.codigo as codigo_cliente,
@@ -525,7 +479,7 @@ const getCurrentDate = () => {
 
     async function deleteOrder( code:number){
       let verifyOrder = await selectByCode(code);
-      if( verifyOrder?.length > 0 ){
+      if( verifyOrder && verifyOrder?.length > 0 ){
         console.log(verifyOrder)
         console.log(`nao existe pedido com o codigo ${code} `)
       }else{
@@ -537,18 +491,18 @@ const getCurrentDate = () => {
           if( result.lastInsertRowId  ){
 
             let items = await  queryItems.selectByCodeOrder(code);
-              if( items.length > 0 ){
+              if( items && items.length > 0 ){
                 await queryItems.deleteByCodeOrder(code);
               }
 
               let parcelas = await queryParcelas.selectByCodeOrder(code);
-              if( parcelas?.length > 0 ){
+              if( parcelas && parcelas?.length > 0 ){
                 await queryParcelas.deleteByCodeOrder(code);
               }
 
               let servicos = await queryServicosPedido.selectByCodeOrder(code);
               
-              if( servicos?.length > 0 ){
+              if( servicos && servicos?.length > 0 ){
                 await queryServicosPedido.deleteByCodeOrder(code);
               }
           }
@@ -681,23 +635,7 @@ const getCurrentDate = () => {
   async function update( pedido:pedido ){
     try{
 
-     // console.log( ` UPDATE   pedidos SET
-     //   situacao  =  '${ pedido.situacao}', 
-     //   contato  =  '${ pedido.contato}', 
-     //   descontos =  ${ pedido.descontos},
-     //   forma_pagamento = ${pedido.forma_pagamento},
-     //   enviado     = '${pedido.enviado}',
-     //   observacoes = '${ pedido.observacoes}', 
-     //   quantidade_parcelas = ${ pedido.quantidade_parcelas},
-     //   total_geral  =  ${ pedido.total_geral},
-     //   total_produtos =  ${ pedido.total_produtos}, 
-     //   cliente  =  ${ pedido.cliente.codigo},
-     //   data_cadastro = '${pedido.data_cadastro}',
-     //   data_recadastro = '${pedido.data_recadastro}',
-     //   veiculo = ${pedido.veiculo},
-     //   tipo_os = ${pedido.tipo_os}
-     //   WHERE codigo = ${ pedido.codigo}  
-     //    ` )
+ 
          
 
       let result = await db.runAsync(

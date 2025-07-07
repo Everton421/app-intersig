@@ -37,9 +37,9 @@ export const ListaItemOrcamento = ( ) => {
         const [localDesconto,setLocalDesconto] = useState(0);
      
         function deleteProduto(value){
-            const novosProdutos = produtos.filter((i) => i.codigo !== value.codigo);
+    //        const novosProdutos = produtos.filter((i) => i.codigo !== value.codigo);
            // console.log(novosProdutos);
-             setProdutos(novosProdutos)
+//             setProdutos(novosProdutos)
 
         }
     
@@ -70,7 +70,6 @@ export const ListaItemOrcamento = ( ) => {
                         <Text style={{ fontWeight: 'bold', maxWidth: 250, fontSize: 15 }} numberOfLines={3} >
                             {item.descricao}
                         </Text>
-                        
                         
      
                     </View>
@@ -122,6 +121,7 @@ export const ListaItemOrcamento = ( ) => {
                 <FlatList
                     data={orcamento.produtos}
                     renderItem={({ item }) => <Item item={item}   />}
+                    keyExtractor={  (item:any) => item.codigo.toString()  }
                 />
             </View>
         </Modal>

@@ -10,6 +10,7 @@ import { Detalhes } from "./detalhes";
 import { AuthContext } from "../../../contexts/auth";
 import { Servico } from "./servico";
 import { configMoment } from "../../../services/moment";
+import { generatorId } from "../../../utils/id-generator";
 
 
 export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
@@ -83,6 +84,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       }
     }
     init();
+    
   }, []);
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
@@ -193,11 +195,20 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         parcelas = orcamento.parcelas;
       }
 
-      let codigoGerado = gerarCodigo();
-      try {
+       let arrlasId = await useQuerypedidos.selectLastId();
+        let lastId = 1
+
+         if( arrlasId && arrlasId[0].codigo  > 0  ) lastId = Number(arrlasId[0].id) + 1; 
+
+        let codigoGerado = gerarCodigo( );
+     let id = generatorId( Number(lastId), usuario.codigo );
+      
+     try {
         let response = await useQuerypedidos.createOrder(
           orcamento,
-          codigoGerado
+          codigoGerado,
+          id, 
+          0
         );
 
         if (response > 0) {

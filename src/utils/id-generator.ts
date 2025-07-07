@@ -14,7 +14,10 @@ export const generatorId = (code: number, codeComplement: number) => {
                   }
                   comp += '0'
             }
-            console.log(comp + code + '-' + codeComplement)
+           // console.log(comp + code + '-' + codeComplement);
+            return comp + code + '-' + codeComplement;
+      }else{
+             return  code + '-' + codeComplement;
       }
 
 }

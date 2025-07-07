@@ -22,6 +22,7 @@ import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosPr
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
 import Feather from '@expo/vector-icons/Feather';
 import { useUsuario } from "../../database/queryUsuario/queryUsuario"
+import { generatorId } from "../../utils/id-generator"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -609,6 +610,10 @@ setMsgApi('')
       Alert.alert(`Não foi possível abrir esta URL: ${url}`);
     }
   };
+  async function testarId(){
+       let lasId = await useQueryPedidos.selectLastId();
+      console.log(lasId);
+  } 
 
   return (
     <View style={{ flex: 1 , backgroundColor:'#EAF4FE', alignItems:"center",   width:'100%' }}>
@@ -635,7 +640,8 @@ setMsgApi('')
           <TouchableOpacity  style={ { alignItems:"center",marginTop:3,elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
             <Text style={{ color:'#FFF' }} > testar conexão </Text>
           </TouchableOpacity>
-      
+
+ 
           {/** */}
           <LoadingData isLoading={isLoading} item={item} progress={progress} />
           <LoadingOrders isLoadingOrder={isLoadingOrder}  />

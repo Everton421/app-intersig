@@ -27,12 +27,10 @@ const getCurrentDate = () => {
   return `${year}-${month}-${day}`;
 };
 
-    async function create( pedido:pedidoApi ){
+    async function create( pedido:pedidoApi, id:string, id_externo:any ){
 
       let data = getCurrentDate();
       try{
-      
- 
         let result = await db.runAsync(
             ` INSERT INTO pedidos 
             (
@@ -58,8 +56,8 @@ const getCurrentDate = () => {
               tipo  
             ) VALUES (
              ${ pedido.codigo}, 
-            '${ pedido.id}', 
-            '${ pedido.id_externo}', 
+            '${id}',
+            '${id_externo}',
             '${pedido.situacao}',
             '${ pedido.contato}',
              ${ pedido.vendedor},
@@ -88,7 +86,7 @@ const getCurrentDate = () => {
         
       }
 
-      async function createByCode( pedido:pedidoApi , code:number){
+      async function createByCode( pedido:pedidoApi , code:number, id:string, id_externo:string){
 
         let data = getCurrentDate();
         try{
@@ -100,8 +98,8 @@ const getCurrentDate = () => {
               ` INSERT INTO pedidos 
               (
               codigo,
-              p.id,
-              p.id_externo,
+              id,
+              id_externo,
               situacao,
               contato,
               vendedor,
@@ -120,9 +118,9 @@ const getCurrentDate = () => {
               tipo_os,
                 tipo  
               ) VALUES (
-               ${ code}, 
-               '${pedido.id}',
-               '${pedido.id_externo}',
+              ${code}, 
+              '${id}',
+              '${id_externo}',
               '${pedido.situacao}',
               '${ pedido.contato}',
                ${ pedido.vendedor},
@@ -250,7 +248,7 @@ const getCurrentDate = () => {
         let result = await db.getAllAsync(`SELECT 
           p.codigo,
           p.id,
-          p.id_externo
+          p.id_externo,
           c.nome,
           p.contato,
           c.codigo as codigo_cliente,
@@ -278,13 +276,77 @@ const getCurrentDate = () => {
           }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${vendedor}  `,e) }
     }
 
+    type queryOrder = { 
+      tipo:number,
+      vendedor:number,
+      data:any,
+      situacao:string
+    }
+    async function newSelect ( query: Partial<queryOrder> ) {
+      try{ 
+
+          let sql = `SELECT 
+        p.codigo,
+        p.id,
+        p.id_externo,
+        c.nome,
+        p.contato,
+        c.codigo as codigo_cliente,
+        p.situacao,
+        p.observacoes,
+        p.descontos,
+        p.forma_pagamento,
+        p.enviado,
+        p.total_geral,
+        p.total_produtos, 
+        p.total_servicos,
+        p.data_cadastro,
+        p.veiculo,
+        strftime('%Y-%m-%d', p.data_cadastro) AS data_cadastro,
+        strftime('%Y-%m-%d %H:%M:%S', p.data_recadastro) AS data_recadastro,
+        p.vendedor,
+        p.tipo_os,
+        p.tipo
+        FROM pedidos p
+        JOIN  clientes c on c.codigo = p.cliente
+          `;
+
+          let conditions = []
+          let values = []
+          if(query.tipo){
+              conditions.push( ' p.tipo = ? ' );
+            values.push( query.tipo );
+          }
+          if( query.vendedor ){
+             conditions.push( ' p.vendedor = ? ' );
+             values.push( query.vendedor );
+          }
+       if( query.data ){
+             conditions.push( ' p.data_cadastro >= ? ' );
+             values.push( query.data );
+          }
+       if (query.situacao !== '*'){
+            conditions.push( ' p.situacao = ? ' );
+             values.push( query.situacao );
+          }
+          let finalSql = sql + ' WHERE '+ conditions.join(' AND ') ;
+
+
+        let result = await db.getAllAsync(finalSql,values );
+          
+       
+       return result;
+        }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${query.vendedor}  `,e) }
+  }
+
+
     async function findByTipeAndDate( tipo:number, vendedor:number, data:any ){
       try{ 
 
       let result = await db.getAllAsync(`SELECT 
         p.codigo,
         p.id,
-        p.id_externo
+        p.id_externo,
         c.nome,
         p.contato,
         c.codigo as codigo_cliente,
@@ -319,7 +381,7 @@ const getCurrentDate = () => {
       let result = await db.getAllAsync(`SELECT 
         p.codigo,
         p.id,
-        p.id_externo
+        p.id_externo,
         c.nome,
         p.contato,
         c.codigo as codigo_cliente,
@@ -393,15 +455,21 @@ const getCurrentDate = () => {
 
         }
 
-  async function selectLastId(){
+  async function selectLastId():Promise< [ { id:number } | any ] | unknown[] | undefined >{
+    try{ 
+      let result = await db.getAllAsync(`SELECT MAX(p.id) as id FROM pedidos p  `);
+        return result;
+        }catch(e){ console.log(' erro ao consultar os pedidos! ',e) }
+   }
+
+  async function selectLastCode():Promise< [ { codigo:number } | any ] | unknown[] | undefined >{
     try{ 
       let result = await db.getAllAsync(`SELECT MAX(p.codigo) as codigo FROM pedidos p  `);
         return result;
         }catch(e){ console.log(' erro ao consultar os pedidos! ',e) }
    }
 
-
-   async function createOrderByCode( order:pedido, code:number ){
+   async function createOrderByCode( order:pedidoApi, code:number , id:string, id_externo:string ){
 
     if(   !order.parcelas.length   ||  order.parcelas.length < 0 ){
       console.log(`nao foi informado os parcelas`)
@@ -410,7 +478,7 @@ const getCurrentDate = () => {
     let produtos:any = order.produtos;
     let parcelas: parcela[] = order.parcelas;
     let servicos: any = order.servicos;
-       let codeOrder:any = await createByCode( order, code );
+       let codeOrder:any = await createByCode( order, code, id, id_externo);
 
                    if( codeOrder > 0 || codeOrder !== undefined  ){
        
@@ -440,7 +508,7 @@ const getCurrentDate = () => {
 }
 
 
-    async function createOrder( order:pedido , code:number){
+    async function createOrder( order:pedidoApi , code:number, id:string , id_externo:number ){
           if(   !order.parcelas.length   ||  order.parcelas.length < 0 ){
             console.log(`nao foi informado os parcelas`)
             return;  
@@ -448,7 +516,7 @@ const getCurrentDate = () => {
           let produtos:any = order.produtos;
           let parcelas: parcela[] = order.parcelas;
           let servicos: any = order.servicos;
-             let codeOrder:any = await createByCode(order ,code );
+             let codeOrder:any = await createByCode(order ,code , id, id_externo);
 
                          if( codeOrder > 0 || codeOrder !== undefined  ){
              
@@ -526,7 +594,7 @@ const getCurrentDate = () => {
 ///
 /// efetua update no pedido caso exista
 /// caso nao exista efetua o cadastro do pedido
-   async function updateOrder(order, codigoOrcamento ){
+   async function updateOrder(order:any, codigoOrcamento:any ){
        
     if( !order.codigo ){
       console.log('é necessario informar um orcamento com um codigo valido')
@@ -561,7 +629,7 @@ const getCurrentDate = () => {
                       let verifyProductsPedido:any = await  queryItems.selectByCodeOrder(codigoOrcamento);
                     
                       if( verifyProductsPedido?.length > 0 ){
-                         const produtosParaExcluir = verifyProductsPedido.filter(prodBd => !order.produtos.some( p => p.codigo === prodBd.codigo));
+                         const produtosParaExcluir = verifyProductsPedido.filter((prodBd:any) => !order.produtos.some( (p:any) => p.codigo === prodBd.codigo));
                          for (const produto of produtosParaExcluir) {
                            await queryItems.deleteProductByCodeOrder(produto.codigo, codigoOrcamento);
                          }
@@ -570,7 +638,7 @@ const getCurrentDate = () => {
                     } 
 
                     for( const p of order.produtos ){
-                      let aux = await queryItems.selectProductByCodeOrder( p.codigo , codigoOrcamento );
+                      let aux:any = await queryItems.selectProductByCodeOrder( p.codigo , codigoOrcamento );
                       console.log('')
                       console.log('produto ', p.codigo,' encontrado', aux)
 
@@ -600,7 +668,7 @@ const getCurrentDate = () => {
                             let verifyServicesPedido:any = await   queryServicosPedido.selectByCodeOrder(codigoOrcamento);
                           
                             if( verifyServicesPedido?.length > 0 ){
-                              const servicosParaExcluir = verifyServicesPedido.filter(servicoBd => !order.servicos.some(servico => servico.codigo === servicoBd.codigo));
+                              const servicosParaExcluir = verifyServicesPedido.filter((servicoBd:any) => !order.servicos.some((servico:any) => servico.codigo === servicoBd.codigo));
                               for (const servico of servicosParaExcluir) {
                                 await queryServicosPedido.deleteServiceByCodeOrder(servico.codigo, codigoOrcamento);
                               }
@@ -610,7 +678,7 @@ const getCurrentDate = () => {
 
                           for( const s of order.servicos ){
                             let aux = await queryServicosPedido.selectServiceByCodeOrder( s.codigo , codigoOrcamento   );
-                            if( aux?.length > 0    ){
+                            if( aux && aux?.length > 0    ){
                                 await queryServicosPedido.update(s, codigoOrcamento)
                             }else{
                                 await queryServicosPedido.create(s, codigoOrcamento );
@@ -621,7 +689,7 @@ const getCurrentDate = () => {
  
                       if( order.parcelas.length > 0 ){
                              await queryParcelas.deleteByCodeOrder( order.codigo );
-                        order.parcelas.forEach( async (pa)=>{
+                        order.parcelas.forEach( async (pa:any)=>{
                           await queryParcelas.create( pa, order.codigo);
                         })
                       }
@@ -632,7 +700,7 @@ const getCurrentDate = () => {
     
   } 
 
-  async function update( pedido:pedido ){
+  async function update( pedido:pedidoApi ){
     try{
 
  
@@ -685,7 +753,7 @@ const getCurrentDate = () => {
     }
   
 
-    async function updateByCode( pedido:pedido, code:number ){
+    async function updateByCode( pedido:pedidoApi, code:number ){
       try{
   
         let result = await db.runAsync(
@@ -758,6 +826,6 @@ const getCurrentDate = () => {
 
 
     return {
-      update,createOrderByCode,findByTipeAndDate,updateSentOrderByCode, findByTipeAndClient, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
+      update, selectLastCode, newSelect,createOrderByCode,findByTipeAndDate,updateSentOrderByCode, findByTipeAndClient, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
 
 }

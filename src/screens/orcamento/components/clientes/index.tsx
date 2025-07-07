@@ -206,7 +206,7 @@ function seleciona(item){
                 <FlatList
                   data={data}
                   renderItem={renderItem}
-                  keyExtractor={(item) => item.codigo}
+                  keyExtractor={(item) => item.codigo.toString()}
                 />
            </View>
 

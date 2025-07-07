@@ -1,21 +1,18 @@
 import { useContext, useEffect, useState } from "react";
 import { Modal, Text, View, TouchableOpacity, FlatList } from "react-native";
 import { ProdutosContext } from "../../../../contexts/produtosDoOrcamento";  
-import { ScrollView } from "react-native-gesture-handler";
-import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { format, addDays, setDate } from 'date-fns';
+import { format, addDays  } from 'date-fns';
 import { OrcamentoContext } from "../../../../contexts/orcamentoContext";
 import { ConnectedContext } from "../../../../contexts/conectedContext";
 import { useFormasDePagamentos } from "../../../../database/queryFormasPagamento/queryFormasPagamento";
-import Feather from '@expo/vector-icons/Feather';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useParcelas } from "../../../../database/queryParcelas/queryParcelas";
 import { usePedidos } from "../../../../database/queryPedido/queryPedido";
 
-export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} ) => {
+export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
     const [visible, setVisible] = useState(false);
     const [total, setTotal] = useState<number>(0);
@@ -29,7 +26,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} ) => {
     const [date, setDate] = useState(new Date());
 
 
-    const { produtos } = useContext(ProdutosContext);
+    const { produtos }:any = useContext(ProdutosContext);
 
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
     const { connected } = useContext(ConnectedContext);

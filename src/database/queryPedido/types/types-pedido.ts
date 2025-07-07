@@ -16,6 +16,7 @@
     cliente: { codigo:number} ,
     produtos:produto_pedido[],
     parcelas:parcela[], 
+    servicos: servico_pedido[],
     data_cadastro:string,
     data_recadastro:string,
     veiculo:number,

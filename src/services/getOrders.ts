@@ -142,7 +142,7 @@ export const receberPedidos = ()=>{
                         console.log(i)
                         console.log('')
 
-                           await useQuerypedidos.createOrderByCode(i , codigo_pedido );
+                           await useQuerypedidos.createOrderByCode(i , codigo_pedido,  i.id, '0');
                            
                        }
     

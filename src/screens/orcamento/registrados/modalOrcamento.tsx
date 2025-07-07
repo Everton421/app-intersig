@@ -89,18 +89,25 @@ export const ModalOrcamento = ({visible , orcamento, setVisible} )=>{
         <Modal transparent={true}  visible={ visible }>
         <View style={{ flex:1, backgroundColor:'rgba( 50 , 50, 50 , 0.5)', alignItems:'center', justifyContent:"center", width:'100%' }}>
               <View style={{ backgroundColor:'#FFF', width:'97%', height:'97%', borderRadius:10}}>
-                 <View style={{ padding:5 , justifyContent:"space-between", flexDirection:"row"  }} >
-                 <TouchableOpacity  onPress={() => {  setVisible(false)  }} 
-                      style={{  margin: 15, backgroundColor: "#185FED",  padding: 7, borderRadius: 7, width: "20%",  elevation: 5,   }}  >
+                  <View style={{ padding:5 , justifyContent:"space-between", flexDirection:"row"  }} >
+                     <TouchableOpacity  onPress={() => {  setVisible(false)  }} 
+                       style={{  margin: 15, backgroundColor: "#185FED",  padding: 7, borderRadius: 7, width: "20%",  elevation: 5,   }}  >
                                     <Text style={{ color: "#FFF", fontWeight: "bold" }}>voltar</Text>
-                 </TouchableOpacity>
-                    <Text>  
-                        { orcamento?.tipo === 1 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}> Orçamento: {orcamento?.codigo} </Text> ) : 
-                        orcamento?.tipo === 3 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}>  OS: {orcamento?.codigo} </Text> ) : null
-                        }
-                    </Text>
+                     </TouchableOpacity>
+                         <View>   
+                          <Text>    
+                             { orcamento?.tipo === 1 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}> Orçamento: {orcamento?.id} </Text> ) : 
+                               orcamento?.tipo === 3 ? ( <Text style={{ fontSize:15, fontWeight:"bold"}}>  OS: {orcamento?.id} </Text> ) : null
+                             }
+                           </Text>
+                           <Text style={{ fontSize:15, fontWeight:"bold"}}> Id externo: { orcamento?.id_externo ? orcamento?.id_externo : 0 } </Text>
+                         </View>
+
                   </View>
+
+
               <View style={{ padding:5 }}>   
+
                      <Text style={{ fontSize:15, fontWeight:"bold"}}>
                            Data Cadastro: {orcamento?.data_cadastro}
                      </Text>      

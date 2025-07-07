@@ -1,93 +1,64 @@
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert, Button, TouchableOpacity} from "react-native"
+import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert,  TouchableOpacity} from "react-native"
 import Feather from '@expo/vector-icons/Feather';
-import { FontAwesome5 } from "@expo/vector-icons";
 import { OrcamentoContext } from "../../../contexts/orcamentoContext";
-import { ConnectedContext } from "../../../contexts/conectedContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
 import { AuthContext } from "../../../contexts/auth";
 import { configMoment } from "../../../services/moment";
- 
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalOrcamento } from "./modalOrcamento";
 import { enviaPedidos } from "../../../services/sendOrders";
-
+import { ModalFilter } from "./modal-filter";
+                
+   
 
 export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
-
-    const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
-
-    const { connected ,setConnected } = useContext ( ConnectedContext )
-    const { usuario } = useContext(AuthContext);
-
-    const useQuerypedidos = usePedidos();
+  const useQuerypedidos = usePedidos();
     const useMoment = configMoment();
-    const useEnvioPedidos = enviaPedidos();
 
+    const useEnvioPedidos = enviaPedidos();
+    const {    setOrcamento } = useContext(OrcamentoContext);
+
+    const { usuario }:any = useContext(AuthContext);
+
+         const [date, setDate] = useState(new Date() );
+
+  
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
-        const [ visible, setVisible ] = useState<boolean>(false);
         const [ visibleModal, setVisibleModal ] = useState<boolean>(false);
         const [ selecionado, setSelecionado ] = useState();
-        const [ dados , setDados ] = useState();
         const [ pesquisa, setPesquisa ] =  useState('*');
-        const [showPicker, setShowPicker] = useState(false);
+        const [ visible, setVisible ] = useState(false);
 
-        const [showPesquisa, setShowPesquisa] = useState(false);
-
-        const [date , setDate ] = useState( new Date() );
         const [data_cadastro , setData_cadastro] = useState( useMoment.dataAtual())
         const [ orcamentoModal,setOrcamentoModal] = useState();
-
-       
+        
+        const [ statusPedido, setStatusPedido ] = useState<  string >('EA');
+        
         async function busca(){
                 if ( !usuario.codigo || usuario.codigo === 0 ){
                     console.log("usuario invalido!")
                     return
                 }
-                //let aux:any = await useQuerypedidos.findByTipeAndDate(tipo , usuario.codigo, data_cadastro );
-                let aux:any = await useQuerypedidos.findByTipe(tipo , usuario.codigo  );
+                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:data_cadastro ,situacao:statusPedido }
+            console.log("Consultando...", queryOrder)
 
-                if(  aux?.length > 0 ){
-                    console.log(aux)
-                    setOrcamentosRegistrados(aux);
-                }  
+             let aux:any = await useQuerypedidos.newSelect( queryOrder );
+                     setOrcamentosRegistrados(aux);
             }
-
-        async function busca2(){
-            if ( !usuario.codigo || usuario.codigo === 0 ){
-                console.log("usuario invalido!")
-                return
-            }
-            let aux:any = await useQuerypedidos.findByTipeAndClient(tipo , usuario.codigo, pesquisa );
-            if(  aux?.length > 0 ){
-                setOrcamentosRegistrados(aux);
-            }  
-        }
-
-
-    /////////////////////////////////////////////////
-    //    useEffect(()=>{
-    //     busca()
-    //    },[ tipo  ])
-    ///////////////////////////////////////////////////
-
-     useFocusEffect(
-             useCallback(() => {
-                 busca()
-             },[ ]
-             )
-         )
+ 
+   
     /////////////////////////////////////////////////
         useEffect(()=>{
             busca()
-           },[ data_cadastro, navigation])
+           },[ data_cadastro, navigation,statusPedido ])
     /////////////////////////////////////////////////
         useEffect(()=>{
              console.log(pesquisa)
-            busca2()
+         //   busca2()
         },[ pesquisa, navigation ]  )
     /////////////////////////////////////////////////
     useEffect(()=>{
@@ -102,14 +73,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     },[selecionado])
     /////////////////////////////////////////////////
     
-    // função responsavel por enviar o pedido
-    async function sincPedido(item:any){
-      await  useEnvioPedidos.postPedido(item.codigo)
-    }
-
-
-
- 
+  
     async function deleteOrder (item:any){
         Alert.alert('', `Deseja excluir o orcamento : ${item.codigo} ?`,[
             { text:'Não',
@@ -136,7 +100,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
         setOrcamentoModal( aux );
 
         setVisibleModal( true )
-        console.log(aux)
+       // console.log(aux)
     }
 
     function selecionaOrcamento(item){
@@ -196,10 +160,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
             </Modal>
 
                         <View style={{ flexDirection:'row', justifyContent:'space-between', }}>
-                           { /* <Text style={{fontWeight:"bold", color:'white'}}>
-                                orçamento :{ item?.codigo}  
-                            </Text>
-                            */}
+                       
                             <Text style={{fontWeight:"bold", color:'white', margin:3 ,width:'90%' }}>
                                    Total R$: {item?.total_geral.toFixed(2)}
                             </Text>
@@ -251,17 +212,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
         )
     }
 
-    const handleEvent = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        const dia = String(currentDate.getDate()).padStart(2,'0');
-        const mes = String( currentDate.getMonth()).padStart(2,'0');
-        const ano = currentDate.getFullYear();
-        const data = `${ano}-${mes}-${dia}`;
 
-        setShowPicker(false);
-        setData_cadastro(data)
-    };
-    
     
     return (
         <View style={{ flex:1, backgroundColor:'#EAF4FE', width:'100%'}} >
@@ -280,9 +231,11 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                     /> 
           
 
-                    <TouchableOpacity  onPress={()=> setShowPesquisa(true)}>
+                    <TouchableOpacity  onPress={()=> setVisible(true )}>
                             <AntDesign name="filter" size={35} color="#FFF" />
                         </TouchableOpacity>
+                        <ModalFilter visible={visible} setVisible={ setVisible} setStatus={setStatusPedido}  setDate={setData_cadastro} />
+                   
                     </View>
             </View>
      
@@ -291,6 +244,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                         <FlatList
                         data={orcamentosRegistrados}
                         renderItem={({item})=> <ItemOrcamento item={item}/>}
+                        keyExtractor={ (item:any)=> item.codigo.toString()}
                         contentContainerStyle={{ paddingBottom: 100 }} 
                         />
 

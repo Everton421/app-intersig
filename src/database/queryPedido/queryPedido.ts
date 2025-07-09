@@ -187,8 +187,8 @@ const getCurrentDate = () => {
       let result = await db.getAllAsync(
         `SELECT
          codigo,
-             p.id,
-          p.id_externo,
+           id,
+          id_externo,
          contato,
          quantidade_parcelas,
          situacao,
@@ -281,6 +281,7 @@ const getCurrentDate = () => {
       vendedor:number,
       data:any,
       situacao:string
+      cliente:string
     }
     async function newSelect ( query: Partial<queryOrder> ) {
       try{ 
@@ -325,15 +326,21 @@ const getCurrentDate = () => {
              conditions.push( ' p.data_cadastro >= ? ' );
              values.push( query.data );
           }
+
+          if( query.cliente){
+            conditions.push(' c.nome like ? ')
+             values.push( `%${query.cliente}%` );
+          }
+
        if (query.situacao !== '*'){
             conditions.push( ' p.situacao = ? ' );
              values.push( query.situacao );
           }
-          let finalSql = sql + ' WHERE '+ conditions.join(' AND ') ;
-
+          let finalSql = sql + ' WHERE '+ conditions.join(' AND ') + ' ORDER BY p.data_cadastro' ;
+          //console.log(finalSql)
+          //console.log(values)
 
         let result = await db.getAllAsync(finalSql,values );
-          
        
        return result;
         }catch(e){ console.log(` erro ao consultar os pedidos  do vendedor : ${query.vendedor}  `,e) }
@@ -759,6 +766,7 @@ const getCurrentDate = () => {
         let result = await db.runAsync(
             ` UPDATE   pedidos SET
             situacao  =  '${pedido.situacao}', 
+            id_externo = '${pedido.id_externo}',
             contato  =  '${pedido.contato}', 
             descontos =  ${pedido.descontos},
             forma_pagamento = ${pedido.forma_pagamento},
@@ -803,7 +811,101 @@ const getCurrentDate = () => {
         }
       }
 
-      
+        type newUpdateQuery  ={
+        situacao:string
+        contato:string
+        descontos:number
+        forma_pagamento:number
+        enviado:string
+        observacoes:string
+        quantidade_parcelas:number
+        total_geral:number
+        total_produtos:number
+        cliente:{ codigo:number}
+        data_cadastro:string
+        data_recadastro:string
+        veiculo:number
+        tipo_os:number
+        }
+        async function newUpdate( query:Partial<newUpdateQuery>, code:number ){
+        try{
+
+                let params =[]
+                let values =[]
+            let sql =  ` UPDATE   pedidos SET `;
+
+                if(query.situacao){
+                  params.push(' situacao = ? ');
+                  values.push(  query.situacao )
+                 }
+                 if(query.contato){
+                  params.push(' contato = ? ');
+                  values.push( query.contato )
+                 }
+                 if(query.descontos){
+                  params.push(' descontos = ? ');
+                  values.push(  query.descontos )
+                 }
+                 if(query.forma_pagamento){
+                  params.push(' forma_pagamento = ? ');
+                  values.push( query.forma_pagamento )
+                 }
+                 if(query.enviado){
+                  params.push(' enviado = ? ');
+                  values.push(  query.enviado )
+                 }
+                 if(query.observacoes){
+                  params.push(' observacoes = ? ');
+                  values.push( query.observacoes )
+                 }
+                 if(query.quantidade_parcelas){
+                  params.push(' quantidade_parcelas = ? ');
+                  values.push( query.quantidade_parcelas )
+                 }
+                 if(query.total_geral){
+                  params.push(' total_geral = ? ');
+                  values.push( query.total_geral )
+                 }
+                 if(query.total_produtos){
+                  params.push(' total_produtos = ? ');
+                  values.push( query.total_produtos )
+                 }
+                 if(query.cliente){
+                  params.push(' cliente = ? ');
+                  values.push( query.cliente )
+                 }
+                 if(query.data_cadastro){
+                  params.push(' data_cadastro = ? ');
+                  values.push( query.data_cadastro )
+                 }
+                 if(query.data_recadastro){
+                  params.push(' data_recadastro = ? ');
+                  values.push(  query.data_recadastro  )
+                 }
+                 if(query.veiculo){
+                  params.push(' veiculo = ? ');
+                  values.push( query.veiculo )
+                 }
+                 if(query.tipo_os){
+                  params.push(' tipo_os = ? ');
+                  values.push(  query.tipo_os  )
+                 }
+                 let whereclauase = ' WHERE codigo = ? '
+                  values.push( code  )
+
+                 let finalSql = sql + params.join(' , ') + whereclauase;
+
+                 console.log(finalSql)
+          //let result = await db.runAsync( finalSql, values);
+  
+        //console.log(' Atualizado a situação orcamento codigo : ' ,code );
+        //return result ;
+          }catch( e ){ 
+            console.log(` ocorreu um erro ao atualiza o orcamento `, e)
+    
+          }
+        }
+  
       async function updateSentOrderByCode( enviado:String, code:number ){
         try{
 
@@ -826,6 +928,6 @@ const getCurrentDate = () => {
 
 
     return {
-      update, selectLastCode, newSelect,createOrderByCode,findByTipeAndDate,updateSentOrderByCode, findByTipeAndClient, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
+      update, newUpdate, selectLastCode, newSelect,createOrderByCode,findByTipeAndDate,updateSentOrderByCode, findByTipeAndClient, updateByCode, selectLastId , findByTipe, deleteAllOrder, updateOrder , create , selectAll,selectByCode , createOrder, selectCompleteOrderByCode , deleteOrder}
 
 }

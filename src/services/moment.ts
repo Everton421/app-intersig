@@ -39,6 +39,11 @@ export const configMoment = ()=>{
         return aux;
     }
 
+      function primeiroDiaMes() {
+        // Obtém a data atual e calcula o início do mês a cada chamada
+        const data = moment.tz("America/Sao_Paulo").startOf('month').format("YYYY-MM-DD");
+        return data;
+    }
 
-    return { dataAtual, generatorDate, dataHoraAtual, formatarData, formatarDataHora }
+    return { primeiroDiaMes,dataAtual, generatorDate, dataHoraAtual, formatarData, formatarDataHora }
 }

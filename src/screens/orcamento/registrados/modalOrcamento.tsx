@@ -111,6 +111,7 @@ export const ModalOrcamento = ({visible , orcamento, setVisible} )=>{
                      <Text style={{ fontSize:15, fontWeight:"bold"}}>
                            Data Cadastro: {orcamento?.data_cadastro}
                      </Text>      
+                     
                     <Text style={{  fontWeight:"bold"}} >
                         cliente: {orcamento?.cliente.codigo}
                     </Text>

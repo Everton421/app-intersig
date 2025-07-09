@@ -6,11 +6,11 @@ import useApi from "../../services/api";
 import Feather from '@expo/vector-icons/Feather';
 import { OrcamentosRegistrados } from "../orcamento/registrados";
 
-export const Vendas = ({navigation})=>{
+export const Vendas = ({navigation, route})=>{
 
 return (
     <View  style={{flex:1}} >
-      <OrcamentosRegistrados tipo={1}  navigation={navigation} to={'novoOrcamento'}/>
+      <OrcamentosRegistrados tipo={1}  navigation={navigation} to={'novoOrcamento'} route={route} />
     </View >
 )
 

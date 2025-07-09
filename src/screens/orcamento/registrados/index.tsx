@@ -15,37 +15,34 @@ import { ModalFilter } from "./modal-filter";
                 
    
 
-export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
-  const useQuerypedidos = usePedidos();
-    const useMoment = configMoment();
+export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
+        
+    const useQuerypedidos = usePedidos();
+        const useMoment = configMoment();
+        const {    setOrcamento } = useContext(OrcamentoContext);
+        const { usuario }:any = useContext(AuthContext);
 
-    const useEnvioPedidos = enviaPedidos();
-    const {    setOrcamento } = useContext(OrcamentoContext);
+        
 
-    const { usuario }:any = useContext(AuthContext);
-
-         const [date, setDate] = useState(new Date() );
-
-  
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visibleModal, setVisibleModal ] = useState<boolean>(false);
         const [ selecionado, setSelecionado ] = useState();
-        const [ pesquisa, setPesquisa ] =  useState('*');
+        const [ pesquisa, setPesquisa ] =  useState(null);
         const [ visible, setVisible ] = useState(false);
 
-        const [data_cadastro , setData_cadastro] = useState( useMoment.dataAtual())
+        const [data_cadastro , setData_cadastro] = useState( useMoment.primeiroDiaMes())
         const [ orcamentoModal,setOrcamentoModal] = useState();
         
-        const [ statusPedido, setStatusPedido ] = useState<  string >('EA');
+        const [ statusPedido, setStatusPedido ] = useState<  string >('*');
         
         async function busca(){
                 if ( !usuario.codigo || usuario.codigo === 0 ){
                     console.log("usuario invalido!")
                     return
                 }
-                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:data_cadastro ,situacao:statusPedido }
-            console.log("Consultando...", queryOrder)
-
+                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:data_cadastro ,situacao:statusPedido     }
+                if( pesquisa !== null &&  pesquisa !== '' ) queryOrder.cliente = pesquisa
+          console.log("Consultando...", queryOrder)
              let aux:any = await useQuerypedidos.newSelect( queryOrder );
                      setOrcamentosRegistrados(aux);
             }
@@ -54,13 +51,15 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     /////////////////////////////////////////////////
         useEffect(()=>{
             busca()
-           },[ data_cadastro, navigation,statusPedido ])
+           },[ data_cadastro,   statusPedido , pesquisa])
     /////////////////////////////////////////////////
-        useEffect(()=>{
-             console.log(pesquisa)
-         //   busca2()
-        },[ pesquisa, navigation ]  )
-    /////////////////////////////////////////////////
+    
+           useFocusEffect(
+            useCallback(() => {
+                busca();
+            }, [ navigation])  
+    );
+
     useEffect(()=>{
         async function busca(){
             if( selecionado !== undefined ){
@@ -69,7 +68,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
             }else { return }  
 
         }
-    busca()
+     busca()
     },[selecionado])
     /////////////////////////////////////////////////
     
@@ -97,16 +96,14 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
 
     async function selecionaOrcamentoModal( item ){
         let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
+        console.log(aux.data_recadastro)
         setOrcamentoModal( aux );
-
         setVisibleModal( true )
-       // console.log(aux)
     }
 
     function selecionaOrcamento(item){
-
           setSelecionado(item);
-         setVisible(true);
+         //setVisible(true);
          navigation.navigate('editarOrcamento',{
             codigo_orcamento: item.codigo,
             tipo: item.tipo
@@ -144,12 +141,19 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     const ItemOrcamento = ({item})=>{
         return(
                 <View style={ [ stiloItem(item),{    margin:20 , borderRadius:15, elevation:9, padding:10 } ]}>
-                        
-                <TouchableOpacity style={{   backgroundColor: '#FFF', padding: 4, borderRadius: 5, width: '12%', elevation: 5, alignItems:"center" }} 
-                    onPress={ ()=> selecionaOrcamentoModal(item)}>
-                        <Feather name="eye" size={24} color="#009de2" />
-                </TouchableOpacity>
-  
+                   <View style={{ flexDirection:"row", justifyContent:"space-between" }} >         
+                         <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
+                             onPress={ ()=> selecionaOrcamentoModal(item)}>
+                                 <Feather name="eye" size={24} color="#009de2" />
+                         </TouchableOpacity>
+                       <View style={{   }} >
+                             { item.id && item.id !== '0' && <Text style={{ fontWeight:'bold', color:'#FFF'}}> id:  {item.id}</Text>
+                             }
+                             {
+                                 item.id_externo && item.id_externo !== '0' && <Text style={{ fontWeight:'bold', color:'#FFF'}}> id externo:  {item.id_externo}</Text>
+                             }
+                       </View>
+                    </View>
             <Modal visible={false }>
             <TouchableOpacity onPress={() => {setVisible(false)  }}
                 style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
@@ -158,29 +162,25 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                 </Text>
               </TouchableOpacity>
             </Modal>
-
                         <View style={{ flexDirection:'row', justifyContent:'space-between', }}>
                        
                             <Text style={{fontWeight:"bold", color:'white', margin:3 ,width:'90%' }}>
                                    Total R$: {item?.total_geral.toFixed(2)}
                             </Text>
-                            
-                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI'  ? 
-                            <TouchableOpacity 
-                            onPress={()=>  deleteOrder(item)  }
-                            >
-                                <AntDesign name="closecircle" size={24} color="red" />
-                            </TouchableOpacity>
-                    : null
-                    }
+                                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI'  ? 
+                                            <TouchableOpacity 
+                                            onPress={()=>  deleteOrder(item)  }
+                                            >
+                                                <AntDesign name="closecircle" size={24} color="red" />
+                                            </TouchableOpacity>
+                                    : null
+                                    }
                         </View>
 
                         <Text style={{ margin:3 ,fontWeight:"bold", color:'white', fontSize:20 }}>
                             {item?.nome}
                         </Text>
                         
-                        
-                
                 { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
                       <TouchableOpacity onPress={( )=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
                               <Feather name="edit" size={24} color="#009de2" />
@@ -191,22 +191,13 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
                           Data Cadastro: {item?.data_cadastro} 
                       </Text>
 
-                  <View style={{ flexDirection:"row", justifyContent:"space-between"}}>
-                      
-                      
+                     <View style={{ flexDirection:"row", justifyContent:"space-between"}}>
                         {
                             item.enviado === 'S'?
                             <Ionicons name="checkmark-done" size={24} color="#73FBFD" />
                             :
                             <Ionicons name="checkmark" size={24} color="#75F94D" />
                         }
-
-                     {/*   <TouchableOpacity 
-                            onPress={ ()=> sincPedido(item)}
-                           style={{  borderRadius:5, elevation:5,alignItems:"center", justifyContent:"center",backgroundColor:'white' ,width:35, padding:5}} >
-                          <FontAwesome5 name="sync-alt" size={20} color="#009de2" />
-                        </TouchableOpacity>
-                      */}
                       </View>
                </View>
         )
@@ -216,28 +207,23 @@ export const OrcamentosRegistrados = ({navigation, tipo, to }:any)=>{
     
     return (
         <View style={{ flex:1, backgroundColor:'#EAF4FE', width:'100%'}} >
-            <View style={{  padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-                <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                    <Ionicons name="arrow-back" size={25} color="#FFF" />
-                </TouchableOpacity>
-            
-                  
-                <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
+              <View style={{  padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
+                 <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
+                     <Ionicons name="arrow-back" size={25} color="#FFF" />
+                 </TouchableOpacity>
+                 <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
                     < TextInput 
                         style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
                         onChangeText={(value)=>setPesquisa(value)}
                         placeholder="pesquisar"
-  
                     /> 
-          
-
-                    <TouchableOpacity  onPress={()=> setVisible(true )}>
+                      <TouchableOpacity  onPress={()=> setVisible(true )} style={{  padding:2}}>
                             <AntDesign name="filter" size={35} color="#FFF" />
                         </TouchableOpacity>
+                </View>
+            </View>  
+
                         <ModalFilter visible={visible} setVisible={ setVisible} setStatus={setStatusPedido}  setDate={setData_cadastro} />
-                   
-                    </View>
-            </View>
      
                 <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
         {/******************************************* */}

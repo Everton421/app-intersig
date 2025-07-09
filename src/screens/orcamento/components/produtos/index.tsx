@@ -219,7 +219,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
       <TouchableOpacity
         style={[
           styles.item,
-          { backgroundColor: isSelected ? "#009de2" : "#FFF" },
+          { backgroundColor: isSelected ? "#185FED" : "#FFF" },
         ]}
         onPress={() => toggleSelection(item)}
       >
@@ -351,20 +351,20 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
       <TouchableOpacity
         onPress={() => setVisibleProdutos(true)}
-        style={{    margin: 5,   elevation: 4,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#009de2",  padding: 10,   borderRadius: 5,  width: "98%",
+        style={{    margin: 5,   elevation: 4,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#185FED",  padding: 10,   borderRadius: 7,  width: "98%",
         }}   >
         <FontAwesome name="search" size={22} color="#FFF" />
         <Text
           style={{
             color: "white",
             fontWeight: "bold",
-            fontSize: 16,
+            fontSize: 20,
             width: 80,
           }}
         >
           produtos
         </Text>
-        <AntDesign name="caretdown" size={24} color="white" />
+        <AntDesign name="caretdown" size={22} color="white" />
       </TouchableOpacity>
 
       <View>
@@ -379,7 +379,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
             <View style={styles.searchContainer}>
                 <TouchableOpacity
                   onPress={() => {  setVisibleProdutos(false);   }}
-                  style={{    margin: 15,  backgroundColor: "#009de2",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
+                  style={{    margin: 15,  backgroundColor: "#185FED",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
                 >
                   <Text style={{ color: "#FFF", fontWeight: "bold" }}>
                     voltar
@@ -391,7 +391,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
                   <TextInput
                     style={{
                       backgroundColor: "#FFF",
-                      fontWeight: "bold",
+                     
                       borderRadius: 4,
                       width: "70%",
                       marginTop: 3,
@@ -401,7 +401,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
                     placeholder="Pesquisar"
                     // value={pesquisa}
                     onChangeText={adiciona}
-                    placeholderTextColor="#009de2"
+                    placeholderTextColor="#185FED"
                   />
                   <TouchableOpacity onPress={limpar}>
                     <View style={styles.limpar}>

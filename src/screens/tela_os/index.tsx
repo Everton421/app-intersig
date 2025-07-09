@@ -6,11 +6,11 @@ import { Orcamento } from "../orcamento/components";
 import Feather from '@expo/vector-icons/Feather';
 import { OrcamentosRegistrados  } from "../orcamento/registrados";
 
-export const Tela_os = ({navigation}:any)=>{
+export const Tela_os = ({navigation,route }:any)=>{
 
 return (
     <View style={{flex:1}}  >
-      <OrcamentosRegistrados  tipo={3} navigation={navigation} to={'NovaOs'} />
+      <OrcamentosRegistrados  tipo={3} navigation={navigation} to={'NovaOs'}  route={route} />
  
     </View >
 )

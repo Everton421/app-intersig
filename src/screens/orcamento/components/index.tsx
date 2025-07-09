@@ -49,11 +49,11 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
 
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
-    let dataHora = useMoment.dataHoraAtual();
+    let atualDate = useMoment.dataHoraAtual();
 
     let data = useMoment.dataAtual();
     setDataAtual(data);
-    setDataHora(dataHora);
+    setDataHora(atualDate);
     async function init() {
       if (!codigo_orcamento || codigo_orcamento === null) {
         setOrcamento((prevOrcamento: OrcamentoModel) =>  ({
@@ -165,68 +165,81 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
     }));
   }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
   ////////////////////////////////////////////////////////////////////////////
+  
   const gravar = async () => {
-    setLoading(true);
+      setLoading(true);
 
-    if (editavel) {
-      try {
-        await useQuerypedidos.updateOrder(orcamento, codigoOrcamento);
-        setStatus(200);
-        setResponse("Orçamento atualizado com sucesso!");
-      } catch (e) {
-        console.log("erro ao atualizar o orcamento no SQLITE", e);
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      let cliente, produtos, parcelas;
-      if (!orcamento.cliente.codigo) {
-        Alert.alert("É necessário informar o cliente!");
-        setLoading(false);
-        return;
+       setOrcamento((prevOrcamento: OrcamentoModel) => ({
+        ...prevOrcamento,
+       data_recadastro: dataHora,
+       }));
+
+      if (editavel) {
+         try {
+            await useQuerypedidos.updateOrder(orcamento, codigoOrcamento);
+            setStatus(200);
+            setResponse("Orçamento atualizado com sucesso!");
+          } catch (e) {
+            console.log("erro ao atualizar o orcamento no SQLITE", e);
+          } finally {
+            setLoading(false);
+          }
+          
       } else {
-        cliente = orcamento.cliente;
-      }
-      if (orcamento.parcelas.length === 0) {
-        Alert.alert("É necessário informar as parcelas!");
-        setLoading(false);
-        return;
-      } else {
-        parcelas = orcamento.parcelas;
-      }
-
-       let arrlasId = await useQuerypedidos.selectLastId();
-        let lastId = 1
-
-         if( arrlasId && arrlasId[0].codigo  > 0  ) lastId = Number(arrlasId[0].id) + 1; 
-
-        let codigoGerado = gerarCodigo( );
-     let id = generatorId( Number(lastId), usuario.codigo );
-      
-     try {
-        let response = await useQuerypedidos.createOrder(
-          orcamento,
-          codigoGerado,
-          id, 
-          0
-        );
-
-        if (response > 0) {
-          console.log("");
-          console.log("codigo orcamento resgistrado : ", response);
-          console.log("");
-          setStatus(200);
-          setResponse("Orçamento registrado com sucesso!");
+        let cliente, produtos, parcelas;
+        if (!orcamento.cliente.codigo) {
+          Alert.alert("É necessário informar o cliente!");
+          setLoading(false);
+          return;
         } else {
-          setStatus(500);
-          setResponse(" falha ao registrar orcamento! ");
+          cliente = orcamento.cliente;
         }
-      } catch (e) {
-        console.log("erro ao gravar o orcamento no SQLITE", e);
-      } finally {
-        setLoading(false);
+        if (orcamento.parcelas.length === 0) {
+          Alert.alert("É necessário informar as parcelas!");
+          setLoading(false);
+          return;
+        } else {
+          parcelas = orcamento.parcelas;
+        }
+
+        let arrlasId = await useQuerypedidos.selectLastId();
+          let lastId  
+          if( arrlasId && arrlasId[0].id  ){
+            lastId  =  arrlasId[0].id   
+          }else{
+            lastId = `0000000000-${usuario.codigo}`
+          }
+          
+          let codigoGerado = gerarCodigo( );
+      let id = generatorId(  lastId , usuario.codigo );
+
+      try {
+          setLoading(false);
+          let response = await useQuerypedidos.createOrder(
+            orcamento,
+            codigoGerado,
+            id, 
+            0
+          );
+
+          if (response > 0) {
+            console.log("");
+            console.log("codigo orcamento resgistrado : ", response);
+            console.log("");
+            setStatus(200);
+            setResponse("Orçamento registrado com sucesso!");
+          } else {
+            setStatus(500);
+            setResponse(" falha ao registrar orcamento! ");
+          }
+
+        
+        } catch (e) {
+          console.log("erro ao gravar o orcamento no SQLITE", e);
+        } finally {
+          setLoading(false);
+        }
       }
-    }
   };
 
   return (

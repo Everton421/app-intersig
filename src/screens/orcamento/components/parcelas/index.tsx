@@ -160,7 +160,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
     const ItemFormas = ({ item }) => {
         return (
-            <View style={{margin:3, elevation:5, backgroundColor:'#009de2',padding:5, borderRadius:7}}>
+            <View style={{margin:3, elevation:5, backgroundColor:'#185FED',padding:5, borderRadius:7}}>
                 <TouchableOpacity onPress={() => selecionaFormaPagamento(item)}>
                     <Text style={{color:'white',fontWeight:"bold"}} >
                         {item.codigo} {item.descricao}
@@ -187,8 +187,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                     item.vencimento = vencimento
                 }
             })
-             
-
+              
             item.vencimento = vencimento
             setShowPicker(false);
         
@@ -238,12 +237,12 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
         <View>
             <TouchableOpacity onPress={() => setVisible(true)  }style={{margin:5}}  >
                  
-                   <View style={{flexDirection:'row', backgroundColor:'#009de2', justifyContent:'space-between', padding:10, borderRadius:5, elevation:5}}>
+                   <View style={{flexDirection:'row', backgroundColor:'#185FED', justifyContent:'space-between', padding:10, borderRadius:7, elevation:5}}>
                      
                          <AntDesign name="creditcard" size={25} color="white" />
                      <Text style={{color:'white', fontWeight:"bold",fontSize:20, width:90}}> 
                             parcelas</Text>
-                     <AntDesign name="caretdown" size={23} color="white" />
+                     <AntDesign name="caretdown" size={22} color="white" />
                     </View> 
 
             </TouchableOpacity>
@@ -285,7 +284,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                         }}
                     >
                         <TouchableOpacity onPress={() => setVisible(false)}
-                            style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }}>
+                            style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }}>
                             <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                                 Voltar
                             </Text>
@@ -300,7 +299,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                             </View>
 
                              <View style={{ margin:5 ,flexDirection:"row" ,  alignItems:"center", justifyContent:"space-between"}} >
-                                <TouchableOpacity onPress={() => setPress(true)} style={{ borderRadius:5, backgroundColor: '#009de2', padding: 5, elevation:5    }}>
+                                <TouchableOpacity onPress={() => setPress(true)} style={{ borderRadius:5, backgroundColor: '#185FED', padding: 5, elevation:5    }}>
                                     <View style={{flexDirection:'row'}}>
                                           <Text style={{color:'#FFF', fontWeight:'bold', fontSize:15}}> Formas De Pagamento  </Text>
                                          <FontAwesome name="search" size={22} color="#FFF" />
@@ -326,7 +325,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                                         <View style={{  elevation:5, marginHorizontal:20 ,height:'80%', width:'90%' , backgroundColor: '#FFF' ,marginTop:30, borderRadius:30, padding:10}}>
 
                                               <TouchableOpacity onPress={() => {setPress(false)  }}
-                                                    style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                                                    style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
                                                     <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                                                     voltar
                                                     </Text>

@@ -38,113 +38,113 @@ export const receberPedidos = ()=>{
                )
     
                if( orcamentosSistema.data.length > 0 ){
-                     console.log(orcamentosSistema.data) 
-                   orcamentosSistema.data.forEach( async ( i )=>{
-    
-                      const codigo_pedido = parseInt(i.codigo)
-                   let pedidoMobile:any = await useQuerypedidos.selectByCode(codigo_pedido)
-    
-                   
-                       if(pedidoMobile?.length > 0 ){
 
-                               let dataRecadMobile = pedidoMobile[0].data_recadastro;
-    
-                               if (i.data_recadastro > dataRecadMobile ){
-                                   await useQuerypedidos.updateByCode(i, codigo_pedido)
-                              
-                              let verifyProductsPedido:any
-                                   let verifyServicesPedido:any;
-                                   let verifyparcelasPedido:any;
-   
-    
-                                   if( i.produtos.length > 0 ){
-                                    verifyProductsPedido = await  useQueryItemsPedido.selectByCodeOrder(codigo_pedido);
-                                        if( verifyProductsPedido?.length > 0 ){
-                                            await useQueryItemsPedido.deleteByCodeOrder( codigo_pedido);
-                                            console.log('excluido items do pedido ' , codigo_pedido )
-                                        }
-                                     }
+                let aux = useQuerypedidos.newUpdate({ contato:'0'}, 1 );
+                    
+                   orcamentosSistema.data.forEach( async ( i )=>{
+
+                     const codigo_pedido = parseInt(i.codigo)
+                   let pedidoMobile:any = await useQuerypedidos.selectByCode(codigo_pedido)
+             
+                       if(pedidoMobile?.length > 0 ){
+                                let dataRecadMobile = pedidoMobile[0].data_recadastro;
         
-                                    if( i.produtos.length > 0  ){
-                                       for( const p of i.produtos ){
-                                           let aux:any = await useQueryItemsPedido.selectProductByCodeOrder( p.codigo , codigo_pedido );
-                                           console.log('')
-                                           console.log('produto ', p.codigo,' encontrado', aux)
-                       
-                                               if( aux?.length > 0    ){
-                                                   await useQueryItemsPedido.update(p, codigo_pedido)
-                                                   console.log('atualizando produto', p.codigo )
-                                               }else{
-                                                   await useQueryItemsPedido.create(p, codigo_pedido);
-                                                   console.log('inserindo produto', p.codigo )
-                                               }
-                                           }  
-                                       }
+                                if ( i.data_recadastro  >  dataRecadMobile  ){
+                                    await useQuerypedidos.updateByCode(i, codigo_pedido)
+                                
+                                let verifyProductsPedido:any
+                                    let verifyServicesPedido:any;
+                                    let verifyparcelasPedido:any;
     
-    
-                                   if( i.servicos.length > 0 ){
-                                       verifyServicesPedido = await  usequeryServicosPedido.selectByCodeOrder(codigo_pedido);
-                                       if( verifyServicesPedido?.length > 0 ){
-                                       await usequeryServicosPedido.deleteByCodeOrder( codigo_pedido);
-                                       console.log('excluido servicos do pedido ' , codigo_pedido )
-    
-                                       }else{
-                                         console.log('nenhum servico encontrado no Orcamento: ',codigo_pedido)
-                                       }
-                                   }
-    
-    
-                                   if( i.servicos.length > 0  ){
-                                       for( const s of i.servicos ){
-                                           let aux:any = await usequeryServicosPedido.selectServiceByCodeOrder( s.codigo , codigo_pedido );
-                                           console.log('')
-                                           console.log('servico ', s.codigo,' encontrado', aux)
-                   
-                                               if( aux?.length > 0    ){
-                                               await usequeryServicosPedido.update(s, codigo_pedido)
-                                               console.log('atualizando servico', s.codigo )
-                                           }else{
-                                               await usequeryServicosPedido.create(s, codigo_pedido);
-                                               console.log('inserindo servico', s.codigo )
-                                           }
-                                       }  
-                                       }
-    
-                                    
-                                   if( i.parcelas.length > 0 ){
-                                       verifyparcelasPedido = await useQueryParcelas.selectByCodeOrder(codigo_pedido);
-                                               if( verifyparcelasPedido.length > 0 ){
-                                                  console.log("atualizando parcelas!");
-                                                await useQueryParcelas.deleteByCodeOrder( codigo_pedido );
-                                                i.parcelas.forEach( async ( p )=>{
-                                                await useQueryParcelas.create( p, codigo_pedido);
-                                                })
-                                            }else{
-                                             console.log('nao foram encontradas parcelas para o orcamento', codigo_pedido )
+                                    if( i.produtos.length > 0 ){
+                                        verifyProductsPedido = await  useQueryItemsPedido.selectByCodeOrder(codigo_pedido);
+                                            if( verifyProductsPedido?.length > 0 ){
+                                                await useQueryItemsPedido.deleteByCodeOrder( codigo_pedido);
+                                                console.log('excluido items do pedido ' , codigo_pedido )
                                             }
-                                   }
+                                        }
+            
+                                        if( i.produtos.length > 0  ){
+                                        for( const p of i.produtos ){
+                                            let aux:any = await useQueryItemsPedido.selectProductByCodeOrder( p.codigo , codigo_pedido );
+                                            console.log('')
+                                            console.log('produto ', p.codigo,' encontrado', aux)
+                        
+                                                if( aux?.length > 0    ){
+                                                    await useQueryItemsPedido.update(p, codigo_pedido)
+                                                    console.log('atualizando produto', p.codigo )
+                                                }else{
+                                                    await useQueryItemsPedido.create(p, codigo_pedido);
+                                                    console.log('inserindo produto', p.codigo )
+                                                }
+                                            }  
+                                        }
+        
+        
+                                    if( i.servicos.length > 0 ){
+                                        verifyServicesPedido = await  usequeryServicosPedido.selectByCodeOrder(codigo_pedido);
+                                        if( verifyServicesPedido?.length > 0 ){
+                                        await usequeryServicosPedido.deleteByCodeOrder( codigo_pedido);
+                                        console.log('excluido servicos do pedido ' , codigo_pedido )
+        
+                                        }else{
+                                            console.log('nenhum servico encontrado no Orcamento: ',codigo_pedido)
+                                        }
+                                    }
+        
+        
+                                    if( i.servicos.length > 0  ){
+                                        for( const s of i.servicos ){
+                                            let aux:any = await usequeryServicosPedido.selectServiceByCodeOrder( s.codigo , codigo_pedido );
+                                            console.log('')
+                                            console.log('servico ', s.codigo,' encontrado', aux)
+                    
+                                                if( aux?.length > 0    ){
+                                                await usequeryServicosPedido.update(s, codigo_pedido)
+                                                console.log('atualizando servico', s.codigo )
+                                            }else{
+                                                await usequeryServicosPedido.create(s, codigo_pedido);
+                                                console.log('inserindo servico', s.codigo )
+                                            }
+                                        }  
+                                        }
+        
+                                        
+                                    if( i.parcelas.length > 0 ){
+                                        verifyparcelasPedido = await useQueryParcelas.selectByCodeOrder(codigo_pedido);
+                                                if( verifyparcelasPedido.length > 0 ){
+                                                    console.log("atualizando parcelas!");
+                                                    await useQueryParcelas.deleteByCodeOrder( codigo_pedido );
+                                                    i.parcelas.forEach( async ( p )=>{
+                                                    await useQueryParcelas.create( p, codigo_pedido);
+                                                    })
+                                                }else{
+                                                console.log('nao foram encontradas parcelas para o orcamento', codigo_pedido )
+                                                }
+                                    }
                                       
                                     
                                }else{
-                                
+                                /*
                                 if(i.tipo != pedidoMobile[0].tipo || i.situacao != pedidoMobile[0].situacao ){
                                     console.log('atualizando status ...')
                                     await useQuerypedidos.updateByCode(i, codigo_pedido)
                                 }else{
-                                console.log(` Não ouve nehuma alteracao no  orcamento ${codigo_pedido}`)
+                                
+                                console.log(  ` Não ouve nehuma alteracao no  orcamento ${codigo_pedido}  `, i.data_recadastro  ,'  >  ', dataRecadMobile )
                                 console.log('')
-                                console.log( i.data_recadastro ,'  >  ', dataRecadMobile )
-                                console.log('')
-                            }
+                            }*/
+                                console.log(  ` Não ouve nehuma alteracao no  orcamento ${codigo_pedido}  `, i.data_recadastro  ,'  >  ', dataRecadMobile )
+
                                }
                        }else{
                         console.log('')
                         console.log(i)
                         console.log('')
 
-                           await useQuerypedidos.createOrderByCode(i , codigo_pedido,  i.id, '0');
+                           await useQuerypedidos.createOrderByCode(i , codigo_pedido,  i.id, i.id_externo);
                            
-                       }
+                       } 
     
                    })
     

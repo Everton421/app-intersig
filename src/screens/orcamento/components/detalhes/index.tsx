@@ -99,7 +99,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
                 display="calendar"
                 mode="date"
                 onChange={handleEvent}
-                locale="pt-BR"
+              //  locale="pt-BR"
               />
           )
           }

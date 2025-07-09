@@ -1,8 +1,8 @@
 import { Modal, Text, TouchableOpacity, View } from "react-native"
-import { useCallback, useContext, useEffect, useState } from "react"
+import {   useState } from "react"
 import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import moment from 'moment-timezone';
+import { configMoment } from "../../../services/moment";
 
 
   type statusPedido = {
@@ -23,12 +23,12 @@ type props = {
 
      
 export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props ) =>{
+        const moment = configMoment();
 
      
         const [showPicker, setShowPicker] = useState(false);
-            const [ auxData, setAuxData ] = useState<string | Date >( new Date() );
-        const [ statusSelecionado, setStatusSelecionado ] = useState('EA');
-
+            const [ auxData, setAuxData ] = useState<  string >(   moment.primeiroDiaMes() );
+        const [ statusSelecionado, setStatusSelecionado ] = useState('*');
             function selectStatus( status:string ){
                     switch ( status ){
                         case '*':
@@ -63,25 +63,10 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
             }
 
         
- 
-
-    const formatDate  = ( date:string )=>{
-        let auxDate = new Date(date);
-    const year = auxDate.getFullYear();
-        const month = String(auxDate.getMonth() + 1).padStart(2, '0');
-        const day = String(auxDate.getDate()).padStart(2, '0');
-        return `${day}/${month}/${year}`;
-    }
-
+   
     const handleEvent = (event:any , selectedDate:any) => {
-         const currentDate = selectedDate || new Date();
-         const dia = String(currentDate.getDate()).padStart(2,'0');
-         const mes = String( currentDate.getMonth()).padStart(2,'0');
-         const ano = currentDate.getFullYear();
-         const data = `${ano}-${mes}-${dia}`;
-         setAuxData( data )
-        console.log(data)
-        setDate(data)
+         setAuxData( selectedDate )
+        setDate( moment.formatarData(selectedDate))
     setShowPicker(false);
     };
     
@@ -103,7 +88,7 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                         <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
                                                         <Fontisto name="date" size={24} color="black" />
                                                             <Text style={{ fontSize: 20, fontWeight: 'bold' , width:'100%'}}>
-                                                                {  formatDate(auxData) }
+                                                                {   moment.formatarData(auxData)   }
                                                             </Text>
                                                           </TouchableOpacity>
                                                        { showPicker &&
@@ -136,9 +121,15 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                           )
                                                                         }
                                                                     </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                        Orçamentos
-                                                                    </Text>
+                                                                        {  statusSelecionado === 'EA' ? (
+                                                                             <Text style={ [ { color: "#1E9C43" , fontWeight: "bold", flexShrink: 1, width:'100%' , textAlign:"center" } ] }>
+                                                                                    Orçamentos
+                                                                              </Text>
+                                                                        ):(
+                                                                             <Text style={ [ { color: "#868686" , fontWeight: "bold", flexShrink: 1, width:'100%' , textAlign:"center" } ] }>
+                                                                                 Orçamentos
+                                                                              </Text>
+                                                                    )}
                                                                 </TouchableOpacity>
                                                             </View>
 
@@ -159,10 +150,17 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                             <View style={{ width: 10, height: 10, backgroundColor: "#868686", borderRadius: 5 }} />
                                                                           )
                                                                         }
-                                                                    </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                        Pedidos
-                                                                    </Text>
+                                                                    </View> 
+                                                                          { statusSelecionado === 'AI'    ? (
+                                                                        <Text style={{ fontWeight: "bold", color: "#307CEB", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                 Pedidos
+                                                                             </Text>
+                                                                          ):(
+                                                                            <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                 Pedidos
+                                                                             </Text>
+                                                                          )}
+                                                               
                                                                 </TouchableOpacity>
                                                             </View>
 
@@ -183,9 +181,17 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                           )
                                                                         }
                                                                     </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                        Faturados
-                                                                    </Text>
+                                                                        { statusSelecionado === 'FI'  ? (
+                                                                              <Text style={{ fontWeight: "bold", color: "#FF7F27", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                 Faturados
+                                                                           </Text>
+                                                                        ):(
+                                                                            <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                              Faturados
+                                                                           </Text>
+                                                                        )}
+                                                                 
+
                                                                 </TouchableOpacity>
                                                             </View>
                                                             <View style={{ marginBottom: 5, width: '100%', alignItems: 'center' }}>
@@ -205,9 +211,18 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                           )
                                                                         }
                                                                     </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                       Parcialmente faturados
-                                                                    </Text>
+
+                                                                        {  statusSelecionado === 'FP'   ? (
+                                                                            <Text style={{ fontWeight: "bold", color: "#0023F5", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                   Parcialmente faturados
+                                                                               </Text>
+                                                                       )  : (
+                                                                              <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                   Parcialmente faturados
+                                                                               </Text>
+                                                                          )
+                                                                        }
+                                                               
                                                                 </TouchableOpacity>
                                                             </View>
                                                          <View style={{ marginBottom: 5, width: '100%', alignItems: 'center' }}>
@@ -227,9 +242,19 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                           )
                                                                         }
                                                                     </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                        Reprovados
-                                                                    </Text>
+
+
+                                                                       { statusSelecionado === 'RE'? (
+                                                                             <Text style={{ fontWeight: "bold", color: "red", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                               Reprovados
+                                                                            </Text>
+                                                                       )  : (
+                                                                            <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                               Reprovados
+                                                                            </Text>
+                                                                          )
+                                                                        }
+                                                                
                                                                 </TouchableOpacity>
                                                             </View>
                                                             <View style={{ marginBottom: 5, width: '100%', alignItems: 'center' }}>
@@ -249,9 +274,17 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                           )
                                                                         }
                                                                     </View>
-                                                                    <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1 }}>
-                                                                        Todos
-                                                                    </Text>
+                                                                    {  statusSelecionado === '*' ? (
+                                                                            <Text style={{ fontWeight: "bold", color: "#000", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                   Todos
+                                                                               </Text>
+                                                                       )  : (
+                                                                                <Text style={{ fontWeight: "bold", color: "#868686", flexShrink: 1, width:'100%' , textAlign:"center"}}>
+                                                                                   Todos
+                                                                               </Text>
+                                                                          )
+                                                                        }
+                                                               
                                                                 </TouchableOpacity>
                                                             </View>
                             

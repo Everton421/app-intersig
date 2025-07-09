@@ -192,7 +192,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
 
     function renderItemOS  (item:any) {
       return ( 
-        <TouchableOpacity style={{ backgroundColor:'#009de2', margin:5, padding:7, borderRadius:5 , elevation:4}} onPress={ ()=> handleSelectOS(item)}  >
+        <TouchableOpacity style={{ backgroundColor:'#185FED', margin:5, padding:7, borderRadius:5 , elevation:4}} onPress={ ()=> handleSelectOS(item)}  >
           <Text style={{ color:'white', fontWeight:'bold'}} >
             codigo:  {item.codigo} descricao: {item.descricao}
           </Text>
@@ -203,7 +203,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
     function renderItemVeiculo  (item:any) {
 
       return ( 
-        <TouchableOpacity style={[ {    backgroundColor: selectedVeiculo?.codigo === item.codigo  ? '#009de2' : '#FFF'},
+        <TouchableOpacity style={[ {    backgroundColor: selectedVeiculo?.codigo === item.codigo  ? '#185FED' : '#FFF'},
            {  margin:5, padding:7, borderRadius:5 , elevation:4}] } 
         onPress={ ()=> selecionaVeiculo(item)}  >
           
@@ -239,7 +239,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
       return ( 
         <TouchableOpacity 
         style={ [
-            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#339' : '#009de2'} , 
+            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#185FED' : '#009de2'} , 
         {  margin:5, padding:7, borderRadius:5 , elevation:4} ] } onPress={ ()=> selecionaServico(item)}  >
           
             <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
@@ -371,7 +371,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                       </View>
 
 
-            <TouchableOpacity style={{backgroundColor:'#009de2',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
+            <TouchableOpacity style={{backgroundColor:'#185FED',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
             onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
               { selectedTipo ?
                 ( <Text  style={{ color:'#FFF', fontSize:15,fontWeight:'bold', width:'90%' }}  numberOfLines={2}>    {selectedTipo?.descricao} </Text> ) 
@@ -392,13 +392,13 @@ export const Servico = ( { codigo_orcamento }:any )=>{
 
 
             <View style={{alignItems:'center' , justifyContent:'space-between', flexDirection:'row'}}>
-                  <TouchableOpacity style={{backgroundColor:'#009de2',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
+                  <TouchableOpacity style={{backgroundColor:'#185FED',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
                             onPress={ ()=>    setVerServicos(true) } >
                           < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold', width:'80%'}}>Serviços</Text>
                     <FontAwesome5 name="tools" size={24} color="white" />
                   </TouchableOpacity>
                 
-                  <TouchableOpacity style={{backgroundColor:'#009de2',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
+                  <TouchableOpacity style={{backgroundColor:'#185FED',margin:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between' ,width:'35%' }}
                               onPress={ ()=>    setVerVeiculos(true) } >
                             { !selectedVeiculo && <Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold',width:'80%' }}>Veiculos</Text> }
 
@@ -418,7 +418,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                   tipoOs.length > 0 ? 
                   ( 
                     <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
-                    <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
+                     <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
                           
                           <View style={{ flexDirection:'row', justifyContent:'space-between'}}> 
                           <Text style={{margin:5, fontWeight:'bold'}} > Tipos De OS </Text>
@@ -440,7 +440,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                   ( 
                     <View style={{backgroundColor:'#FFF', flex:1}} >
                         <TouchableOpacity onPress={() => {setPresstipoOS(false)  }}
-                          style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                          style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
                         <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                           voltar
                         </Text>
@@ -461,17 +461,18 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                   <View style={{ backgroundColor:'#FFF', width:'95%' , height:'90%' ,padding:5, borderRadius:15}}>
 
                    
-        <TouchableOpacity onPress={() => {setVerServicos(false)  }}
-                      style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                      <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                 <TouchableOpacity onPress={() => {setVerServicos(false)  }}
+                        style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                       <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                         voltar
                       </Text>
                     </TouchableOpacity>
 
                         <TextInput
                             placeholder='pesquisar'
-                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
+                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%',  elevation:5, textAlign:'center', padding:5, borderRadius:10}}
                             onChangeText={ (t)=>  setPesquisa(t) }
+                            placeholderTextColor={'#185FED'}
                            />  
 
                         <View style={{ height:'75%' }} >
@@ -494,7 +495,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
 
                    <View style={{flexDirection:'row',justifyContent:'space-between', width:"100%"}}>
                        <TouchableOpacity onPress={() => {setVerVeiculos(false)  }}
-                              style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                              style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
                              <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
                                voltar
                            </Text>
@@ -503,15 +504,8 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                           Veiculos
                         </Text>
                     </View>
-                       
-                       {/**  <TextInput
-                            placeholder='pesquisar'
-                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%', elevation:5, textAlign:'center', padding:5, borderRadius:10}}
-                            onChangeText={ (t)=>  setPesquisaVeiculo(t) }
-                           />  
-                       */ }
-                        <View style={{ height:'75%' }} >
-                         
+                        
+                        <View style={{ height:'75%' }} > 
                   <FlatList
                               data={ dadosVeiculos }
                               renderItem={ ({item})=> renderItemVeiculo( item ) }

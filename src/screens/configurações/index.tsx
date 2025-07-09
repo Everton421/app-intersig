@@ -22,7 +22,6 @@ import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosPr
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
 import Feather from '@expo/vector-icons/Feather';
 import { useUsuario } from "../../database/queryUsuario/queryUsuario"
-import { generatorId } from "../../utils/id-generator"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -533,6 +532,11 @@ setMsgApi('')
 
 
   const handleSync = () => {
+
+    if(loading){
+      Alert.alert('Aguarde!','Estabelecendo conexão...');
+    }
+
     if (!connected) {
       Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
       return;
@@ -545,6 +549,9 @@ setMsgApi('')
   };
 
   async function syncOrders(){
+      if(loading){
+      Alert.alert('Aguarde!','Estabelecendo conexão...');
+    }
     if (!connected) {
       Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
       return;
@@ -555,15 +562,13 @@ setMsgApi('')
     }
     try{
       setIsLoadingOrder(true)
-      let aux:any = formatDate(date)
-     console.log('');
-     console.log('data pedidos ',aux);
-     console.log('');
+      let dataPedidos:any = formatDate(date)
+ 
 
-    await useGetOrders.getPedidos(aux);
-    let responseSystem =  await useSendOrders.postPedidos();
-    console.log(responseSystem);
-    setIsLoadingOrder(false)
+    await useGetOrders.getPedidos(dataPedidos);
+     let responseSystem =  await useSendOrders.postPedidos();
+     console.log(responseSystem);
+     setIsLoadingOrder(false)
 
   }catch(e){
     console.log(e);
@@ -620,7 +625,7 @@ setMsgApi('')
         <View style={{flexDirection:"row" ,marginTop:10 }}>
           {loading ? (
                  <View>
-                     <Text> status api:  <ActivityIndicator size={20} color="#185FED" /></Text>
+                     <Text>   Testando conexão... <ActivityIndicator size={20} color="#185FED" /></Text>
                   </View>
                         ) : (
                             <>

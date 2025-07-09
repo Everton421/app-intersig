@@ -94,7 +94,7 @@ function seleciona(item){
         const isSelected = item.codigo === selectedItem.codigo;
 
     return (
-        <TouchableOpacity style={[styles.item, { backgroundColor: isSelected ? '#009de2' : '#FFF' }]} onPress={() => seleciona(item)} >
+        <TouchableOpacity style={[styles.item, { backgroundColor: isSelected ? '#185FED' : '#FFF' }]} onPress={() => seleciona(item)} >
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                    <Text style={[styles.txt, { fontWeight: isSelected ? 'bold' : null }, { color: isSelected ? 'white' : null }]}>
                      Código: {item.codigo}
@@ -136,13 +136,12 @@ function seleciona(item){
     <View style={styles.container}>
 
     <TouchableOpacity onPress={()=>setVisibleClientes(true)  }  
-    style={{ justifyContent:'space-between', flexDirection:'row',margin:10,backgroundColor:'#009de2' ,borderRadius:7 , padding:10, elevation:4, width:'95%'}}>
+     style={{ justifyContent:'space-between', flexDirection:'row',margin:10,backgroundColor:'#185FED' ,borderRadius:7 , padding:10, elevation:4, width:'95%'}}>
                         <FontAwesome name="search" size={22} color="white" />
-                       
                         <Text style={{fontWeight:'bold' , fontSize:20, color:'white' ,width: '50%' ,textAlign:'center'}}>
                           clientes
                        </Text> 
-                       <AntDesign name="caretdown" size={24} color="white"    />
+                       <AntDesign name="caretdown" size={22} color="white"    />
 
       </TouchableOpacity>
             <View style={{ justifyContent: 'center', backgroundColor: '#FFF' ,margin:7  }}>
@@ -182,7 +181,7 @@ function seleciona(item){
 
             <View style={{padding:5}}>
             <TouchableOpacity onPress={()=>setVisibleClientes(false)}
-                   style={{margin:15, backgroundColor:'#009de2',padding:7, borderRadius:7,width:'25%',elevation: 5}} >
+                   style={{margin:15, backgroundColor:'#185FED',padding:7, borderRadius:7,width:'25%',elevation: 5}} >
                     <Text style={{color:'#FFF',fontWeight:'bold'}}>
                       voltar
                     </Text>
@@ -195,7 +194,7 @@ function seleciona(item){
                   placeholder='Pesquisar'
                   value={pesquisa}
                   onChangeText={adiciona}
-                  placeholderTextColor='#009de2'
+                  placeholderTextColor='#185FED'
                 />
                     <TouchableOpacity  style={{  borderRadius: 5,backgroundColor: 'red',width: 50,  alignItems: 'center',justifyContent:'center' }}>
                         <Text style={{color:'#FFF',fontWeight:'bold'}}>limpar</Text>

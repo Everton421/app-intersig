@@ -22,6 +22,7 @@ import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosPr
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
 import Feather from '@expo/vector-icons/Feather';
 import { useUsuario } from "../../database/queryUsuario/queryUsuario"
+import { MaterialCommunityIcons } from "@expo/vector-icons"
 
 const LoadingData = ({ isLoading, item , progress }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoading}>
@@ -615,10 +616,7 @@ setMsgApi('')
       Alert.alert(`Não foi possível abrir esta URL: ${url}`);
     }
   };
-  async function testarId(){
-       let lasId = await useQueryPedidos.selectLastId();
-      console.log(lasId);
-  } 
+   
 
   return (
     <View style={{ flex: 1 , backgroundColor:'#EAF4FE', alignItems:"center",   width:'100%' }}>
@@ -630,12 +628,12 @@ setMsgApi('')
                         ) : (
                             <>
                                 {error ? (
-                                    <Text> status api: {error}</Text>
+                                    <Text style={{ fontWeight:"bold" }}> status api: {error}</Text>
                                 ) : (
                                     <View  >
                                       
-                                    {connected ? <Text style={{ color:'green' }}> status api:  Conectado! <Feather name="wifi" size={24} color="green" /> </Text> 
-                                    : <Text style={{ color:'red',width:'100%' }}>status api:   Não conectado! <Feather name="wifi-off" size={24} color="red" /> </Text>}
+                                    {connected ? <Text style={{ color:'green', fontWeight:"bold" }}> status api:  Conectado! <Feather name="wifi" size={24} color="green" /> </Text> 
+                                    : <Text style={{ color:'red',width:'100%',fontWeight:"bold" }}>status api:   Não conectado! <Feather name="wifi-off" size={24} color="red" /> </Text>}
                                     </View>
 
                                 )}
@@ -643,7 +641,7 @@ setMsgApi('')
                         )}
         </View>
           <TouchableOpacity  style={ { alignItems:"center",marginTop:3,elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED', justifyContent:"center" }} onPress={()=>{ connect()}}>
-            <Text style={{ color:'#FFF' }} > testar conexão </Text>
+            <Text style={{ color:'#FFF' , fontWeight:"bold"}} > testar conexão </Text>
           </TouchableOpacity>
 
  
@@ -655,17 +653,23 @@ setMsgApi('')
       
             {/***** enviar cadastros  */}
             <View style={{ marginTop:15, margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:' 98%', alignItems:"center", justifyContent:"center"  }} >
-                <Text> cadastrar/atualizar cadastros </Text>
-                  <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ handleSync()}}>
-                    <Text style={{ color:'#FFF' }} > cadastrar/atualizar </Text>
+                  <View style={{ flexDirection:"row", gap:5}}>
+                     <Text style={{ color:'#185FED', fontWeight:"bold", fontSize:17}} > cadastrar/atualizar cadastros </Text>
+                  </View>         
+                  
+                  <TouchableOpacity  style={ { flexDirection:"row",alignItems:"center", margin:15, elevation:5,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ handleSync()}}>
+                     <MaterialCommunityIcons name="database-sync" size={35} color="#FFF"  />
+                    <Text style={{ color:'#FFF', fontWeight:"bold"}} > cadastrar/atualizar </Text>
                   </TouchableOpacity>
             </View >
 
           {/***** enviar/receber pedidos */}
               <View style={{margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:'98%', alignItems:"center", justifyContent:"center"  }} >
-                      <Text>
-                        enviar/receber pedidos a partir de :
+                  <View style={{ flexDirection:"row", gap:5}}>
+                       <Text style={{ color:'#185FED', fontWeight:"bold", fontSize:17}} >
+                         enviar/receber pedidos a partir de :
                       </Text>
+                  </View>         
                       
                     <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
                         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
@@ -687,12 +691,15 @@ setMsgApi('')
                   )
                   }
                     
-                    <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ syncOrders()}}>
-                    <Text style={{ color:'#FFF' }} > enviar/receber pedidos</Text>
+                    <TouchableOpacity  style={ {margin:15, elevation:3,padding:5,flexDirection:"row",alignItems:'center' ,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ syncOrders()}}>
+                      <MaterialCommunityIcons name="folder-sync" size={35} color='#FFF' />
+                      
+                        <Text style={{ color:'#FFF', fontWeight:"bold" }} > enviar/receber pedidos</Text>
                     </TouchableOpacity>
               </View >
-              <TouchableOpacity  style={ { marginTop:50, elevation:3,padding:5,borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
-                  <Text style={{ color:'#FFF' }} > limpar base de dados</Text>
+              <TouchableOpacity  style={ { marginTop:50, alignItems:"center", elevation:3,padding:5, flexDirection:"row", borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
+                <MaterialCommunityIcons name="database-remove" size={35} color="#FFF" />
+                  <Text style={{ color:'#FFF',fontWeight:"bold" }} > limpar base de dados</Text>
               </TouchableOpacity>
       <ScrollView style={styles.contentArea}>
 

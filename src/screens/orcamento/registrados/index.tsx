@@ -1,5 +1,5 @@
 import { useCallback, useContext, useEffect, useState } from "react"
-import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert,  TouchableOpacity} from "react-native"
+import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert,  TouchableOpacity, ActivityIndicator} from "react-native"
 import Feather from '@expo/vector-icons/Feather';
 import { OrcamentoContext } from "../../../contexts/orcamentoContext";
 import { usePedidos } from "../../../database/queryPedido/queryPedido";
@@ -10,8 +10,10 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalOrcamento } from "./modalOrcamento";
-import { enviaPedidos } from "../../../services/sendOrders";
 import { ModalFilter } from "./modal-filter";
+import { ConnectedContext } from "../../../contexts/conectedContext";
+import { enviaPedidos } from "../../../services/sendOrders";
+import { receberPedidos } from "../../../services/getOrders";
                 
    
 
@@ -21,14 +23,19 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
         const useMoment = configMoment();
         const {    setOrcamento } = useContext(OrcamentoContext);
         const { usuario }:any = useContext(AuthContext);
+        const {connected, setConnected }:any = useContext(ConnectedContext);
 
-        
+          const usePostPedidos = enviaPedidos();
+          const useGetPedidos =  receberPedidos();  
 
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visibleModal, setVisibleModal ] = useState<boolean>(false);
         const [ selecionado, setSelecionado ] = useState();
         const [ pesquisa, setPesquisa ] =  useState(null);
         const [ visible, setVisible ] = useState(false);
+       
+        const [ visiblePostPedido, setVisiblePostPedido ] = useState(false);
+        const [ loadingPedidoId, setLoadingPedidoId ] = useState<number>(0)
 
         const [data_cadastro , setData_cadastro] = useState( useMoment.primeiroDiaMes())
         const [ orcamentoModal,setOrcamentoModal] = useState();
@@ -45,6 +52,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
           console.log("Consultando...", queryOrder)
              let aux:any = await useQuerypedidos.newSelect( queryOrder );
                      setOrcamentosRegistrados(aux);
+                     setVisiblePostPedido(false);
             }
  
    
@@ -96,10 +104,47 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
 
     async function selecionaOrcamentoModal( item ){
         let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
-        console.log(aux.data_recadastro)
+        console.log(aux  )
         setOrcamentoModal( aux );
         setVisibleModal( true )
     }
+
+    async function postPedido( item ){
+        setVisiblePostPedido(true);
+            let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
+            setVisiblePostPedido( true )
+            setLoadingPedidoId( item.codigo )
+            useGetPedidos.getPedido( item.codigo);
+       let resultPostApi = await  usePostPedidos.postItem( [aux] );
+       
+       if( resultPostApi.status === 200 && resultPostApi.data.results && resultPostApi.data.results.length > 0 ){
+            Alert.alert( '',  `Pedido id: ${item.id} enviado com sucesso!` , 
+                [
+                     { text:'ok', onPress: ()=>{
+                         setLoadingPedidoId(0)
+                            setVisiblePostPedido(false)
+                            busca();
+                        } 
+                    }
+                ]   
+                )
+       }else{
+           Alert.alert( '',  `Algo de inesperado ocorreu ao processar o pedido : ${item.id} !` , 
+                [
+                     { text:'ok', onPress: ()=>{
+                         setLoadingPedidoId(0)
+                            setVisiblePostPedido(false)
+                            busca();
+                        } 
+                    }
+                ]   
+                )
+       }
+    }
+
+
+
+
 
     function selecionaOrcamento(item){
           setSelecionado(item);
@@ -137,6 +182,8 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
             }
             return cor;
     }
+
+  
 
     const ItemOrcamento = ({item})=>{
         return(
@@ -198,6 +245,23 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                             :
                             <Ionicons name="checkmark" size={24} color="#75F94D" />
                         }
+                        { !connected ? ( 
+                          <TouchableOpacity   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                            <MaterialIcons name="sync-disabled" size={24} color="#009de2" />
+                          </TouchableOpacity>
+                            ):(
+                              visiblePostPedido && loadingPedidoId === item.codigo ? 
+                          <View   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                                <ActivityIndicator size={25}/>
+                          </View>
+                          :
+                          <TouchableOpacity  onPress={()=> postPedido(item) } style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                                <Ionicons name="sync-sharp" size={24} color="#009de2" />
+                          </TouchableOpacity>
+                          
+                            )
+                        }
+
                       </View>
                </View>
         )
@@ -223,9 +287,31 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                 </View>
             </View>  
 
+
+
+                {
+/*
+                   <Modal  visible={ true }  transparent={true} >
+                              <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" , flex:1, alignItems:"center", justifyContent:"center" }}>
+                                <View style={{ backgroundColor:'#FFF', width:'80%',alignItems:"center", justifyContent:"center", height:'40%', marginTop:10, borderRadius:10 }}>    
+                                        <Text style={{ color:'blue', fontWeight:"bold", fontSize:20}} >
+                                                Processando Pedido:  { postPedidoS && postPedidoS}
+                                        </Text>
+                                        <ActivityIndicator size={50} color="blue"  />
+                               </View>
+                       </View>
+ 
+                </Modal>
+                    */
+                }
+
+        {/******************************************* */}
                         <ModalFilter visible={visible} setVisible={ setVisible} setStatus={setStatusPedido}  setDate={setData_cadastro} />
-     
-                <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
+        {/******************************************* */}
+                       <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
+        {/******************************************* */}
+
+
         {/******************************************* */}
                         <FlatList
                         data={orcamentosRegistrados}

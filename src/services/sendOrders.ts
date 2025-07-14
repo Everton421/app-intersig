@@ -43,8 +43,9 @@ export const enviaPedidos = () => {
                     await useQuerypedidos.updateSentOrderByCode('S',i.codigo)
                 }
             })  
+            console.log(aux.data);
         }
-        return resultApi;
+        return aux;
     }
  
     async function postPedidos() {
@@ -83,5 +84,5 @@ async function postPedido(codigo:number){
 }
 
 
-    return { postPedidos ,postPedido };
+    return { postPedidos ,postPedido , postItem};
 }

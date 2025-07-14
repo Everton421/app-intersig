@@ -343,7 +343,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
       <View style={{ alignItems: "center" }}>
         <Text
-          style={{ fontWeight: "bold", width: "100%", textAlign: "center" }}
+          style={{    fontWeight: "bold", width: "100%", textAlign: "center" }}
         >
           Produtos
         </Text>
@@ -351,7 +351,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
       <TouchableOpacity
         onPress={() => setVisibleProdutos(true)}
-        style={{    margin: 5,   elevation: 4,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#185FED",  padding: 10,   borderRadius: 7,  width: "98%",
+        style={{   margin: 5,   elevation: 10,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#185FED",  padding: 10,   borderRadius: 7,  width: "98%",
         }}   >
         <FontAwesome name="search" size={22} color="#FFF" />
         <Text
@@ -359,7 +359,8 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
             color: "white",
             fontWeight: "bold",
             fontSize: 20,
-            width: 80,
+            width: '90%',
+            textAlign:"center"
           }}
         >
           produtos

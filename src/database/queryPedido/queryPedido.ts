@@ -133,7 +133,7 @@ const getCurrentDate = () => {
                ${ pedido.total_produtos},
                ${ pedido.total_servicos},
                ${ pedido.cliente.codigo},
-              '${ pedido.data_cadastro }',
+              '${ pedido.data_cadastro}',
               '${pedido.data_recadastro}',
                ${ pedido.veiculo},
                ${ pedido.tipo_os},
@@ -141,6 +141,7 @@ const getCurrentDate = () => {
               )` 
           );
     
+       
   
            console.log(' orcamento inserido codigo : ' ,result.lastInsertRowId);
           return result.lastInsertRowId;
@@ -710,8 +711,6 @@ const getCurrentDate = () => {
   async function update( pedido:pedidoApi ){
     try{
 
- 
-         
 
       let result = await db.runAsync(
           ` UPDATE   pedidos SET

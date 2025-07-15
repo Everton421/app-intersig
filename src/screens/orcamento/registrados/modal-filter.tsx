@@ -3,6 +3,7 @@ import {   useState } from "react"
 import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { configMoment } from "../../../services/moment";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
   type statusPedido = {
@@ -27,9 +28,9 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
 
      
         const [showPicker, setShowPicker] = useState(false);
-            const [ auxData, setAuxData ] = useState<  string >(   moment.primeiroDiaMes() );
+            const [ auxData, setAuxData ] = useState<  string >(   moment.dataAtual() );
         const [ statusSelecionado, setStatusSelecionado ] = useState('*');
-            function selectStatus( status:string ){
+          async  function selectStatus( status:string ){
                     switch ( status ){
                         case '*':
                                 setStatusSelecionado('*')
@@ -58,17 +59,29 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                             default:  
                                setStatusSelecionado('*')
                                 setStatus('*')
-                        
+                        }
+
+                        try{
+                            await AsyncStorage.setItem('filtroPedidos',status );
+                          //  console.log(status)
+                        }catch( e ) {
+                            console.log("erro ao tentar salvar o filtro dos pedidos ", e )
                         }
             }
 
         
    
-    const handleEvent = (event:any , selectedDate:any) => {
+    const handleEvent = async (event:any , selectedDate:any) => {
          setAuxData( selectedDate )
         setDate( moment.formatarData(selectedDate))
-    setShowPicker(false);
-    };
+      setShowPicker(false);
+               try{
+                            await AsyncStorage.setItem('dataPedidos', moment.formatarData(selectedDate) );
+                       //     console.log( "Data isneridda: " ,  moment.formatarData(selectedDate))
+                        }catch( e ) {
+                            console.log("erro ao tentar salvar a data do filtro dos pedidos ", e )
+                        }
+};
     
         return(
                  <Modal  visible={visible}  transparent={true} >

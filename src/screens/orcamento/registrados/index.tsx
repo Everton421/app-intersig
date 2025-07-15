@@ -14,6 +14,7 @@ import { ModalFilter } from "./modal-filter";
 import { ConnectedContext } from "../../../contexts/conectedContext";
 import { enviaPedidos } from "../../../services/sendOrders";
 import { receberPedidos } from "../../../services/getOrders";
+import AsyncStorage from "@react-native-async-storage/async-storage";
                 
    
 
@@ -42,12 +43,45 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
         
         const [ statusPedido, setStatusPedido ] = useState<  string >('*');
         
+
+
+        const getFitroPedidos = async ()=>{
+            try{
+                const value = await AsyncStorage.getItem('filtroPedidos');
+                if(value !== null ) {
+                    return value;
+                }
+
+            }catch(e){  
+
+                console.log("erro ao consultar AsyncStorage")
+            }
+        }
+        const getDataFiltroPedido = async ()=>{ 
+              try{
+                const value = await AsyncStorage.getItem('dataPedidos');
+                if(value !== null ) {
+                    return value;
+                }
+
+            }catch(e){  
+
+                console.log("erro ao consultar data do filtro dos pedidos AsyncStorage")
+            }
+        }
+
         async function busca(){
+
+          let filtroStatus =   await getFitroPedidos();
+           let dataFiltroPedidos = await  getDataFiltroPedido();
+
                 if ( !usuario.codigo || usuario.codigo === 0 ){
                     console.log("usuario invalido!")
                     return
                 }
-                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:data_cadastro ,situacao:statusPedido     }
+                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:dataFiltroPedidos ,situacao: filtroStatus     }
+
+
                 if( pesquisa !== null &&  pesquisa !== '' ) queryOrder.cliente = pesquisa
           console.log("Consultando...", queryOrder)
              let aux:any = await useQuerypedidos.newSelect( queryOrder );
@@ -187,7 +221,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
 
     const ItemOrcamento = ({item})=>{
         return(
-                <View style={ [ stiloItem(item),{    margin:20 , borderRadius:15, elevation:9, padding:10 } ]}>
+                <View style={ [ stiloItem(item),{    margin:20 , borderRadius:10, elevation:9, padding:10 } ]}>
                    <View style={{ flexDirection:"row", justifyContent:"space-between" }} >         
                          <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
                              onPress={ ()=> selecionaOrcamentoModal(item)}>
@@ -306,7 +340,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                 }
 
         {/******************************************* */}
-                        <ModalFilter visible={visible} setVisible={ setVisible} setStatus={setStatusPedido}  setDate={setData_cadastro} />
+                        <ModalFilter visible={visible} setVisible={ setVisible}  setStatus={setStatusPedido} setDate={setData_cadastro} />
         {/******************************************* */}
                        <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
         {/******************************************* */}

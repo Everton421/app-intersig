@@ -28,7 +28,6 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
 
           const usePostPedidos = enviaPedidos();
           const useGetPedidos =  receberPedidos();  
-
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visibleModal, setVisibleModal ] = useState<boolean>(false);
         const [ selecionado, setSelecionado ] = useState();
@@ -144,36 +143,36 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
     }
 
     async function postPedido( item ){
-        setVisiblePostPedido(true);
-            let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
-            setVisiblePostPedido( true )
-            setLoadingPedidoId( item.codigo )
-            useGetPedidos.getPedido( item.codigo);
-       let resultPostApi = await  usePostPedidos.postItem( [aux] );
+        
+
+        try{
+                setVisiblePostPedido(true);
+              let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
+                setLoadingPedidoId( item.codigo )
+             useGetPedidos.getPedido( item.codigo);
+             let resultPostApi = await  usePostPedidos.postItem( [aux] );
+          if( resultPostApi.status === 200 && resultPostApi.data.results && resultPostApi.data.results.length > 0 ){
+                        setLoadingPedidoId(0)
+                            setVisiblePostPedido(false)
+                            busca();
+          }
+        }catch( e ){
+            console.log(e);
+            Alert.alert( '',  `Algo de inesperado ocorreu ao processar o pedido : ${item.id} !` , 
+                    [
+                         { text:'ok', onPress: ()=>{
+                             setLoadingPedidoId(0)
+                                setVisiblePostPedido(false)
+                            busca();
+                        } 
+                    }
+                    ]   
+                )
+        }
+            
+           
        
-       if( resultPostApi.status === 200 && resultPostApi.data.results && resultPostApi.data.results.length > 0 ){
-            Alert.alert( '',  `Pedido id: ${item.id} enviado com sucesso!` , 
-                [
-                     { text:'ok', onPress: ()=>{
-                         setLoadingPedidoId(0)
-                            setVisiblePostPedido(false)
-                            busca();
-                        } 
-                    }
-                ]   
-                )
-       }else{
-           Alert.alert( '',  `Algo de inesperado ocorreu ao processar o pedido : ${item.id} !` , 
-                [
-                     { text:'ok', onPress: ()=>{
-                         setLoadingPedidoId(0)
-                            setVisiblePostPedido(false)
-                            busca();
-                        } 
-                    }
-                ]   
-                )
-       }
+  
     }
 
 

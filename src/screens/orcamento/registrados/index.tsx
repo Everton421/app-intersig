@@ -49,10 +49,11 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                 const value = await AsyncStorage.getItem('filtroPedidos');
                 if(value !== null ) {
                     return value;
+                }else{
+                    await AsyncStorage.setItem('filtroPedidos', statusPedido)
                 }
 
             }catch(e){  
-
                 console.log("erro ao consultar AsyncStorage")
             }
         }

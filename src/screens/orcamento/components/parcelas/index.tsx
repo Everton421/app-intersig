@@ -221,12 +221,12 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
     
     const ItemParcelas2 = ({ item }) => {
         return (
-            <View style={{margin:5, elevation:3, backgroundColor:'#FFF',  borderRadius:50}}>
+            <View style={{margin:5, elevation:3, backgroundColor:'#FFF',  borderRadius:40}}>
                 <TouchableOpacity style={{margin:3,   width:100}}  
                  onPress={()=> console.log(orcamento.parcelas)
 
                 }>
-                    <Text style={{  fontWeight:"bold"    }} >  R$ {item.valor.toFixed(2)}</Text>
+                    <Text style={{  fontWeight:"bold" ,color: '#6C757D'  }} >  R$ {item.valor.toFixed(2)}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -240,14 +240,14 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                    <View style={{flexDirection:'row', backgroundColor:'#185FED', justifyContent:'space-between', padding:10, borderRadius:7, elevation:5}}>
                      
                          <AntDesign name="creditcard" size={25} color="white" />
-                     <Text style={{color:'white', fontWeight:"bold",fontSize:20, width:90}}> 
+                     <Text style={{color:'white', fontWeight:"bold",fontSize:20, width:90  }}> 
                             parcelas</Text>
                      <AntDesign name="caretdown" size={22} color="white" />
                     </View> 
 
             </TouchableOpacity>
                   <View style={{marginHorizontal:5}}>
-                    <Text style={{fontWeight:"bold"}}> { orcamento.parcelas && orcamento.parcelas.length} Parcelas </Text>
+                    <Text style={{fontWeight:"bold", color: '#6C757D'}}> { orcamento.parcelas && orcamento.parcelas.length} Parcelas </Text>
                  </View>
 
                 <View style={{   width:'100%'}}>

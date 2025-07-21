@@ -79,8 +79,6 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       } else {
         setEditavel(true);
         setCodigoOrcamento(codigo_orcamento);
-        console.log('carrregando orcamento tipo', tipo)
-
       }
     }
     init();
@@ -243,13 +241,12 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+    <View style={{ flex: 1, backgroundColor: "#EAF4FE" }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
         {/** *** separador ***/}
-        <View style={{ borderWidth: 0.5, margin: 5 }}></View>
 
-        {codigo_orcamento && codigo_orcamento > 0 && editavel === true ? (
-          <Text style={{ marginLeft:7, fontWeight:"bold"}}>codigo: {codigo_orcamento}</Text>
+        {  editavel === true && orcamentoEditavel && orcamentoEditavel.id  ? (
+          <Text style={{ marginLeft:7, fontWeight:"bold",  color:'#6C757D' }}>Id: { orcamentoEditavel.id }</Text>
         ) : null}
 
         <View style={{ flexDirection: "row" }}>
@@ -275,27 +272,14 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
             codigo_orcamento={codigo_orcamento}
           />
         </View>
-        <View style={{ borderWidth: 0.2, margin: 5 }}></View>
 
         {/*/////////////////////////// detalhes /////////////////////////////////////*/}
+        <View style={{ borderWidth: 0.2, margin: 5 }}></View>
         <Detalhes orcamentoEditavel={orcamentoEditavel} />
       </ScrollView>
       <View
         style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "#FFF",
-          borderColor: "#ccc",
-          borderWidth: 1,
-          borderRadius: 5,
-          elevation: 5,
-          padding: 10,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
+          position: "absolute", bottom: 0, left: 0, right: 0,  backgroundColor: "#FFF",  borderColor: "#ccc",  borderWidth: 1,  borderRadius: 5, elevation: 5,  padding: 10,   flexDirection: "row",  alignItems: "center",  justifyContent: "space-between",  }}
       >
         <Text style={{ fontWeight: "bold", fontSize: 12 }}>
           Total: R$ {orcamento.total_geral?.toFixed(2)}

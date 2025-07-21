@@ -164,7 +164,7 @@ export const Login = ({ navigation }: any) => {
             style={{
               top: 10,
               backgroundColor: "#FFF",
-              width: "90%",
+              width: "95%",
               padding: 15,
               borderRadius: 10,
               justifyContent: "center",
@@ -186,38 +186,40 @@ export const Login = ({ navigation }: any) => {
             </Text>
 
             <View style={{ width: "100%" }}>
-
-              <Text style={{ color: "#185FED", fontWeight: "bold" }}> EMAIL </Text>
-              <View style={{ width: "100%", flexDirection: "row" }}>
-                <TextInput
-                  style={{ borderBottomWidth: 1, width: "90%" }}
-                  placeholder="example@example.com"
-                  onChangeText={(t) => setEmail(t)}
-                  value={email}
-                  autoComplete="email"
-                />
-              </View>
+              <View style={{ width: "100%",   alignItems:"center"}}>
+                 <Text style={{ alignSelf:'flex-start',marginLeft:15 ,color: "#185FED", fontWeight: "bold" }}>EMAIL </Text>
+                  <TextInput
+                    style={{ borderBottomWidth: 1, width: "90%" }}
+                    placeholder="example@example.com"
+                    onChangeText={(t) => setEmail(t)}
+                    value={email}
+                    autoComplete="email"
+                  />
+                </View>
             </View>
 
-            <View style={{ width: "100%", marginTop: 50, }}>
-              <Text style={{ color: "#185FED", fontWeight: "bold" }}> SENHA </Text>
-              <TextInput
-                style={{ borderBottomWidth: 1, width: "90%" }}
-                secureTextEntry={false}
-                onChangeText={(v) => setSenha(v)}
-                placeholder="*********"
-                value={senha}
-              />
-
-              <View style={{ margin: 10 }}>
+            <View style={{ width: "100%", marginTop: 50,  }}>
+             <View  style={{ width: "100%",alignItems:"center"}} > 
+                <Text style={{ alignSelf:'flex-start',marginLeft:10 ,color: "#185FED", fontWeight: "bold" }}> SENHA </Text>
+                <TextInput
+                  style={{ borderBottomWidth: 1, width: "90%" }}
+                  secureTextEntry={false}
+                  onChangeText={(v) => setSenha(v)}
+                  placeholder="*********"
+                  value={senha}
+                />
+            </View>
+              <View style={{ margin: 10  }}>
 
                 <TouchableOpacity
                   style={{
                     alignItems: "center",
                     padding: 10,
-                    borderRadius: 10,
+                    borderRadius: 5,
                     backgroundColor: "#185FED",
+                    elevation:5,
                   }}
+
                   onPress={() => logar()}
                 >
                   <Text

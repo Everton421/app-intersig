@@ -29,6 +29,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
   const [totalItens, setTotalItens] = useState(0);
   const [loading, setLoading] = useState(false);
   const [visibleProdutos, setVisibleProdutos] = useState(false);
+  const [ loadingEditItens, setLoadingEditItens  ]= useState(false);
 
   const { orcamento, setOrcamento } = useContext(OrcamentoContext);
   const { connected, setConnected } = useContext(ConnectedContext);
@@ -138,8 +139,11 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
   useEffect(() => {
     async function init() {
-      if (codigo_orcamento && codigo_orcamento > 0) {
-        console.log("editando***");
+      try{
+         if (codigo_orcamento && codigo_orcamento > 0) {
+        setLoadingEditItens(true);
+
+          console.log("editando***");
         console.log(codigo_orcamento);
         console.log("****");
         setSelectedItem([]);
@@ -152,7 +156,15 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
         }
         setSelectedItem(data);
+        setLoadingEditItens(false);
+      
       }
+      }catch(e){
+      }finally{
+        setLoadingEditItens(false);
+
+      }
+     
     }
 
     init();
@@ -163,18 +175,18 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
     return (
       <View
-        style={{backgroundColor: "#FFF", elevation: 5, margin: 3,borderRadius: 30, padding: 35, width: 300,}}   >
+        style={{backgroundColor: "#FFF",elevation:3, borderRadius:5,  margin: 3 , padding: 25, width: 300 }}   >
         <View
           style={{ flexDirection: "row", justifyContent: "space-between", margin: 3, }}
         >
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontWeight: "bold" }}>Codigo:</Text>
-            <Text> {" " + item.codigo} </Text>
+            <Text style={{ fontWeight: "bold" ,color: '#6C757D'}}>Codigo: 
+              {" " + item.codigo} </Text>
           </View>
 
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontWeight: "bold" }}>Unitario:</Text>
-            <Text>{" " + item?.preco.toFixed(2)}</Text>
+            <Text style={{ fontWeight: "bold",  color: '#6C757D'}}>Unitario: 
+             {" " + item?.preco.toFixed(2)}</Text>
           </View>
         </View>
         {
@@ -187,21 +199,19 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
            />
 
            ):(
-            <MaterialIcons name="no-photography" size={100} color=  "black" />
-
+            <MaterialIcons name="no-photography" size={100}  color= '#6C757D'/>
            )
         }
-        <Text numberOfLines={2}>{item.descricao}</Text>
+        <Text numberOfLines={2} style={{ fontWeight: "bold", color: '#6C757D' }}>  {item.descricao}</Text>
 
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontWeight: "bold" }}>Quantidade:</Text>
-            <Text>{" " + item.quantidade}</Text>
+            <Text style={{ fontWeight: "bold",color: '#6C757D' }}>Quantidade: 
+             {" " + item.quantidade}</Text>
           </View>
 
           <View style={{ flexDirection: "row" }}>
-            <Text style={{ fontWeight: "bold" }}>Total:</Text>
-            <Text>{" " + item?.total.toFixed(2)}</Text>
+            <Text style={{ fontWeight: "bold", color: '#6C757D' }}> Total: {" " + item?.total.toFixed(2)}</Text>
           </View>
         </View>
       </View>
@@ -339,19 +349,12 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ borderWidth: 0.5, margin: 5 }}></View>
 
-      <View style={{ alignItems: "center" }}>
-        <Text
-          style={{    fontWeight: "bold", width: "100%", textAlign: "center" }}
-        >
-          Produtos
-        </Text>
-      </View>
+  
 
       <TouchableOpacity
         onPress={() => setVisibleProdutos(true)}
-        style={{   margin: 5,   elevation: 10,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#185FED",  padding: 10,   borderRadius: 7,  width: "98%",
+        style={{  marginTop: 5, margin: 5,   elevation: 10,    flexDirection: "row",  justifyContent: "space-between",  backgroundColor: "#185FED",  padding: 10,   borderRadius: 7,  width: "98%",
         }}   >
         <FontAwesome name="search" size={22} color="#FFF" />
         <Text
@@ -360,9 +363,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
             fontWeight: "bold",
             fontSize: 20,
             width: '90%',
-            textAlign:"center"
-          }}
-        >
+            textAlign:"center"  }} >
           produtos
         </Text>
         <AntDesign name="caretdown" size={22} color="white" />
@@ -390,17 +391,9 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
                 <View
                   style={{   flexDirection: "row", justifyContent: "space-between",  marginBottom: 15,   margin: 5,   elevation: 5,  }}   >
                   <TextInput
-                    style={{
-                      backgroundColor: "#FFF",
-                     
-                      borderRadius: 4,
-                      width: "70%",
-                      marginTop: 3,
-                      elevation: 5,
-                      marginHorizontal: 5,
+                    style={{  backgroundColor: "#FFF",  borderRadius: 4,  width: "70%",   marginTop: 3,  elevation: 5,   marginHorizontal: 5,
                     }}
                     placeholder="Pesquisar"
-                    // value={pesquisa}
                     onChangeText={adiciona}
                     placeholderTextColor="#185FED"
                   />
@@ -441,11 +434,15 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
           {/** 
                             <Cart/>
                         */}
-          <Text style={{ fontSize: 15, fontWeight: "bold", width: "100%" }}>
+          <Text style={{ fontSize: 15, fontWeight: "bold", width: "100%" ,color: '#6C757D'}}>
             Total Produtos:{" "}
             {orcamento.total_produtos ? orcamento.total_produtos.toFixed(2) : 0}
           </Text>
         </View>
+{
+  loadingEditItens ? (
+     <ActivityIndicator size={50} color='#185FED'  />
+  ):(
 
         <FlatList
           data={selectedItem}
@@ -453,7 +450,11 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
           renderItem={({ item }) => renderProdutosSelecionado(item)}
           keyExtractor={(item) => item.codigo.toString()}
         />
-      </View>
+  )
+
+}
+
+        </View>
     </View>
   );
 };

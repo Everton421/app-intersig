@@ -305,48 +305,45 @@ export const Servico = ( { codigo_orcamento }:any )=>{
   function renderServicoSelecionado ( item ){
 
       return(
-        <View style={{ backgroundColor: '#FFF', elevation: 7, margin: 3, borderRadius: 30, padding: 35, width:300 }}>
+        <View style={{  borderRadius:5, elevation:3 ,backgroundColor: '#FFF',  margin: 10,  padding: 25, width:300 }}>
            
            <View style={{flexDirection:'row', justifyContent:'space-between', margin:3}}>
               
               <View style={{flexDirection:'row' }}>
-                <Text style={{fontWeight:'bold'}}>
+                <Text style={{fontWeight:'bold' , color: '#6C757D'}}>
                  Codigo:
-                </Text>
-                <Text> { ' '+item.codigo} </Text>
+                
+                 { ' '+item.codigo} </Text>
               </View>
 
                 <View style={{flexDirection:'row' }}>
-                  <Text style={{fontWeight:'bold'}} >
+                  <Text style={{fontWeight:'bold',color: '#6C757D'}} >
                     Unitario:
-                  </Text>
-                  <Text>
+                  
                   {' '+ item.valor}
                   </Text>
                 </View>
             
             </View>
 
-            <Text numberOfLines={2} >
+            <Text numberOfLines={2} style={{color: '#6C757D', fontWeight:'bold'}} >
               { item.aplicacao } 
             </Text>
 
 
       <View style={{flexDirection:'row', justifyContent:'space-between' }} >
             <View style={{flexDirection:'row' }}>
-              <Text style={{fontWeight:'bold'}} >
+              <Text style={{fontWeight:'bold', color: '#6C757D'}} >
                 Quantidade:
-              </Text>
-              <Text>
+         
               {' '+item.quantidade}
               </Text>
             </View>
 
             <View style={{flexDirection:'row' }}>
-                <Text style={{fontWeight:'bold'}} >
+                <Text style={{fontWeight:'bold',color: '#6C757D'}} >
                   Total: 
-                </Text>
-                <Text>
+              
                  {' '+item.total}
                 </Text>
             </View>
@@ -360,9 +357,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
       return(
         
         <View   >
-
-          {/** separador */}
-      <View style={{ borderWidth: 0.5, margin: 5 }}></View> 
+ 
                    
                     <View style={{flexDirection:'row', alignItems:'center',   justifyContent:'center'  }}>
                       <Text style={{fontSize:15,fontWeight:'bold' }}>
@@ -532,8 +527,8 @@ export const Servico = ( { codigo_orcamento }:any )=>{
 
                      }
 
-          <View style={{ flexDirection:'row', justifyContent:'space-between', margin:10}}>
-            { servicosSelecionado?.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold'}}> total serviços :{ totalItens.toFixed(2)}  </Text>): null }
+          <View style={{ flexDirection:'row', justifyContent:'space-between', margin:5}}>
+            { servicosSelecionado?.length > 0 ? ( <Text style={{ fontSize:15 ,fontWeight:'bold', color: '#6C757D'}}> total serviços :{ totalItens.toFixed(2)}  </Text>): null }
                       {
                         selectedVeiculo ? ( <Text style={{fontWeight:'bold'}}> placa: {selectedVeiculo?.placa } </Text>) : null
                       } 

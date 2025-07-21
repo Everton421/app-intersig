@@ -20,6 +20,7 @@
         "foregroundImage": "./assets/splash-intersig.png",
         "backgroundColor": "#ffffff"
       },
+      "versionCode":1,
       "package": "com.everton421.appintersig",
       "permissions": [
         "ACCESS_NETWORK_STATE",
@@ -33,6 +34,18 @@
       "eas": {
         "projectId": "74c7d393-dcc5-47f0-bd03-56678a77a9f3"
       }
+    },
+    "plugins": [
+  [
+    "expo-build-properties",
+    {
+      "android": {
+        "enableProguardInReleaseBuilds": true,
+        "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
+        "allowBackup": false
+      }
     }
+  ]
+]
   }
 }

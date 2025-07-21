@@ -74,8 +74,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ margin: 5 }}>
-        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold' }}>Detalhes</Text>
-        <View style={{ borderWidth: 0.4 }}></View>
+        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Detalhes</Text>
 
         <View>
           <View style={{ margin: 10 }}>
@@ -90,7 +89,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ borderWidth: 0.4 }}></View>
+          <View style={{ borderWidth: 0.2 }}></View>
 
           {
             showPicker && (
@@ -105,10 +104,9 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
           }
         </View>
 
-          <Text style={{ fontWeight:'bold', margin: 8 }}>
+          <Text style={{ fontWeight:'bold', margin: 8,color: '#6C757D' }}>
              Situação :
-              {   orcamento?.situacao === 'EA' && 'Em Aberto' }
-              {   orcamento?.situacao === 'AI' && 'Aprovado Integralmente' }
+              
            </Text>
 
               <View style={{ flexDirection:'row', justifyContent:'space-between',width:'100%'  }} >

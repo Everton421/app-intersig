@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Touchable } from 'react-native';
+import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Touchable, ActivityIndicator } from 'react-native';
 import { ClienteContext } from '../../../../contexts/clienteDoOrcamento';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -16,11 +16,10 @@ export const ListaClientes = ( {  codigo_orcamento }:any ) => {
   const [pesquisa, setPesquisa] = useState('');
   const [selectedItem, setSelectedItem] = useState({});
   const [data, setData] = useState([]);
-  const [totalItens, setTotalItens] = useState(0);
+  const [ loadingClient, setLoadingClient ] = useState(false);
 
   const [ visibleClientes, setVisibleClientes ] = useState<boolean>(false);
 
- const { connected, setConnected } = useContext(ConnectedContext)
    
  const useQueryClients = useClients();
  const useQuerypedidos   = usePedidos();
@@ -58,6 +57,7 @@ export const ListaClientes = ( {  codigo_orcamento }:any ) => {
               const pedido = responsePedido[0];
                if(pedido.codigo_cliente && pedido.codigo_cliente > 0  ){
                  try{
+                  setLoadingClient(true)
                     let cliente:any = await useQueryClients.selectByCode(pedido.codigo_cliente);
 
                     setSelectedItem(cliente[0])
@@ -66,8 +66,12 @@ export const ListaClientes = ( {  codigo_orcamento }:any ) => {
                       ...prevOrcamento,
                       cliente: cliente[0]
                     }));
-
-                 }catch(e){ console.log("Erro ao consultar o cliente do pedido:",codigo_orcamento)}
+                  setLoadingClient(false)
+                 }catch(e){
+                   console.log("Erro ao consultar o cliente do pedido:",codigo_orcamento)
+                 } finally{
+                  setLoadingClient(false)
+                 }
                }
           }
       }
@@ -144,15 +148,30 @@ function seleciona(item){
                        <AntDesign name="caretdown" size={22} color="white"    />
 
       </TouchableOpacity>
-            <View style={{ justifyContent: 'center', backgroundColor: '#FFF' ,margin:7  }}>
-                    
-                    <Text style={{ fontWeight: 'bold',width:'100%' }}> {selectedItem?.nome}</Text>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between',width:'100%' }}>
-                        <Text style={{ fontWeight: 'bold', width:'100%' }}> cnpj: {selectedItem?.cnpj}</Text>
-                    </View>
-                    <Text style={{ alignSelf:'flex-end' ,fontWeight: 'bold' }}>celular: {selectedItem?.celular}</Text>
+          
 
-                </View>
+         <View style={{ justifyContent: 'center', alignItems:'center', backgroundColor: '#FFF', borderWidth: 1, borderColor:'#DEE2E6' , width:'98%'}}>
+                    { loadingClient ?  
+                    ( 
+                    <ActivityIndicator size={35} color="#185FED"  /> 
+                    ) :(
+                     <View>
+                    <View style={{margin:2, flexDirection: 'row', justifyContent: 'space-between',width:'100%' }}>
+                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D'}}> Cliente:</Text>
+                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' }}> { selectedItem?.nome} </Text>
+                    </View>
+                   
+                        <View style={{  margin:2, flexDirection: 'row', justifyContent: 'space-between',width:'98%' }}>
+                          <Text style={{    fontWeight: 'bold'  ,color: '#6C757D'}}> 
+                            cnpj: {selectedItem?.cnpj}
+                          </Text>
+                         <Text style={{ fontWeight: 'bold'  ,color: '#6C757D'}}> celular: {selectedItem?.celular}</Text>
+                     </View> 
+                    </View>
+                     )
+                     }
+
+           </View>
 
       <Modal visible={visibleClientes}
       animationType="slide"
@@ -224,7 +243,8 @@ function seleciona(item){
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-     
+       alignItems: 'center',
+    justifyContent: 'center',
   },
   item: {
     padding: 20,

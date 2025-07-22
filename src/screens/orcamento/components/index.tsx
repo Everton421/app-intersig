@@ -82,7 +82,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       }
     }
     init();
-    
+    console.log('init useEffect ****')
   }, []);
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
@@ -99,7 +99,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       setTotalGeral(0);
       setDescontosGeral(0);
 
-      Alert.alert(response);
+      Alert.alert('',response);
       navigation.goBack();
     }
 
@@ -118,6 +118,8 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       Alert.alert(response);
       navigation.goBack();
     }
+   // console.log('useEffect pedido cadastrado/atualizado ****')
+
   }, [status, response, navigation, setOrcamento]);
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
@@ -161,6 +163,8 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       descontos: totaDescontosProdutos,
       data_recadastro: dataHora,
     }));
+
+
   }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
   ////////////////////////////////////////////////////////////////////////////
   

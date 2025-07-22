@@ -113,8 +113,12 @@ export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
                     <ScrollView showsVerticalScrollIndicator={false}>
                         {/* Informações Gerais */}
                         <View style={styles.section}>
-                            <InfoRow label="Data Cadastro:" value={orcamento.data_cadastro} />
+                            <InfoRow label="Data Cadastro:" value={  new Date(orcamento?.data_cadastro).toLocaleString("pt-br", {    year: "numeric", month: "short", day: "numeric"  }) } />
+
                             <InfoRow label="Cliente:" value={`${orcamento.cliente.codigo} - ${orcamento.cliente.nome}`} />
+                            <InfoRow label="Última alteração::" value={   new Date(orcamento?.data_recadastro).toLocaleTimeString("pt-br", { month: "short", day: "numeric"  })   } />
+                           
+
                         </View>
 
                         {/* Totais */}

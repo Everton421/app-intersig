@@ -37,6 +37,8 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
         const [ visiblePostPedido, setVisiblePostPedido ] = useState(false);
         const [ loadingPedidoId, setLoadingPedidoId ] = useState<number>(0)
 
+        const [  loadingEditOrder, setLoadingEditOrder ] = useState(false);
+
         const [data_cadastro , setData_cadastro] = useState( useMoment.primeiroDiaMes())
         const [ orcamentoModal,setOrcamentoModal] = useState();
         
@@ -102,16 +104,17 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
             }, [ navigation])  
     );
 
-    useEffect(()=>{
-        async function busca(){
-            if( selecionado !== undefined ){
-                let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
-                setOrcamento(aux );
-            }else { return }  
-
-        }
-     busca()
-    },[selecionado])
+    //useEffect(()=>{
+    //    async function busca(){
+    //        if( selecionado !== undefined ){
+    //            let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
+    //             setOrcamento(aux );
+    //        }else { return }  
+//
+    //    }
+    // busca()
+    //},[selecionado])
+    //
     /////////////////////////////////////////////////
     
   
@@ -170,23 +173,24 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                     ]   
                 )
         }
-            
-           
-       
-  
     }
 
-
-
-
-
     function selecionaOrcamento(item){
+    setLoadingEditOrder(true)
+
+        try{
+
           setSelecionado(item);
-         //setVisible(true);
-         navigation.navigate('editarOrcamento',{
-            codigo_orcamento: item.codigo,
-            tipo: item.tipo
-         });
+          navigation.navigate('editarOrcamento',{
+             codigo_orcamento: item.codigo,
+             tipo: item.tipo
+          });
+    setLoadingEditOrder(false)
+
+        }catch(e){
+        }finally{ 
+    setLoadingEditOrder(false)
+        }
     }
 
     function stiloItem(item:any){
@@ -248,7 +252,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                             <Text style={{fontWeight:"bold", color:'white', margin:3 ,width:'90%' }}>
                                    Total R$: {item?.total_geral.toFixed(2)}
                             </Text>
-                                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI'  ? 
+                                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI' && item.situacao !== "FP" ? 
                                             <TouchableOpacity 
                                             onPress={()=>  deleteOrder(item)  }
                                             >
@@ -263,17 +267,20 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                         </Text>
                         
                 { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
-                      <TouchableOpacity onPress={( )=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                      <TouchableOpacity onPress={()=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
                               <Feather name="edit" size={24} color="#009de2" />
                       </TouchableOpacity>
                       : null     
                   }
-                      <Text style={{fontWeight:"bold", color:'white', marginTop:2}}>
-                          Data Cadastro: {item?.data_cadastro} 
-                      </Text>
 
-                     <View style={{ flexDirection:"row", justifyContent:"space-between"}}>
-                        {
+                      <Text style={{fontWeight:"bold", color:'white', marginTop:2}}>
+                          Cadatrado: { new Date(item?.data_cadastro).toLocaleString("pt-br", {    year: "numeric", month: "short", day: "numeric"  }) }
+                      </Text>
+                   
+
+
+                     <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
+                            {
                             item.enviado === 'S'?
                             <Ionicons name="checkmark-done" size={24} color="#73FBFD" />
                             :
@@ -297,6 +304,13 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                         }
 
                       </View>
+                     <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
+                    
+                         <Text style={{fontWeight:"bold", color:'white', marginTop:2}}>
+                             Última alteração: { new Date(item?.data_recadastro).toLocaleTimeString("pt-br", { month: "short", day: "numeric"  }) }
+                        </Text>
+                      </View>
+
                </View>
         )
     }
@@ -319,32 +333,17 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                             <AntDesign name="filter" size={35} color="#FFF" />
                         </TouchableOpacity>
                 </View>
-            </View>  
-
-
-
-                {
-/*
-                   <Modal  visible={ true }  transparent={true} >
-                              <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" , flex:1, alignItems:"center", justifyContent:"center" }}>
-                                <View style={{ backgroundColor:'#FFF', width:'80%',alignItems:"center", justifyContent:"center", height:'40%', marginTop:10, borderRadius:10 }}>    
-                                        <Text style={{ color:'blue', fontWeight:"bold", fontSize:20}} >
-                                                Processando Pedido:  { postPedidoS && postPedidoS}
-                                        </Text>
-                                        <ActivityIndicator size={50} color="blue"  />
-                               </View>
-                       </View>
- 
-                </Modal>
-                    */
-                }
-
+              </View>  
+                    <Modal  visible={loadingEditOrder}  transparent={true} >
+                            <View style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" , flex:1, alignItems:"center", justifyContent:"center" }}>
+                                <ActivityIndicator size={50} color="#185FED" /> 
+                        </View>  
+              </Modal> 
         {/******************************************* */}
                         <ModalFilter visible={visible} setVisible={ setVisible}  setStatus={setStatusPedido} setDate={setData_cadastro} />
         {/******************************************* */}
                        <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
         {/******************************************* */}
-
 
         {/******************************************* */}
                         <FlatList
@@ -354,7 +353,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                         contentContainerStyle={{ paddingBottom: 100 }} 
                         />
 
-                   {/*********    botao Novo Pedido  */}
+                 {/*********    botao Novo Pedido  */}
                             <TouchableOpacity onPress={()=> navigation.navigate(to)} 
                                 style={{
                                          backgroundColor:'#185FED' ,  width:50, height:50,   
@@ -362,7 +361,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                                   <MaterialIcons name="add-circle" size={45} color="#FFF" />
                              </TouchableOpacity>
 
-                   {/*********    lista de status dos pedidos  */}
+                {/*********    lista de status dos pedidos  */}
                     <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#FFF',   padding: 10 ,  }}>
                         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', margin:3  }}>
                             <View style={{  alignItems:"center"}}>

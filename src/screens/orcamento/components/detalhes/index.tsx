@@ -74,7 +74,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ margin: 5 }}>
-        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Detalhes</Text>
+        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Detalhes:</Text>
 
         <View>
           <View style={{ margin: 10 }}>
@@ -104,19 +104,16 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
           }
         </View>
 
-          <Text style={{ fontWeight:'bold', margin: 8,color: '#6C757D' }}>
-             Situação :
-              
-           </Text>
+        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Situação:</Text>
 
               <View style={{ flexDirection:'row', justifyContent:'space-between',width:'100%'  }} >
-                <TouchableOpacity style={  [     orcamento?.situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#CCC'}    ,{  width: 95 ,padding:5,  borderRadius:5 , elevation:5}  ] } 
+                <TouchableOpacity style={  [     orcamento?.situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#FFF'}    ,{  width: 95 ,padding:5,  borderRadius:5 , elevation:5}  ] } 
                   onPress={ ()=> setSituacao('EA') }
                  >
                     <Text  style={  [ orcamento?.situacao  === 'EA' && { color:'#FFF'}  ,{width:'100%'} ]  } >Orçamento</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={  [    orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#CCC'}  ,{ width: 95 ,padding:5, borderRadius:5 , elevation:5}  ] }
+                <TouchableOpacity style={  [    orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#FFF'}  ,{ width: 95 ,padding:5, borderRadius:5 , elevation:5}  ] }
                     onPress={ ()=> setSituacao('AI') }
                    >
                    <Text  style={  [  orcamento?.situacao  === 'AI' && { color:'#FFF'} ,{width:'100%'} ] } > Pedido </Text>
@@ -127,11 +124,12 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
 
 
         <View style={{ margin: 5 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Observações</Text>
+        <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}> Observações:</Text>
           <TextInput
-            style={{ margin: 5, borderWidth: 1.5, borderRadius: 7, borderColor: '#009de2', textAlign: "center" }}
+            style={{ margin: 5,fontWeight:'bold', borderWidth: 1.5, borderRadius: 7, borderColor: '#6C757D', textAlign: "center" }}
             numberOfLines={5}
-            placeholder="observações"
+            placeholder="Observações"
+            placeholderTextColor='#6C757D'
             value={observacoes}
             onChangeText={ setObservacoes}
           />

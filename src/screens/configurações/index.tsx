@@ -550,17 +550,18 @@ setMsgApi('')
   };
 
   async function syncOrders(){
-      if(loading){
-      Alert.alert('Aguarde!','Estabelecendo conexão...');
-    }
-    if (!connected) {
-      Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
-      return;
-    }
-    if (!conectado) {
-      Alert.alert(msgApi );
-      return;
-    }
+    //  if(loading){
+    //  Alert.alert('Aguarde!','Estabelecendo conexão...');
+    //}
+    //if (!connected) {
+    //  Alert.alert('É necessário estabelecer conexão com a internet para efetuar o sincronismo dos dados!');
+    //  return;
+    //}
+    //if (!conectado) {
+    //  Alert.alert(msgApi );
+    //  return;
+    //}
+
     try{
       setIsLoadingOrder(true)
       let dataPedidos:any = formatDate(date)

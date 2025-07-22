@@ -282,7 +282,7 @@ const getCurrentDate = () => {
       vendedor:number,
       data:any,
       situacao:string
-      cliente:string
+      input:string
     }
     async function newSelect ( query: Partial<queryOrder> ) {
       try{ 
@@ -315,6 +315,10 @@ const getCurrentDate = () => {
 
           let conditions = []
           let values = []
+
+          let inputConditions = []
+          let inputValues = []
+
           if(query.tipo){
               conditions.push( ' p.tipo = ? ' );
             values.push( query.tipo );
@@ -328,18 +332,24 @@ const getCurrentDate = () => {
              values.push( query.data );
           }
 
-          if( query.cliente){
-            conditions.push(' c.nome like ? ')
-             values.push( `%${query.cliente}%` );
-          }
+            if( query.input){
+              inputConditions.push(`  AND  c.nome like '%${query.input}%' `)
+            }
+          if( query.input){
+              inputConditions.push( ` p.id like '%${query.input}%' ` )
+            }
+          if( query.input){
+               inputConditions.push(` p.id_externo like  '%${query.input}%' `)
+             }
 
        if (query.situacao !== '*'){
             conditions.push( ' p.situacao = ? ' );
              values.push( query.situacao );
           }
-          let finalSql = sql + ' WHERE '+ conditions.join(' AND ') + ' ORDER BY p.data_cadastro' ;
-          //console.log(finalSql)
-          //console.log(values)
+
+      let finalSql= sql;
+
+              finalSql = sql + ' WHERE '+ conditions.join(' AND ') +   inputConditions.join(' OR ') +' ORDER BY p.data_cadastro' ;
 
         let result = await db.getAllAsync(finalSql,values );
        

@@ -81,15 +81,16 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                     console.log("usuario invalido!")
                     return
                 }
-                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:dataFiltroPedidos ,situacao: filtroStatus     }
+                let queryOrder = { tipo:tipo , vendedor: usuario.codigo, data:dataFiltroPedidos ,situacao: filtroStatus  ,input:''  }
 
 
-                if( pesquisa !== null &&  pesquisa !== '' ) queryOrder.cliente = pesquisa
-          console.log("Consultando...", queryOrder)
+                if( pesquisa !== null &&  pesquisa !== '' ) queryOrder.input = pesquisa
              let aux:any = await useQuerypedidos.newSelect( queryOrder );
                      setOrcamentosRegistrados(aux);
                      setVisiblePostPedido(false);
-            }
+          //console.log("query...", aux)
+            
+                    }
  
    
     /////////////////////////////////////////////////
@@ -104,17 +105,17 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
             }, [ navigation])  
     );
 
-    //useEffect(()=>{
-    //    async function busca(){
-    //        if( selecionado !== undefined ){
-    //            let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
-    //             setOrcamento(aux );
-    //        }else { return }  
-//
-    //    }
-    // busca()
-    //},[selecionado])
-    //
+     useEffect(()=>{
+         async function busca(){
+             if( selecionado !== undefined ){
+                 let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
+                  setOrcamento(aux );
+             }else { return }  
+ 
+         }
+      busca()
+     },[selecionado])
+     
     /////////////////////////////////////////////////
     
   
@@ -325,9 +326,10 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                  </TouchableOpacity>
                  <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
                     < TextInput 
-                        style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
+                        style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5,   borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
                         onChangeText={(value)=>setPesquisa(value)}
-                        placeholder="pesquisar"
+                        placeholderTextColor="#a0a0a0ff"
+                        placeholder="pesquisar:  cliente, id pedido ..."
                     /> 
                       <TouchableOpacity  onPress={()=> setVisible(true )} style={{  padding:2}}>
                             <AntDesign name="filter" size={35} color="#FFF" />

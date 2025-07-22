@@ -20,11 +20,11 @@
         "foregroundImage": "./assets/splash-intersig.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode":1,
+      "versionCode": 1,
       "package": "com.everton421.appintersig",
       "permissions": [
         "ACCESS_NETWORK_STATE",
-        "ACCESS_WIFI_STATE" 
+        "ACCESS_WIFI_STATE"
       ]
     },
     "web": {
@@ -36,16 +36,17 @@
       }
     },
     "plugins": [
-  [
-    "expo-build-properties",
-    {
-      "android": {
-        "enableProguardInReleaseBuilds": true,
-        "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
-        "allowBackup": false
-      }
-    }
-  ]
-]
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
+            "allowBackup": false
+          }
+        }
+      ],
+      "expo-sqlite"
+    ]
   }
 }

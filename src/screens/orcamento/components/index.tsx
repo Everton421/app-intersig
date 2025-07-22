@@ -78,6 +78,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         }));
       } else {
         setEditavel(true);
+        console.log(orcamentoEditavel)
         setCodigoOrcamento(codigo_orcamento);
       }
     }
@@ -250,7 +251,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         {/** *** separador ***/}
 
         {  editavel === true && orcamentoEditavel && orcamentoEditavel.id  ? (
-          <Text style={{ marginLeft:7, fontWeight:"bold",  color:'#6C757D' }}>Id: { orcamentoEditavel.id }</Text>
+          <Text style={{ marginLeft:10, fontWeight:"bold",fontSize:20,  color:'#6C757D' }}>Pedido Id: { orcamentoEditavel.id }</Text>
         ) : null}
 
         <View style={{ flexDirection: "row" }}>

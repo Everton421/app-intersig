@@ -11,6 +11,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useParcelas } from "../../../../database/queryParcelas/queryParcelas";
 import { usePedidos } from "../../../../database/queryPedido/queryPedido";
+import { Ionicons } from "@expo/vector-icons";
 
 export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
@@ -160,7 +161,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
     const ItemFormas = ({ item }) => {
         return (
-            <View style={{margin:3, elevation:5, backgroundColor:'#185FED',padding:5, borderRadius:7}}>
+            <View style={{margin:10, elevation:5, backgroundColor:'#185FED',padding:5, borderRadius:7}}>
                 <TouchableOpacity onPress={() => selecionaFormaPagamento(item)}>
                     <Text style={{color:'white',fontWeight:"bold"}} >
                         {item.codigo} {item.descricao}
@@ -221,12 +222,12 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
     
     const ItemParcelas2 = ({ item }) => {
         return (
-            <View style={{margin:5, elevation:3, backgroundColor:'#FFF',  borderRadius:40}}>
+            <View style={{margin:5, elevation:3, backgroundColor:'#FFF',  borderRadius:5}}>
                 <TouchableOpacity style={{margin:3,   width:100}}  
                  onPress={()=> console.log(orcamento.parcelas)
 
                 }>
-                    <Text style={{  fontWeight:"bold" ,color: '#6C757D'  }} >  R$ {item.valor.toFixed(2)}</Text>
+                    <Text style={{  fontWeight:"bold" ,color: '#6C757D',fontSize:15  }} >  R$ {item.valor.toFixed(2)}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -247,7 +248,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
             </TouchableOpacity>
                   <View style={{marginHorizontal:5}}>
-                    <Text style={{fontWeight:"bold", color: '#6C757D'}}> { orcamento.parcelas && orcamento.parcelas.length} Parcelas </Text>
+                                <Text style={{  fontWeight:"bold" ,color: '#6C757D',fontSize:18  }} > { orcamento.parcelas && orcamento.parcelas.length} Parcelas </Text>
                  </View>
 
                 <View style={{   width:'100%'}}>
@@ -265,31 +266,11 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                 animationType="slide"
                 transparent={true}
             >
-                <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 15 }}>
-                    <View
-                        style={{
-                            margin: 20,
-                            backgroundColor: 'white',
-                            borderRadius: 20,
-                            width: '90%',
-                            height: '90%',
-                            shadowColor: '#000',
-                            shadowOffset: {
-                                width: 0,
-                                height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            elevation: 5,
-                        }}
-                    >
-                        <TouchableOpacity onPress={() => setVisible(false)}
-                            style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '25%', elevation: 5 }}>
-                            <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                                Voltar
-                            </Text>
-                        </TouchableOpacity>
-
+                <View style={ { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end',width: "100%", }}>
+                    <View  style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopEndRadius: 20, borderTopStartRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }} >
+                    <TouchableOpacity onPress={() => setVisible(false)}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                            <Ionicons name="close" size={28} color={ '#6C757D' } />
+                    </TouchableOpacity>
                         <View>
 
                             <View style={{margin:3}} >
@@ -321,26 +302,23 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
 
                             <View style={{ height: '70%'  }}>
                                  
-                                        <Modal visible={press} transparent={true}>
-                                        <View style={{  elevation:5, marginHorizontal:20 ,height:'80%', width:'90%' , backgroundColor: '#FFF' ,marginTop:30, borderRadius:30, padding:10}}>
+                                    <Modal visible={press} transparent={true}>
+                                  <View style={ { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end',width: "100%", }}>
+                                          <View  style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopEndRadius: 20, borderTopStartRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }} >   
+                                        <TouchableOpacity onPress={() => {setPress(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                                                    <Ionicons name="close" size={28} color={ '#6C757D' } />
+                                            </TouchableOpacity>
+                                                    <View style={{alignItems:"center",padding:5}} >
+                                                        <Text style={{fontWeight:"bold"}}> Formas De Pagamento </Text>
+                                                     </View>
 
-                                              <TouchableOpacity onPress={() => {setPress(false)  }}
-                                                    style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                                                    <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                                                    voltar
-                                                    </Text>
-                                                </TouchableOpacity>
-
-                                                <View style={{alignItems:"center",padding:5}} >
-                                                    <Text style={{fontWeight:"bold"}}> Formas De Pagamento </Text>
-                                               </View>
-
-                                                <FlatList
-                                                    data={formas}
-                                                    renderItem={({ item }) => <ItemFormas item={item} />}
-                                                    keyExtractor={(i: any) => i.codigo}
-                                                />
-                                                </View>
+                                                    <FlatList
+                                                        data={formas}
+                                                        renderItem={({ item }) => <ItemFormas item={item} />}
+                                                        keyExtractor={(i: any) => i.codigo}
+                                                    />
+                                              </View>
+                                          </View>
                                         </Modal>
      
                                     <View>

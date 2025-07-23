@@ -261,8 +261,12 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         {/*//////////////// components serviços  ////////////////////////*/}
         {tipo && tipo === 3 && (
           <View>
+        <View style={{ borderWidth: 0.4, margin: 10 }}></View>
             <Servico codigo_orcamento={codigo_orcamento} />
+        <View style={{ borderWidth: 0.4, margin: 10 }}></View>
+          
           </View>
+          
         )}
         {/*//////////////// components produtos  ////////////////////////*/}
         <View style={{ flexDirection: "row", margin: 5 }}>
@@ -279,8 +283,8 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         </View>
 
         {/*/////////////////////////// detalhes /////////////////////////////////////*/}
-        <View style={{ borderWidth: 0.2, margin: 5 }}></View>
-        <Detalhes orcamentoEditavel={orcamentoEditavel} />
+            <View style={{ borderWidth: 0.4, margin: 10 }}></View>
+            <Detalhes orcamentoEditavel={orcamentoEditavel} />
       </ScrollView>
       <View
         style={{

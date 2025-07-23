@@ -8,6 +8,7 @@ import { ConnectedContext } from '../../../../contexts/conectedContext';
 import { useClients } from '../../../../database/queryClientes/queryCliente';
 import { AuthContext } from '../../../../contexts/auth';
 import { usePedidos } from '../../../../database/queryPedido/queryPedido';
+import { Ionicons } from '@expo/vector-icons';
 
 
 
@@ -157,8 +158,8 @@ function seleciona(item){
                     ) :(
                      <View>
                     <View style={{margin:2, flexDirection: 'row',  width:'100%' }}>
-                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D'}}> Cliente:</Text>
-                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' }} numberOfLines={3}> { selectedItem?.nome} </Text>
+                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D',width:'10%'}}> Cliente:</Text>
+                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' ,width:'90%' }} numberOfLines={3}> { selectedItem?.nome} </Text>
                     </View>
                    
                         <View style={{ padding:5  ,flexDirection: 'row', justifyContent: 'space-between',width:'98%' }}>
@@ -177,47 +178,25 @@ function seleciona(item){
       animationType="slide"
       transparent={true}
       >
-      
- <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 15 }}>
-                    <View
-                        style={{
-                            margin: 20,
-                            backgroundColor: 'white',
-                            borderRadius: 20,
-                            width: '90%',
-                            height: '90%',
-                            shadowColor: '#000',
-                            shadowOffset: {
-                                width: 0,
-                                height: 2,
-                            },
-                            shadowOpacity: 0.25,
-                            shadowRadius: 4,
-                            elevation: 5,
-                        }}
-                    >
+       <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
+                  <View style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
      
-
             <View style={{padding:5}}>
-            <TouchableOpacity onPress={()=>setVisibleClientes(false)}
-                   style={{margin:15, backgroundColor:'#185FED',padding:7, borderRadius:7,width:'25%',elevation: 5}} >
-                    <Text style={{color:'#FFF',fontWeight:'bold'}}>
-                      voltar
-                    </Text>
-                  </TouchableOpacity>
+           
+                      <TouchableOpacity  onPress={()=>setVisibleClientes(false)}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                            <Ionicons name="close" size={28} color={ '#6C757D' } />
+                    </TouchableOpacity>
             </View>
 
             <View style={{marginBottom:20, margin:5, flexDirection:'row',justifyContent:'space-between', elevation:5}}>
                 <TextInput
-                  style={styles.input}
+                            style={{backgroundColor: "#FFF",fontWeight:'bold', margin:2, borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd'}}
                   placeholder='Pesquisar'
                   value={pesquisa}
                   onChangeText={adiciona}
                   placeholderTextColor='#185FED'
                 />
-                    <TouchableOpacity  style={{  borderRadius: 5,backgroundColor: 'red',width: 50,  alignItems: 'center',justifyContent:'center' }}>
-                        <Text style={{color:'#FFF',fontWeight:'bold'}}>limpar</Text>
-                    </TouchableOpacity>
+                
              </View>
 
             <View style={{backgroundColor:'#dcdcdd'}}>

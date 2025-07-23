@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Text, TextInput, Touchable, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { Text, TextInput,  TouchableOpacity,  View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Fontisto from '@expo/vector-icons/Fontisto';
 import { OrcamentoContext } from '../../../../contexts/orcamentoContext';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 export const Detalhes = ( {orcamentoEditavel} ) => {
   const [date, setDate] = useState(new Date());
@@ -72,7 +72,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor:'#FFF', elevation:2, borderRadius:10, margin:3 }}>
       <View style={{ margin: 5 }}>
         <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Detalhes:</Text>
 
@@ -107,16 +107,19 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
         <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Situação:</Text>
 
               <View style={{ flexDirection:'row', justifyContent:'space-between',width:'100%'  }} >
-                <TouchableOpacity style={  [     orcamento?.situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#FFF'}    ,{  width: 95 ,padding:5,  borderRadius:5 , elevation:5}  ] } 
+                <TouchableOpacity style={  [     orcamento?.situacao  === 'EA' ?  { backgroundColor:'green'} :  { backgroundColor:'#FFF'}    ,{  alignItems:'center',gap:5, width: 120 ,padding:5,  borderRadius:5 , elevation:5, flexDirection:'row'}] } 
                   onPress={ ()=> setSituacao('EA') }
                  >
-                    <Text  style={  [ orcamento?.situacao  === 'EA' && { color:'#FFF'}  ,{width:'100%'} ]  } >Orçamento</Text>
+                   <FontAwesome5 name="clipboard-list" size={24} color={ orcamento?.situacao  === 'EA' ? '#FFF' : '#000'}  />
+                    <Text  style={  [ orcamento?.situacao  === 'EA' && { color:'#FFF'}  ,{width:'100%', fontWeight:'bold', fontSize:15} ]  } >Orçamento</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={  [    orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#FFF'}  ,{ width: 95 ,padding:5, borderRadius:5 , elevation:5}  ] }
+                <TouchableOpacity style={  [    orcamento?.situacao  === 'AI' ? { backgroundColor:'#009de2'} :  { backgroundColor:'#FFF'}  ,{ gap:5, alignItems:'center',width: 120 ,padding:5, borderRadius:5 , elevation:5, flexDirection:'row'}  ] }
                     onPress={ ()=> setSituacao('AI') }
                    >
-                   <Text  style={  [  orcamento?.situacao  === 'AI' && { color:'#FFF'} ,{width:'100%'} ] } > Pedido </Text>
+                             <FontAwesome5 name="clipboard-check" size={24} color={ orcamento?.situacao  === 'AI' ? '#FFF' : '#000'}/>
+                   
+                   <Text  style={  [  orcamento?.situacao  === 'AI' && { color:'#FFF'} ,{width:'100%', fontWeight:'bold', fontSize:15} ] } > Pedido </Text>
                 </TouchableOpacity>
               </View>
 

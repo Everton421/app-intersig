@@ -10,6 +10,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useServicosPedido } from '../../../../database/queryPedido/queryServicosPedido';
 import { useVeiculos } from '../../../../database/queryVceiculos/queryVeiculos';
 import { usePedidos } from '../../../../database/queryPedido/queryPedido';
+import { Ionicons } from '@expo/vector-icons';
 
 export const Servico = ( { codigo_orcamento }:any )=>{
 
@@ -239,21 +240,21 @@ export const Servico = ( { codigo_orcamento }:any )=>{
       return ( 
         <TouchableOpacity 
         style={ [
-            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#185FED' : '#009de2'} , 
+            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#185FED' : '#FFF'} , 
         {  margin:5, padding:7, borderRadius:5 , elevation:4} ] } onPress={ ()=> selecionaServico(item)}  >
           
             <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-             <Text style={{ color:'white', fontWeight:'bold'}} >
+             <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'     }, { fontWeight:'bold'} ] } >
               codigo:  {item.codigo}  
              </Text>
              
-             <Text style={{ color:'white', fontWeight:'bold'}} >
+             <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'      }, { fontWeight:'bold'} ] } >
              valor:  {item.valor}  
              </Text>
 
             </View>
           
-          <Text style={{ color:'white', fontWeight:'bold'}} numberOfLines={2} >
+         <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'  }, { fontWeight:'bold'} ] }  numberOfLines={2} >
                {item.aplicacao}
           </Text>
           
@@ -355,16 +356,12 @@ export const Servico = ( { codigo_orcamento }:any )=>{
   }
 
       return(
-        
-        <View   >
- 
-                   
-                    <View style={{flexDirection:'row', alignItems:'center',   justifyContent:'center'  }}>
-                      <Text style={{fontSize:15,fontWeight:'bold' }}>
+        <View  >
+                    <View style={{flexDirection:'row',margin:2 , alignItems:'center',   justifyContent:'center'  }}>
+                      <Text style={{fontSize:20,fontWeight:'bold' ,color:'#6C757D' }}>
                           Serviços
                        </Text>
                       </View>
-
 
             <TouchableOpacity style={{backgroundColor:'#185FED',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
             onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
@@ -408,64 +405,47 @@ export const Servico = ( { codigo_orcamento }:any )=>{
               {/**modal tipos de OS  */ }
                
               <Modal visible={presstipoOs} transparent={true}   >
-
-                {
-                  tipoOs.length > 0 ? 
-                  ( 
-                    <View style={{ backgroundColor:'rgba( 50 ,50 ,50, 0.5 )', flex:1 }} >
-                     <View style={{ backgroundColor:'white',   padding:15, borderRadius:10 , margin:'2%', marginTop:'50%', elevation:2}} >
-                          
-                          <View style={{ flexDirection:'row', justifyContent:'space-between'}}> 
-                          <Text style={{margin:5, fontWeight:'bold'}} > Tipos De OS </Text>
-
-                            <TouchableOpacity 
-                              onPress={()=>  setPresstipoOS(false)  }
-                              >
-                                  <AntDesign name="closecircle" size={24} color="red" />
+         <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
+                  <View style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
+           
+                    
+                    
+                            <View style={{flexDirection:'row',  width:"100%" }}>
+                             <TouchableOpacity  onPress={() => {setPresstipoOS(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                                <Ionicons name="close" size={28} color={ '#6C757D' } />
                               </TouchableOpacity>
+                             <Text style={{margin:15 ,fontWeight:'bold', width:'100%',fontSize:20   }}>
+                                 Tipos De OS 
+                            </Text>
                             </View>
+              
+                    { tipoOs.length > 0 ? 
                           <FlatList
                               data={ tipoOs }
                               renderItem={ ( {item} )=> renderItemOS(item)}
                             />
-                      </View>
-                  </View>
-                  )
-                  :
-                  ( 
-                    <View style={{backgroundColor:'#FFF', flex:1}} >
-                        <TouchableOpacity onPress={() => {setPresstipoOS(false)  }}
-                          style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                        <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                          voltar
-                        </Text>
-                      </TouchableOpacity>
-                      <Text>
-                        NENHUM TIPO DE OS ENCONTRADO!
-                      </Text>
-                    </View>
-                    )
-                }  
+                        :
+                        <Text style={{textAlign:'center', fontWeight:'bold', fontSize:15 }}>  
+                         nenhum tipo de os encontrada</Text>
+                          }
+                    
+                
+                        </View>
+                        </View>
             
               </Modal>
               {/******* */}
            
            {/****** modal servicos */}
-            <Modal visible={verServicos} transparent={true}>
-                <View style={{ backgroundColor:'rgba( 50,50,50, 0.5 )', flex:1, alignItems:'center', justifyContent:'center' }} > 
-                  <View style={{ backgroundColor:'#FFF', width:'95%' , height:'90%' ,padding:5, borderRadius:15}}>
-
-                   
-                 <TouchableOpacity onPress={() => {setVerServicos(false)  }}
-                        style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                       <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                        voltar
-                      </Text>
+            <Modal visible={verServicos} animationType="slide"  transparent={true}>
+                <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
+                  <View style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
+                  <TouchableOpacity  onPress={() => {setVerServicos(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                            <Ionicons name="close" size={28} color={ '#6C757D' } />
                     </TouchableOpacity>
-
                         <TextInput
-                            placeholder='pesquisar'
-                            style={{ margin:10, backgroundColor:'#F5F6F8', width:'90%',  elevation:5, textAlign:'center', padding:5, borderRadius:10}}
+                            placeholder='pesquisar serviço...'
+                            style={{backgroundColor: "#FFF",fontWeight:'bold', margin:2, borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd'}}
                             onChangeText={ (t)=>  setPesquisa(t) }
                             placeholderTextColor={'#185FED'}
                            />  
@@ -485,27 +465,28 @@ export const Servico = ( { codigo_orcamento }:any )=>{
 
           {/****** modal veiculos */}
            <Modal visible={verVeiculos} transparent={true}>
-                <View style={{ backgroundColor:'rgba( 50,50,50, 0.5 )', flex:1, alignItems:'center', justifyContent:'center' }} > 
-                  <View style={{ backgroundColor:'#FFF', width:'95%' , height:'90%' ,padding:5, borderRadius:15}}>
-
-                   <View style={{flexDirection:'row',justifyContent:'space-between', width:"100%"}}>
-                       <TouchableOpacity onPress={() => {setVerVeiculos(false)  }}
-                              style={{ margin: 15, backgroundColor: '#185FED', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                             <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                               voltar
-                           </Text>
-                        </TouchableOpacity>
-                        <Text style={{margin:15 ,fontWeight:'bold', width:'100%'   }}>
+              <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
+                  <View style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
+           
+                   <View style={{flexDirection:'row',justifyContent:'space-between', width:"100%" }}>
+                            <TouchableOpacity  onPress={() => {setVerVeiculos(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                            <Ionicons name="close" size={28} color={ '#6C757D' } />
+                    </TouchableOpacity>
+                        <Text style={{margin:15 ,fontWeight:'bold', width:'100%',fontSize:20   }}>
                           Veiculos
                         </Text>
                     </View>
                         
                         <View style={{ height:'75%' }} > 
-                  <FlatList
+                        {
+              dadosVeiculos.length > 0 ?
+                        <FlatList
                               data={ dadosVeiculos }
                               renderItem={ ({item})=> renderItemVeiculo( item ) }
                               keyExtractor={ (item:any) =>item.codigo.toString() }
-                            />  
+                            />  :
+                            <Text style={{textAlign:'center', fontWeight:'bold', fontSize:15 }}>  nenhum veiculo encontrado!</Text>
+                        }
                             
                         </View>
                       
@@ -532,8 +513,8 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                       {
                         selectedVeiculo ? ( <Text style={{fontWeight:'bold'}}> placa: {selectedVeiculo?.placa } </Text>) : null
                       } 
-            </View>                    
 
+            </View>                    
                 
                 
         </View>

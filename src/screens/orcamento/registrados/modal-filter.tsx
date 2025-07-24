@@ -4,6 +4,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { configMoment } from "../../../services/moment";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Ionicons } from "@expo/vector-icons";
 
 
   type statusPedido = {
@@ -93,19 +94,17 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                  <Modal  visible={visible}  transparent={true} >
                             <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" , flex:1, alignItems:"center", justifyContent:"flex-start" }}>
                                 <View style={{ backgroundColor:'#FFF', width:'80%', height:'80%', marginTop:10, borderRadius:10 }}>    
-                                              <TouchableOpacity onPress={()=>setVisible(false)}
-                                                           style={{ margin:10, backgroundColor:'#0023F5',height: 30 ,alignItems:"center",justifyContent:"center",  borderRadius:7,width:'20%',elevation: 5}} >
-                                                            <Text style={{color:'#FFF',fontWeight:'bold'}}>
-                                                              voltar
-                                                            </Text>
-                                               </TouchableOpacity>
+                                               
+                                                       <TouchableOpacity onPress={() => setVisible(false)}  style={ { width:'15%'  ,padding: 10, borderRadius: 12    }}>
+                                                                           <Ionicons name="close" size={28} color={ '#6C757D' } />
+                                                         </TouchableOpacity>
                                         
                                         <View style={{   width:'95%', height:"100%", marginLeft: 5 } } >
                                                         <View style={{  borderColor: '#DDD', borderWidth: 1,padding: 10,marginVertical: 5, borderRadius: 5, width: '95%'  }}>
                                                           <Text style={{ fontWeight:"bold"}}> Data Cadastro:</Text>   
 
                                                         <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
-                                                        <Fontisto name="date" size={24} color="black" />
+                                                               <Fontisto name="date" size={24} color="black" />
                                                             <Text style={{ fontSize: 20, fontWeight: 'bold' , width:'100%'}}>
                                                                 {   moment.formatarData(auxData)   }
                                                             </Text>

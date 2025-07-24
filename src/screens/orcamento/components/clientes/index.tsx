@@ -34,7 +34,7 @@ export const ListaClientes = ( {  codigo_orcamento }:any ) => {
       useEffect(() => {
         const busca = async () => {
             try{
-              let aux:any = await  useQueryClients.selectByDescription(pesquisa,10);
+              let aux:any = await  useQueryClients.selectByDescription(pesquisa,50);
               setData(aux)
             }catch(e){ console.log(e)}
         };
@@ -151,22 +151,22 @@ function seleciona(item){
       </TouchableOpacity>
           
 
-         <View style={{ justifyContent: 'center', alignItems:'center', backgroundColor: '#FFF', borderWidth: 1, borderColor:'#DEE2E6' , width:'98%'}}>
+         <View style={{   justifyContent: 'center', alignItems:'center', backgroundColor: '#FFF', borderWidth: 1, borderColor:'#DEE2E6' , width:'98%'}}>
                     { loadingClient ?  
                     ( 
                     <ActivityIndicator size={35} color="#185FED"  /> 
                     ) :(
-                     <View>
-                    <View style={{margin:2, flexDirection: 'row',  width:'100%' }}>
-                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D',width:'10%'}}> Cliente:</Text>
-                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' ,width:'90%' }} numberOfLines={3}> { selectedItem?.nome} </Text>
+                     <View style={{ width: '100%'}} >
+                    <View style={{margin:2, flexDirection: 'row',  width:'90%' }}>
+                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D',width:'20%'}}> Cliente:</Text>
+                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' ,width:'90%' }} numberOfLines={3} > { selectedItem?.nome} </Text>
                     </View>
                    
-                        <View style={{ padding:5  ,flexDirection: 'row', justifyContent: 'space-between',width:'98%' }}>
-                          <Text style={{    fontWeight: 'bold'  ,color: '#6C757D'}}> 
+                        <View style={{ padding:5  ,  justifyContent: 'space-between',width:'98%' }}>
+                          <Text style={{    fontWeight: 'bold'  ,color: '#6C757D' }}> 
                             cnpj: {selectedItem?.cnpj}
                           </Text>
-                         <Text style={{ fontWeight: 'bold'  ,color: '#6C757D'}}> celular: {selectedItem?.celular}</Text>
+                         <Text style={{ fontWeight: 'bold' ,alignSelf:'flex-end' ,color: '#6C757D'}} numberOfLines={3} > celular: {selectedItem?.celular}</Text>
                      </View> 
                     </View>
                      )
@@ -191,7 +191,7 @@ function seleciona(item){
             <View style={{marginBottom:20, margin:5, flexDirection:'row',justifyContent:'space-between', elevation:5}}>
                 <TextInput
                             style={{backgroundColor: "#FFF",fontWeight:'bold', margin:2, borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd'}}
-                  placeholder='Pesquisar'
+                  placeholder='Pesquisar cliente...'
                   value={pesquisa}
                   onChangeText={adiciona}
                   placeholderTextColor='#185FED'

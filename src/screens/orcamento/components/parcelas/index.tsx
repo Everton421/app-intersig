@@ -223,7 +223,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
     const ItemParcelas2 = ({ item }) => {
         return (
             <View style={{margin:5, elevation:3, backgroundColor:'#FFF',  borderRadius:5}}>
-                <TouchableOpacity style={{margin:3,   width:100}}  
+                <TouchableOpacity style={{margin:3  }}  
                  onPress={()=> console.log(orcamento.parcelas)
 
                 }>
@@ -273,11 +273,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                     </TouchableOpacity>
                         <View>
 
-                            <View style={{margin:3}} >
-                                <Text style={{fontWeight:'bold'}}>
-                                    Total orçamento R$ {total?.toFixed(2)}
-                                </Text>
-                            </View>
+                            
 
                              <View style={{ margin:5 ,flexDirection:"row" ,  alignItems:"center", justifyContent:"space-between"}} >
                                 <TouchableOpacity onPress={() => setPress(true)} style={{ borderRadius:5, backgroundColor: '#185FED', padding: 5, elevation:5    }}>

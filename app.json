@@ -2,7 +2,7 @@
   "expo": {
     "name": "INTERSIG",
     "slug": "app-intersig",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "light",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/splash-intersig.png",
         "backgroundColor": "#ffffff"
       },
-      "versionCode": 1,
+      "versionCode": 4,  
       "package": "com.everton421.appintersig",
       "permissions": [
         "ACCESS_NETWORK_STATE",
@@ -40,6 +40,9 @@
         "expo-build-properties",
         {
           "android": {
+            "compileSdkVersion": 35, 
+            "targetSdkVersion": 35,   
+            "buildToolsVersion": "34.0.0",  
             "enableProguardInReleaseBuilds": true,
             "extraProguardRules": "-keep public class com.horcrux.svg.** {*;}",
             "allowBackup": false

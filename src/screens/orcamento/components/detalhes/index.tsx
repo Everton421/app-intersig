@@ -77,7 +77,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
         <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}>Detalhes:</Text>
 
         <View>
-          <View style={{ margin: 10 }}>
+          <View style={{ margin: 10  }}>
             <View style={{ margin: 5 }}>
               <Text style={{ fontWeight: 'bold' }}>Data Emissão</Text>
             </View>
@@ -89,7 +89,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
             </TouchableOpacity>
           </View>
 
-          <View style={{ borderWidth: 0.2 }}></View>
+        <View style={{ borderWidth: 0.4  }}></View>
 
           {
             showPicker && (
@@ -125,6 +125,7 @@ export const Detalhes = ( {orcamentoEditavel} ) => {
 
         <View style={{ borderWidth: 0.2 ,margin:5}}></View>
 
+        <View style={{ borderWidth: 0.4  }}></View>
 
         <View style={{ margin: 5 }}>
         <Text style={{ fontSize: 20, margin: 5, fontWeight: 'bold',color: '#6C757D' }}> Observações:</Text>

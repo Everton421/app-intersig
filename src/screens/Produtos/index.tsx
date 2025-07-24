@@ -1,11 +1,9 @@
-import { View , Text, TextInput, FlatList, Modal, Button, Image} from "react-native";
+import { View , Text, TextInput, FlatList, Modal, Button, Image, TouchableOpacity} from "react-native";
 import { useProducts } from "../../database/queryProdutos/queryProdutos";
 import { useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useFocusEffect  } from "@react-navigation/native";
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos";
 
 export function Produtos ( {navigation}:any ){

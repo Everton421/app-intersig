@@ -56,7 +56,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
     setDataHora(atualDate);
     async function init() {
       if (!codigo_orcamento || codigo_orcamento === null) {
-        setOrcamento((prevOrcamento: OrcamentoModel) =>  ({
+        setOrcamento((prevOrcamento:OrcamentoModel) =>  ({
           ...prevOrcamento,
           vendedor: usuario.codigo,
           total_produtos: 0,
@@ -78,12 +78,11 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         }));
       } else {
         setEditavel(true);
-        console.log(orcamentoEditavel)
         setCodigoOrcamento(codigo_orcamento);
       }
     }
     init();
-    console.log('init useEffect ****')
+ //   console.log('iniciando compoenente useEffect ****')
   }, []);
   ////////////////////////////////////////////////////////////////////////////
   useEffect(() => {
@@ -119,7 +118,6 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       Alert.alert(response);
       navigation.goBack();
     }
-   // console.log('useEffect pedido cadastrado/atualizado ****')
 
   }, [status, response, navigation, setOrcamento]);
   ////////////////////////////////////////////////////////////////////////////
@@ -145,7 +143,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       setDescontosGeral(totaDescontosProdutos);
     }
 
-    if (orcamento.servicos.length > 0) {
+    if (   orcamento.servicos.length > 0) {
       orcamento.servicos.forEach((i: any) => {
         novoTotalGeralServicos += i.total;
         totaDescontosServicos += i.desconto;
@@ -165,10 +163,10 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
       data_recadastro: dataHora,
     }));
 
-
   }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
   ////////////////////////////////////////////////////////////////////////////
   
+ 
   const gravar = async () => {
       setLoading(true);
 
@@ -251,7 +249,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
         {/** *** separador ***/}
 
         {  editavel === true && orcamentoEditavel && orcamentoEditavel.id  ? (
-          <Text style={{ marginLeft:10, fontWeight:"bold",fontSize:20,  color:'#6C757D' }}>Pedido Id: { orcamentoEditavel.id }</Text>
+          <Text style={{ marginLeft:10, fontWeight:"bold",fontSize:17,  color:'#6C757D' }}>Pedido Id: { orcamentoEditavel.id }</Text>
         ) : null}
 
         <View style={{ flexDirection: "row" }}>
@@ -333,7 +331,7 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
             height: "100%", // ,top: '50%', left: '60%', transform: [{ translateX: -50 }, { translateY: -50 }]
           }}
         >
-          <ActivityIndicator size="55" color="#185FED" />
+          <ActivityIndicator size={55} color="#185FED" />
         </View>
       )}
     </View>

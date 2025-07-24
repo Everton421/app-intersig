@@ -18,23 +18,37 @@ const getCurrentDate = () => {
             "servicos":[],
             "data_cadastro":string,
             "data_recadastro":string,
-            total_produtos: number,
-            total_servicos:  number,
-            contato: `react-native `,
-            total_geral: number,
-            descontos: number,
-
+            "total_produtos": number,
+            "total_servicos":  number,
+            "contato": `react-native `,
+            "total_geral": number,
+            "descontos": number,  
+            "vendedor":number
         }
 export const OrcamentoContext = createContext({
   orcamento: {
     produtos: [],
-    cliente: {},
+    cliente:  { codigo:0},
     parcelas: [],
+     servicos :[],
     data_cadastro: "",
     data_recadastro: "",
+     total_produtos : 0,
+     total_servicos :  0,
+     contato : `react-native `,
+     total_geral : 0,
+     descontos : 0,  
+     vendedor :0,
+     observacoes :   "",
+     quantidade_parcelas : 0,
+     enviado : "N",
+     situacao : "EA",
+     veiculo : 0,
+     tipo_os : 0,
+     tipo : 0,
 
   },
-  setOrcamento: (orcamento: OrcamentoModel) => {}
+  setOrcamento: (orcamento: any) => {}
 });
     function OrcamentoProvider({ children }:any){
             const [ orcamento , setOrcamento]  = useState  ( {
@@ -43,7 +57,20 @@ export const OrcamentoContext = createContext({
                 "parcelas":[],
                 "servicos":[],
                 "data_cadastro": "",
-                "data_recadastro": ""
+                "data_recadastro": "",
+               "total_produtos": 0,
+              "total_servicos":  0,
+              "contato": `react-native `,
+              "total_geral": 0,
+              "descontos": 0,  
+              "vendedor":0,
+              "observacoes":   "",
+              "quantidade_parcelas": 0,
+              "enviado": "N",
+              "situacao": "EA",
+              "veiculo": 0,
+              "tipo_os": 0,
+              "tipo": 0,
               } );
 
             return (

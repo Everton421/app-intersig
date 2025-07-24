@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useMemo, useCallback } from "react";
+import React, { useContext, useEffect, useState, useMemo, useCallback, use } from "react";
 import { View, FlatList, Text, StyleSheet, TouchableOpacity, TextInput, Modal, ActivityIndicator, Image } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -10,14 +10,17 @@ import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { useFotosProdutos } from "../../../../database/queryFotosProdutos/queryFotosProdutos";
 import { Ionicons } from "@expo/vector-icons";
 
-// OTIMIZAÇÃO 1: Envolver o componente com React.memo
-// Isso evita re-renderizações se as props (codigo_orcamento) não mudarem.
+ 
 export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
+
   const [pesquisa, setPesquisa] = useState<string>("1");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [visibleProdutos, setVisibleProdutos] = useState(false);
   const [loadingEditItens, setLoadingEditItens] = useState(false);
+  
+  const [ fotosItems, setFotosItens ] = useState<any>();
+
 
   const { orcamento, setOrcamento } = useContext(OrcamentoContext);
   
@@ -35,9 +38,7 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
     return map;
   }, [orcamento.produtos]);
 
-  // OTIMIZAÇÃO 3: Usar useCallback para estabilizar as funções
-  // Isso impede que as funções sejam recriadas em cada renderização,
-  // o que é crucial para o funcionamento do React.memo e da performance da FlatList.
+ 
   const handleSelectionChange = useCallback((newSelectedItems) => {
     const totalItens = newSelectedItems.reduce((acc, item) => {
       const total = (item.quantidade * item.preco) - (item.desconto || 0);
@@ -112,6 +113,7 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
         const fotosPromises = produtos.map(p => useQueryFotos.selectByCode(p.codigo));
         const fotosResultados = await Promise.all(fotosPromises);
         
+
         produtos.forEach((p, index) => {
           p.fotos = fotosResultados[index] || [];
         });
@@ -131,7 +133,7 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
 
   useEffect(() => {
     async function init() {
-      if (codigo_orcamento && codigo_orcamento > 0) {
+      if (codigo_orcamento && codigo_orcamento > 0 && orcamento.codigo === codigo_orcamento) {
         setLoadingEditItens(true);
         try {
           let items: any = await useQueryItemsPedido.selectByCodeOrder(codigo_orcamento);
@@ -140,6 +142,8 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
             // Busca fotos em paralelo para os itens do pedido
             const fotosPromises = items.map(p => useQueryFotos.selectByCode(p.codigo));
             const fotosResultados = await Promise.all(fotosPromises);
+              fotosResultados.forEach(( f )=>{
+              })
 
             items.forEach((p, index) => {
                 p.fotos = fotosResultados[index] || [];
@@ -154,14 +158,15 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
         }
       }
     }
+    console.log('carregando produtos...')
     init();
     // A dependência setOrcamento é estável, mas é bom incluí-la
   }, [codigo_orcamento  ]);
 
+ 
+ 
 
-  // Componente interno para o item da lista de busca (otimizado)
   const RenderSearchItem = React.memo(({ item }) => {
-    // A verificação agora é instantânea!
     const isSelected = selectedProductsMap[item.codigo];
     const quantidade = isSelected ? isSelected.quantidade : 0;
 
@@ -210,8 +215,9 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
     );
   });
 
-  // Componente interno para o item selecionado (lista horizontal)
-  const RenderSelectedItem = React.memo(({ item }) => (
+  const RenderSelectedItem = React.memo(({ item }) => {
+    
+    return (
     <View style={styles.selectedItemCard}>
         <View style={styles.cardHeader}>
             <Text style={styles.cardText}>Cód: {item.codigo}</Text>
@@ -227,7 +233,7 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
             <Text style={styles.cardText}>Total: {item?.total.toFixed(2)}</Text>
         </View>
     </View>
-  ));
+  )});
 
   return (
     <View style={styles.container}>
@@ -313,7 +319,7 @@ const styles = StyleSheet.create({
     modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' },
     modalContent: { margin: 0, backgroundColor: "#F0F4F8", borderRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
     backButton: {  backgroundColor: "#185FED", padding: 10, borderRadius: 7, zIndex: 1 },
-    searchInput: { backgroundColor: "#FFF", fontWeight:'bold',borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd' },
+    searchInput: { backgroundColor: "#FFF", fontWeight:"bold",borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd' },
     totalContainer: { flexDirection: "row", justifyContent: "space-between", margin: 10 },
     totalProdutosText: { fontSize: 15, fontWeight: "bold", color: '#6C757D' },
     selectedItemCard: { backgroundColor: "#FFF", elevation: 3, borderRadius: 8, marginHorizontal: 5, padding: 10, width: 280 },

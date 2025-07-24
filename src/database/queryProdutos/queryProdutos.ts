@@ -15,6 +15,7 @@ import { useFotosProdutos } from "../queryFotosProdutos/queryFotosProdutos";
         class_fiscal:string,
         cst:string,
         num_fabricante:string,
+        num_original:string,
         observacoes1:string,
         observacoes2:string,
         observacoes3:string,
@@ -183,6 +184,7 @@ export const useProducts = ()=>{
                       class_fiscal    = '${produto.class_fiscal}',   
                       cst             = '${produto.cst}', 
                       num_fabricante  = '${produto.num_fabricante}',
+                      num_original  = '${produto.num_original}',
                       data_cadastro   = '${data_cadastro}',
                       data_recadastro = '${data_recadastro}',
                       observacoes1    = '${observacoes2}', 
@@ -200,7 +202,109 @@ export const useProducts = ()=>{
                
             }
 
+     async function updateByParam(produto:Partial<produto>, code:number ){
 
+                if( produto.descricao )  produto.descricao = formataDados.normalizeString(produto.descricao)
+                if( produto.observacoes1 )  produto.observacoes1 =  formataDados.normalizeString(produto.observacoes1);
+                if( produto.observacoes2 )  produto.observacoes2 =  formataDados.normalizeString(produto.observacoes2);
+                if( produto.observacoes3 )  produto.observacoes3 =  formataDados.normalizeString(produto.observacoes3);
+          
+                 if( produto.data_recadastro) produto.data_recadastro = formataDados.formatDateTime(produto.data_recadastro);
+                 if( produto.data_cadastro) produto.data_cadastro = formataDados.formatDate(produto.data_cadastro);
+
+                let verifCode:any[]; 
+
+                let sql = `UPDATE produtos SET`;
+                let conditions =[]
+                let values=[]
+                  if(produto.estoque){
+                    conditions.push(' estoque = ? ');
+                    values.push(produto.estoque )
+                  }
+                  if(produto.preco){
+                    conditions.push(' preco = ? ');
+                    values.push( produto.preco )
+                  }
+                  if(produto.grupo){
+                    conditions.push(' grupo = ? ');
+                    values.push( produto.grupo )
+                  }
+                  if(produto.origem){
+                    conditions.push(' origem = ? ');
+                    values.push(`${produto.origem}`)
+                  }
+                  if(produto.descricao){
+                    conditions.push(' descricao = ? ');
+                    values.push(`${produto.descricao}`)
+                  }
+                  if(produto.ativo){
+                    conditions.push(' ativo = ? ');
+                    values.push(`${produto.ativo}`)
+                  }
+                  if(produto.sku){
+                    conditions.push(' sku = ? ');
+                    values.push(`${produto.sku}`)
+                  }
+                    if(produto.num_original){
+                    conditions.push(' num_original = ? ');
+                    values.push(`${produto.num_original}`)
+                  }
+                  if(produto.marca){
+                    conditions.push(' marca = ? ');
+                    values.push(produto.marca)
+                  }
+                  if(produto.class_fiscal){
+                    conditions.push(' class_fiscal = ? ');
+                    values.push(`${produto.class_fiscal}`)
+                  }
+                  if(produto.cst){
+                    conditions.push(' cst = ? ');
+                    values.push(`${produto.cst}`)
+                  }
+                  if(produto.num_fabricante){
+                    conditions.push(' num_fabricante = ? ');
+                    values.push(`${produto.num_fabricante}`)
+                  }
+                  if(produto.data_cadastro){
+                    conditions.push(' data_cadastro = ? ');
+                    values.push(`${produto.data_cadastro}`)
+                  }
+                  if(produto.data_recadastro){
+                    conditions.push(' data_recadastro = ? ');
+                    values.push(`${produto.data_recadastro}`)
+                  }
+                  if(produto.observacoes1){
+                    conditions.push(' observacoes1 = ? ');
+                    values.push(`${produto.observacoes1}`)
+                  }
+                  if(produto.observacoes2){
+                    conditions.push(' observacoes2 = ? ');
+                    values.push(`${produto.observacoes2}`)
+                  }
+                  if(produto.observacoes3){
+                    conditions.push(' observacoes3 = ? ');
+                    values.push(`${produto.observacoes3}`)
+                  }
+                  if(produto.tipo){
+                    conditions.push(' tipo = ? ');
+                    values.push(`${produto.tipo}`)
+                  } 
+                  let whereClause = ' WHERE codigo = ? '
+                    values.push(code)
+
+                  let finalsql = sql + conditions.join(' , ') + whereClause;
+                try{
+                      verifCode = await selectByCode(code);
+                      if(verifCode.length > 0 ){
+                  let aux = await db.runAsync(finalsql,values  )
+                         
+                  console.log( 'produto atualizado codigo: ',code)
+                          }else{
+                            console.log('nao foi encontrado produto com o codigo:', code)
+                          }
+                }catch(e){ console.log(` Erro ao tentar atualizar o produto codigo: ${code} `,e) }
+               
+            }
             /// cria produto informando  o codigo 
             async function createByCode( produto:produto, code:number ){
               const descricao  = formataDados.normalizeString(produto.descricao)
@@ -236,6 +340,7 @@ export const useProducts = ()=>{
                       class_fiscal,
                       cst,
                       num_fabricante,
+                      num_original,
                       data_cadastro,
                       data_recadastro,
                       observacoes1,
@@ -256,6 +361,7 @@ export const useProducts = ()=>{
                       '${produto.class_fiscal}' ,
                       '${produto.cst}',
                       '${produto.num_fabricante}',
+                      '${produto.num_original}',
                       '${data_cadastro}',
                       '${data_recadastro}',
                       '${observacoes1}',
@@ -288,7 +394,7 @@ export const useProducts = ()=>{
 
 
 
-        return { update ,selectAllLimit,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription ,selectProductAndImgsByDescription }
+        return { update ,updateByParam ,selectAllLimit,  selectByCode, create, deleteByCode, selectAll, createByCode,deleteAll,selectByDescription ,selectProductAndImgsByDescription }
     }
 
         

@@ -192,8 +192,8 @@ export const Resgistrar_empresa = ({ navigation }: any) => {
                  showAlert(e.response.data.msg);
             } else if (e.response) {
                 showAlert(`Erro ${e.response.status}: ${e.response.data?.msg || 'Ocorreu um erro.'}`);
-            }
-             else {
+            } else {
+                console.log
                 showAlert('Ocorreu um erro ao tentar registrar. Verifique sua conexão.');
             }
         } finally {

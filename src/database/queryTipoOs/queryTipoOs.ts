@@ -42,7 +42,7 @@ const db = useSQLiteContext();
        
     }
 
-    async function selectByCode( code:number ){
+    async function selectByCode( code:number ):Promise<tipoOs[] | undefined>{
         let aux = 0;
         if( isNaN(code)){
             aux = Number(code);
@@ -50,7 +50,7 @@ const db = useSQLiteContext();
             aux = code ; 
         }
         try{
-            let result   = await db.getAllAsync   ( `SELECT * ,
+            let result:tipoOs[]   = await db.getAllAsync   ( `SELECT * ,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro FROM tipos_os WHERE codigo = ${aux} `)
             //console.log(result);

@@ -37,7 +37,7 @@ export const  useClients = ()=>{
             .replace(/['"]/g, ""); // Remove aspas simples e duplas
     }
  
-    async function selectByCode( code:number ) {
+    async function selectByCode( code:number ):Promise<cliente[] | undefined> {
         let aux = 0;
         if(isNaN(code)){
             aux = Number(code);
@@ -45,10 +45,9 @@ export const  useClients = ()=>{
             aux = code;
         }
           try{
-                const result = await db.getAllAsync(` SELECT *, strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro FROM clientes where codigo = ${aux}`);
-            // console.log(result);
+                const result:cliente[] = await db.getAllAsync(` SELECT *, strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro FROM clientes where codigo = ${aux}`);
                 return result;
-            }catch(e){ console.log(`erro ao consultar o produto ${code} `, e)}
+            }catch(e){ console.log(`erro ao consultar o cliente ${code} `, e)}
     }
 
     async function selectByCnpjAndCode(  client:cliente ) {
@@ -145,25 +144,26 @@ export const  useClients = ()=>{
     
     
     
-    async function update( client:cliente , code:number) {
+    async function update( client:  Partial<cliente> , code:number) {
       const data_recadastro = formataDados.formatDateTime(client.data_recadastro)
-      let cidade = normalizeString(client.cidade);
-      let nome = normalizeString(client.nome);
-        let endereco = normalizeString(client.endereco);
-        let bairro =  normalizeString(client.bairro)
+        if( client.cidade)    client.cidade = normalizeString(client.cidade)
+        if( client.nome )  client.nome = normalizeString(client.nome);
+        if( client.endereco ) client.endereco = normalizeString(client.endereco);
+        if( client.bairro ) client.bairro =  normalizeString(client.bairro)
+
 
         try{
             const result = await db.execAsync( 
                 ` UPDATE clientes
                   SET celular = '${client.celular}',
                   cep = '${client.cep}',
-                  cidade = '${cidade}', 
+                  cidade = '${client.cidade}', 
                   cnpj = '${client.cnpj}',
-                  endereco ='${endereco}',
-                  bairro = '${bairro}',
+                  endereco ='${client.endereco}',
+                  bairro = '${client.bairro}',
                   estado= '${client.estado}',
                   ie = '${client.ie}',
-                  nome = '${nome}',
+                  nome = '${client.nome}',
                   numero = '${client.numero}', 
                   data_cadastro ='${client.data_cadastro}',
                   data_recadastro='${data_recadastro}'

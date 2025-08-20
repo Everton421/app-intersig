@@ -7,6 +7,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import useApi from "../../services/api";
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
+import { FontAwesome5, Octicons } from "@expo/vector-icons";
+import { defaultColors } from "../../styles/global";
 
 
 type servico  = {
@@ -115,14 +117,14 @@ async function gravar(){
                 onPress={ ()=> handleSelect(item) }
                 style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%'}}
              >
-               <Text style={{ fontWeight:"bold"}}>
+               <Text style={{ fontWeight:"bold", flex: 1, fontSize:15, color: defaultColors.gray }}>
                   Codigo: {item.codigo}
                </Text>
-
-               <Text>
+            <FontAwesome5 name="tools" size={24} color="#185FED" />
+               <Text style={{ fontWeight:"bold", flex: 1, fontSize:15, color: defaultColors.gray }}>
                  {item.aplicacao}
                </Text>
-               <Text style={{ fontWeight:"bold"}}>
+               <Text style={{ fontWeight:"bold", flex: 1, fontSize:15, color: defaultColors.gray }}>
                  R$ {item.valor}
                </Text>
                

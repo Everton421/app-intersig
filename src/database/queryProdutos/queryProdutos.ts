@@ -1,6 +1,7 @@
 import { useSQLiteContext } from "expo-sqlite";
 import { formatItem } from "../../services/formatStrings";
 import { useFotosProdutos } from "../queryFotosProdutos/queryFotosProdutos";
+import { typeFotoProduto } from "../../screens/cadastro_produto/types/fotos";
 
  export type produto = {
         codigo:number,
@@ -21,18 +22,18 @@ import { useFotosProdutos } from "../queryFotosProdutos/queryFotosProdutos";
         observacoes3:string,
         data_cadastro:string,
         data_recadastro:string,
-        tipo?:string
-
+        tipo?:string,
+    fotos?: typeFotoProduto[]
     }
     
+   export type produtoComFotos = produto & { fotos: typeFotoProduto[] | [] } 
+
 export const useProducts = ()=>{
  
     const db = useSQLiteContext();
     const formataDados =  formatItem();
-
     const useQueryFotos = useFotosProdutos()
 
-      
     
         async function selectByCode( codigo:number ) {
             let aux = 0;
@@ -67,14 +68,14 @@ export const useProducts = ()=>{
      }
 
           
-          async function selectByDescription( query:any, limit:number ) {
-            const result = await db.getAllAsync(`SELECT * FROM produtos WHERE  descricao like ? OR codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
+          async function selectByDescription( query:any, limit:number ):Promise<produto[]> {
+            const result:produto[] = await db.getAllAsync(`SELECT * FROM produtos WHERE  descricao like ? OR codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
           //  console.log(result);
             return result;
              }
      
              async function selectProductAndImgsByDescription( query:any, limit:number ) {
-              const result = await db.getAllAsync(
+              const result:produtoComFotos[] = await db.getAllAsync(
                 `SELECT p.codigo, p.descricao, p.preco, p.estoque   FROM produtos as p
                 WHERE  p.descricao like ? OR  p.codigo like ? LIMIT ?`, `%${query}%`, `%${query}%`,`${limit}` );
             //  console.log(result);
@@ -82,7 +83,7 @@ export const useProducts = ()=>{
                   if(result.length > 0 ){
                      result.forEach( async (i)=>{
                           let fotos = await useQueryFotos.selectByCode(i.codigo)
-                          if(fotos.length > 0 ){
+                          if(fotos && fotos.length > 0 ){
                             i.fotos = fotos;
                           }else{
                             i.fotos = [];

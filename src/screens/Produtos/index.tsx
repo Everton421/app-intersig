@@ -1,35 +1,38 @@
-import { View , Text, TextInput, FlatList, Modal, Button, Image, TouchableOpacity} from "react-native";
-import { useProducts } from "../../database/queryProdutos/queryProdutos";
+import { View , Text, TextInput, FlatList, Modal, Button, Image, TouchableOpacity, ActivityIndicator} from "react-native";
+import { produto, useProducts } from "../../database/queryProdutos/queryProdutos";
 import { useEffect, useState } from "react";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos";
+import { RenderItem } from "./components/renderItem";
+import { defaultColors } from "../../styles/global";
 
 export function Produtos ( {navigation}:any ){
   
     const useQueryProdutos = useProducts();
     const useQueryFotos = useFotosProdutos();
 
-const [ pesquisa, setPesquisa ] = useState<string>('');
-const [ dados , setDados ] = useState();
-const [ pSelecionado, setpSelecionado ] = useState();
-const [ visible, setVisible ] = useState(false);
+    const [ pesquisa, setPesquisa ] = useState<string>('');
+    const [ dados , setDados ] = useState<produto[]>();
+    const [ pSelecionado, setpSelecionado ] = useState<produto>();
+    const [ visible, setVisible ] = useState(false);
+    const [ loadingItens, setLoadingItens  ] = useState(false);
 
 type fotoProduto =
  {
-produto: number,
-sequencia:number,
-descricao:string,
-link:string,
-foto:string,
-data_cadastro:string,
-data_recadastro:string 
+    produto: number,
+    sequencia:number,
+    descricao:string,
+    link:string,
+    foto:string,
+    data_cadastro:string,
+    data_recadastro:string 
  }
-
 
     async function filterByDescription(){
         const response:any = await useQueryProdutos.selectByDescription(pesquisa, 10);
+
         for( let p of response ){
             let dadosFoto:any = await useQueryFotos.selectByCode(p.codigo)   
             if(dadosFoto?.length > 0 ){
@@ -42,8 +45,6 @@ data_recadastro:string
         if(response.length > 0  ){
             setDados(response)
         }
-        console.log('filterByDescription carregando produtos ....');
-
     }
 
     async function filterAll(){
@@ -64,31 +65,28 @@ data_recadastro:string
 ///////
    useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      if( pesquisa !== null || pesquisa !== '' ){
-        filterByDescription()
-      }else{
+       if( pesquisa !== null || pesquisa !== '' ){
+         filterByDescription()
+       }else{
+         filterAll()
+       }
+
         filterAll()
 
-      }
     });
 
     return unsubscribe;
   }, [navigation]);
 
 ///////
- 
 
 useEffect(()=>{
-
     filterByDescription()
-
 },[  pesquisa])
 
-    function mudarPesquisa(value:string){
-        setPesquisa(value)
-    }
+        type prop =  {  produto: produto }  
 
-        function handleSelect(item){
+        function handleSelect(item:produto){
                 setpSelecionado(item);
             //setVisible(true)
             navigation.navigate('cadastro_produto',{
@@ -96,55 +94,16 @@ useEffect(()=>{
             })
         }
 
-        
-        function renderItem({item}){
-            return(
-                <TouchableOpacity 
-                    onPress={ ()=> handleSelect(item) }
-                    style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
-                 >
-                    
-                   <Text style={{ fontWeight:"bold"}}>
-                      Codigo: {item.codigo}
-                   </Text>
-
-                   <Text style={{fontSize:15}}>
-                     {item.descricao}
-                   </Text>
-
-                   {  item.fotos && item.fotos.length > 0 && item.fotos[0].link ?
-                     (<Image
-                        source={{ uri: `${item.fotos[0].link}` }}
-                        // style={styles.galleryImage}
-                        style={{ width: 100, height: 100,  borderRadius: 5,}}
-                         resizeMode="contain"
-                       />) :(
-                         <MaterialIcons name="no-photography" size={40} color="black"  />
-                       )
-                    
-                    }
-
-                <View style={{ flexDirection:"row", justifyContent:"space-between", margin:3}}>  
-                    <Text style={{ fontWeight:"bold"}}>
-                      R$ {item.preco.toFixed(2)}
-                    </Text>
-                    <Text style={{ fontWeight:"bold"}}>
-                       estoque: {item.estoque}
-                    </Text>
-                </View>
-                </TouchableOpacity>
-            )
-        }
-      
+     
+     
      return  (
 
       <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
-          <View style={{ backgroundColor:'#185FED', }}> 
+          <View style={{ backgroundColor: defaultColors.darkBlue, }}> 
              <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
                 <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                     <Ionicons name="arrow-back" size={25} color="#FFF" />
                 </TouchableOpacity>
-            
                   
                 <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
                     < TextInput 
@@ -162,9 +121,9 @@ useEffect(()=>{
                  <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Produtos </Text>
            </View>
              
+             { 
                 <Modal transparent={true} visible={ visible }>
                     <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: '#FFF'}} >
-                        
                         <View style={{ width:'96%',height:'97%', backgroundColor:'#E0E0E0', borderRadius:10}} >
                             
                                 <View style={{ margin:8}}>
@@ -175,18 +134,17 @@ useEffect(()=>{
                                 </View>
 
                                  <View style={{ margin:10, gap:15, flexDirection:"row"}}>
-                                    
 
-                          {   pSelecionado?.fotos &&  pSelecionado?.fotos.length > 0 && pSelecionado?.fotos[0].link &&
-
-                                         (<Image
-                                                source={{ uri: `${pSelecionado?.fotos[0].link}` }}
-                                                // style={styles.galleryImage}
-                                                style={{ width: 70 , height: 70   }}
-                                                resizeMode="contain"
-                                                />
-                                        ) 
-                                            }
+                          {     pSelecionado?.fotos &&  pSelecionado?.fotos.length > 0 && pSelecionado?.fotos[0].link &&
+                                          (
+                                            <Image
+                                                    source={{ uri: `${pSelecionado?.fotos[0].link}` }}
+                                                    // style={styles.galleryImage}
+                                                    style={{ width: 70 , height: 70   }}
+                                                    resizeMode="contain"
+                                                    />
+                                           )  
+                                         }
 
 
                                      <View style={{ backgroundColor:'#fff', borderRadius:5, height:25, elevation:5 }}>
@@ -194,7 +152,7 @@ useEffect(()=>{
                                      </View>   
 
                                      <View style={{ backgroundColor:'#fff', borderRadius:5, height:25, elevation:5 }}>
-                                       <Text> R$ {pSelecionado?.preco.toFixed(2)} </Text>
+                                       <Text> R$ {pSelecionado?.preco ? pSelecionado?.preco.toFixed(2) : 0.00 } </Text>
                                      </View>   
                                  </View>
   
@@ -231,27 +189,25 @@ useEffect(()=>{
                     </View>
 
                 </Modal> 
+              }
 
+    {   
+     loadingItens ? (
+        <ActivityIndicator size={40} color={defaultColors.darkBlue}  />
+     ):  
  
+           dados && dados.length> 0 &&
              <FlatList
                  data={dados}
-                 renderItem={(item)=> renderItem(item)}
-                 keyExtractor={(i)=>i.codigo}
+                 renderItem={( {item} )=> < RenderItem  item={item}  handleSelect={handleSelect} /> }
+               //   renderItem={( {item} )=> <RenderTeste item={item} /> }
+                 keyExtractor={(i)=> i.codigo.toString()}
              /> 
-    
+     }
+
             <TouchableOpacity
                 style={{
-                    backgroundColor: '#185FED', 
-                    width: 50, 
-                    height: 50,   
-                    borderRadius: 25,  
-                    position: "absolute",       
-                    bottom: 150,                 
-                    right: 30,                   
-                    elevation: 10,               
-                    alignItems: "center", 
-                    justifyContent: "center",
-                    zIndex: 999,             // Garante que o botão fique sobre os outros itens
+                    backgroundColor: defaultColors.darkBlue, width: 50, height: 50,  borderRadius: 25,  position: "absolute",  bottom: 150,  right: 30,  elevation: 10,   alignItems: "center", justifyContent: "center",zIndex: 999,             // Garante que o botão fique sobre os outros itens
                 }}
                 onPress={() => {
                     navigation.navigate('cadastro_produto')

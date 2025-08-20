@@ -2,37 +2,28 @@ import { View, Text, Button, Alert, Modal, ActivityIndicator, StyleSheet,Animate
 import useApi from "../../services/api"
 import { useContext, useEffect, useState } from "react"
 import { ConnectedContext } from "../../contexts/conectedContext"
-import { usePedidos } from "../../database/queryPedido/queryPedido"
-import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento"
-import { useClients } from "../../database/queryClientes/queryCliente"
-import { useProducts } from "../../database/queryProdutos/queryProdutos"
 import { AuthContext } from "../../contexts/auth"
-import { useServices } from "../../database/queryServicos/queryServicos"
-import { useTipoOs } from "../../database/queryTipoOs/queryTipoOs"
-import {    useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
 import { restartDatabaseService } from "../../services/restartDatabase"
 import { configMoment } from "../../services/moment"
 import { enviaPedidos } from "../../services/sendOrders"  
 import { receberPedidos } from "../../services/getOrders"
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Fontisto from '@expo/vector-icons/Fontisto';
-import { useCategoria } from "../../database/queryCategorias/queryCategorias"
-import { useMarcas } from "../../database/queryMarcas/queryMarcas"
-import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosProdutos"
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api"
 import Feather from '@expo/vector-icons/Feather';
-import { useUsuario } from "../../database/queryUsuario/queryUsuario"
 import { MaterialCommunityIcons } from "@expo/vector-icons"
-
-const LoadingData = ({ isLoading, item , progress }:any) => (
-  <Modal animationType='slide' transparent={true} visible={isLoading}>
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#FFF" />
-      <Text style={styles.loadingText}>Carregando  {item} ... {progress}%</Text>
-      <Animated.View style={[styles.progressBar, { width: `${progress}%` }]} />
-    </View>
-  </Modal>
-);
+import { useSyncProdutos } from "../../hooks/sync-produtos/useSyncProdutos"
+import { useSyncCategorias } from "../../hooks/sync-categorias/useSyncCategorias"
+import { useSyncFotos } from "../../hooks/sync-fotos/useSyncFotos"
+import { useSyncMarcas } from "../../hooks/sync-marcas/useSyncMarcas"
+import { useSyncServices } from "../../hooks/sync-servicos/useSyncServicos"
+import { useSyncClients } from "../../hooks/sync-clientes/useSyncClientes"
+import { useSyncVeiculos } from "../../hooks/sync-veiculos/useSyncVeiculos"
+import { useSyncTiposDeOs } from "../../hooks/sync-tipos-de-os/useSyncTiposDeOs"
+import { useSyncFormasPagamento } from "../../hooks/sync-formas-pagamento/useSyncFormasPagamento"
+import { useSyncUsuarios } from "../../hooks/sync-usuarios/useSyncUsuarios"
+import { DotIndicatorLoadingData } from "../../components/dotIndicator"
+ 
 const LoadingOrders = ({ isLoadingOrder        }:any) => (
   <Modal animationType='slide' transparent={true} visible={isLoadingOrder}>
     <View style={styles.loadingContainer}>
@@ -49,19 +40,20 @@ export const Configurações = () => {
   const { usuario }:any = useContext(AuthContext);
   const {connected, setConnected }:any = useContext(ConnectedContext);
 
-  const useQueryProdutos = useProducts();
-  const useQueryClientes = useClients();
-  const useQueryFpgt = useFormasDePagamentos();
-  const useQueryTipoOs = useTipoOs();
-  const useQueryServices = useServices();
-  const useQueryVeiculos = useVeiculos();
-  const useQueryPedidos = usePedidos();
   const useRestartService = restartDatabaseService();
   const useMoment = configMoment();
-  const useQueryCategoria = useCategoria() 
-  const useQueryMarcas = useMarcas();
-  const useQueryFotos = useFotosProdutos();
-  const useQueryUsuario = useUsuario();
+
+  const syncProdutos = useSyncProdutos();
+  const syncCategorias = useSyncCategorias();
+  const syncFotos = useSyncFotos();
+  const syncMarcas = useSyncMarcas();
+  const syncServicos = useSyncServices();
+  const syncClientes = useSyncClients();
+  const syncVeiculos = useSyncVeiculos();
+  const syncTipoDeOs = useSyncTiposDeOs();
+  const syncFormasPagamento =   useSyncFormasPagamento();
+  const syncUsusarios =  useSyncUsuarios();
+  
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingOrder, setIsLoadingOrder] = useState(false);
@@ -72,17 +64,14 @@ export const Configurações = () => {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string>()
   const [conectado, setConectado] = useState<boolean>()
-  const [loadingOrders, setLoadingOrders] = useState<boolean>(true)
   const [ dataSelecionada, setDataSelecionada ] = useState(  );
   const [showPicker, setShowPicker] = useState(false);
   const [msgApi , setMsgApi ] = useState('');
 
-  const [ headerApi, setHeaderApi ] = useState<object | null>(null)
-
   const useGetOrders = receberPedidos();
   const useSendOrders = enviaPedidos();
 
-    const useQueryConfigApi = queryConfig_api();
+  const useQueryConfigApi = queryConfig_api();
   
   const formatDate = (date:any) => {
     const year = date.getFullYear();
@@ -125,361 +114,6 @@ setMsgApi('')
     }
 }
 
-  const fetchClientes = async (data:string) => {
-    let params:any = '';
-    try {
-        setItem('clientes');
-        const aux = await api.get(`/offline/clientes`, 
-          { 
-            params:{
-              vendedor:usuario.codigo, 
-              data_recadastro: data
-            } 
-          }    
-        );
-        const dados = aux.data;
-          const totalClientes = dados.length;
-        if( totalClientes > 0 ){
-
-              for (let v = 0;  v <= totalClientes; v++) {
-                
-                let result:any  = await useQueryClientes.selectByCnpjAndCode(dados[v]);
-                    if(result?.length > 0  ){
-                      const data_recadastro =   useMoment.formatarDataHora(dados[v].data_recadastro)
-                        if(   data_recadastro > result[0].data_recadastro ){
-                          await useQueryClientes.update(dados[v],dados[v].codigo)
-                        }else{
-                          console.log('cliente nao atualizado');
-                        }
-
-                      }else{
-                        await useQueryClientes.create(dados[v])
-                      }
-            const progressPercentage = Math.floor(((v + 1) / totalClientes) * 100);
-           setProgress(progressPercentage);  
-              }
-            }else{
-              console.log("Clientes : ", dados)
-            }
-
-        } catch (e) {
-        console.log(e);
-        console.log(e);
-
-    }
-  };
-
-  const fetchProdutos = async (data:string) => {
-    try {
-      setItem('produtos');
-  
-      const aux = await api.get('/offline/produtos',  { 
-        params :{ data_recadastro : data}
-      } );
-      const dados = aux.data;
-      const totalProdutos = dados.length;
-      if(totalProdutos > 0 ){
-        for (let v = 0; v < totalProdutos; v++) {
-          const verifyProduct:any = await useQueryProdutos.selectByCode(dados[v].codigo);
-          if (verifyProduct.length > 0) {
-            let data_recadastro = useMoment.formatarDataHora( dados[v].data_recadastro ); // Ajuste se necessário
-    
-            console.log(`${data_recadastro } > ${verifyProduct[0].data_recadastro}` )
-
-            if (data_recadastro > verifyProduct[0].data_recadastro ) {
-
-              await useQueryProdutos.update(dados[v], dados[v].codigo);
-            }
-          } else {
-            await useQueryProdutos.createByCode(dados[v], dados[v].codigo );
-          }
-          const progressPercentage = Math.floor(((v + 1) / totalProdutos) * 100);
-          setProgress(progressPercentage); // Atualiza progresso
-        }
-      }else{
-        console.log("Produtos: ", dados);        
-      }
-
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const fetchFpgt = async (data:string) => {
-    setItem('formas de pagamento');
-
-    try {
-      const aux = await api.get('/offline/formas_pagamento',{ params :{ data_recadastro : data}});
-      const dados = aux.data;
-
-      const totalFormas = dados.length
-          if( totalFormas > 0 ){
-           for (let f =0; f <  dados.length; f++ ) {
-            const verifiFpgt:any = await useQueryFpgt.selectByCode( dados[f].codigo);
-
-                  if (verifiFpgt.length > 0) {
-
-              let data_recadastro =  useMoment.formatarDataHora( dados[f].data_recadastro);
-              console.log(`fpgt:  ${data_recadastro } > ${verifiFpgt[0].data_recadastro}` )
-
-                  if (data_recadastro > verifiFpgt[0].data_recadastro ) {
-                    await useQueryFpgt.update(dados[f], dados[f].codigo);
-                  }
-
-                  } else {
-                    await useQueryFpgt.create(dados[f]);
-                  }
-            const progressPercentage = Math.floor(((f + 1) / totalFormas) * 100);
-            setProgress(progressPercentage); // Atualiza progresso
-           }
-         }else{
-          console.log("Formas de pagamento: ", dados);
-         }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const fetchServices = async ( data:string) => {
-    try {
-    setItem('serviços');
-
-      const aux = await api.get('/offline/servicos',{ params :{ data_recadastro : data}});
-      const dados:any = aux.data;
-        const totalServicos = dados.length;
-        if(totalServicos > 0 ){
-         for (let v = 0; v <  totalServicos; v++ ) {
-          const verifyServices:any = await useQueryServices.selectByCode(dados[v].codigo);
-          if (verifyServices.length > 0) {
-            let data_recadastro =  useMoment.formatarDataHora( dados[v].data_recadastro);
-            console.log(`servicos: ${data_recadastro } > ${verifyServices[0].data_recadastro}` )
-            if (data_recadastro > verifyServices[0].data_recadastro ) {
-              await useQueryServices.update(dados[v])
-            }
-          }else{
-            await useQueryServices.createByCode2(dados[v], dados[v].codigo);
-          }
-          const progressPercentage = Math.floor(((v + 1) / totalServicos) * 100);
-          setProgress(progressPercentage); // Atualiza progresso
-
-         }
-       }else{
-        console.log("Serviços: ", dados);
-
-       }
-
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const fetchTiposOs = async (data:string) => {
-    setItem('tipo de os');
-    try {
-      const aux = await api.get('/offline/tipo_os',
-        { params :{ data_recadastro : data}}
-      );
-      const dados = aux.data;
-      let totalTipos_os = data.length
-      if( totalTipos_os > 0 ){
-        for (let i = 0; i < data.length; i++ ) {
-          const verifiTipOs:any = await useQueryTipoOs.selectByCode(dados[i].codigo);
-          if (verifiTipOs.length > 0) {
-            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
-            console.log(`tipo de os: ${data_recadastro } > ${verifiTipOs[0].data_recadastro}` )
-            if (data_recadastro > verifiTipOs[0].data_recadastro ) {
-              await useQueryTipoOs.update( dados[i], dados[i].codigo);
-            }
-          } else {
-            await useQueryTipoOs.create(dados[i]);
-          }
-        
-          const progressPercentage = Math.floor(((i + 1) / totalTipos_os) * 100);
-          setProgress(progressPercentage); // Atualiza progresso
-
-        }
-      }else{
-        console.log("Tipo de OS: ", dados);
-      }        
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const fetchCategorias = async (data:string) => {
-    setItem('categorias');
-    try {
-      const aux = await api.get('/offline/categorias',
-        { params :{ data_recadastro : data}}
-      );
-      console.log("request categorias ", aux.data )
-      const dados = aux.data;
-      let TotalCategorias = dados.length
-      if( TotalCategorias > 0 ){
-        for (let i = 0; i < dados.length; i++ ) {
-          const verifiCategoria:any = await useQueryCategoria.selectByCode(dados[i].codigo);
-          if (verifiCategoria.length > 0) {
-            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
-            console.log(`categoria: ${data_recadastro } > ${verifiCategoria[0].data_recadastro}` )
-            if (data_recadastro > verifiCategoria[0].data_recadastro ) {
-              await useQueryCategoria.update( dados[i], dados[i].codigo);
-            }
-          } else {
-            await useQueryCategoria.create(dados[i]);
-          }
-          const progressPercentage = Math.floor(((i + 1) / TotalCategorias) * 100);
-          setProgress(progressPercentage); // Atualiza progresso
-        }        
-      }else{
-        console.log("Categorias: ", dados);
-      }
-    } catch (e) {
-      console.log(" ocorreu um erro ao processar as categorias", e);
-    }
-  };
-
-  const fetchMarcas = async (data:string) => {
-    setItem('marcas');
-    try {
-      const aux = await api.get('/offline/marcas',
-        { params :{ data_recadastro : data}}
-
-      );
-      const dados = aux.data;
-      let TotalMarcas = dados.length
-      if(TotalMarcas > 0 ){
-      for (let i = 0; i < dados.length; i++ ) {
-        const verifiMarca:any = await useQueryMarcas.selectByCode(dados[i].codigo);
-        
-        if (verifiMarca.length > 0) {
-           let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
-       console.log(`marca: ${data_recadastro } > ${verifiMarca[0].data_recadastro}` )
-          
-          if (data_recadastro > verifiMarca[0].data_recadastro ) {
-            await useQueryMarcas.update( dados[i], dados[i].codigo);
-          
-          }
-        } else {
-          await useQueryMarcas.create(dados[i]);
-        }
-        const progressPercentage = Math.floor(((i + 1) / TotalMarcas) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-
-      }     
-      }else{
-       console.log("Marcas: ", dados);
-    }   
-    } catch (e) {
-      console.log(" ocorreu um erro ao processar as marcas", e);
-    }
-  };
-
-  const fetchVeiculos = async (data:string ) => {
-    setItem('veiculos');
-
-    try {
-      const aux = await api.get('/offline/veiculos',
-        { params :{ data_recadastro : data}}
-      );
-      const dados = aux.data;
-
-      const totalVeiculos = dados.length
-       if( totalVeiculos > 0 ){
-        for (let i = 0; i < dados.length; i++ ) {
-        const verifiVeic:any = await useQueryVeiculos.selectByCode(dados[i].codigo);
-        if (verifiVeic.length > 0) {
-          let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
-          console.log(`Veiculos: ${data_recadastro } > ${verifiVeic[i].data_recadastro}` )
-          if (data_recadastro > verifiVeic[0].data_recadastro ) {
-            await useQueryVeiculos.update( dados[i] );
-          }
-        } else {
-          await useQueryVeiculos.create(dados[i]);
-        }
-
-        const progressPercentage = Math.floor(((i + 1) / totalVeiculos) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-      
-        } 
-      }else{
-        console.log("Veiculos: ", dados)
-      }
-    } catch (e:any) {
-      console.log(e);
-      console.log(e.response.data.msg);
-
-    }
-  };
-
-  const fetchImgs = async (data:string) => {
-    setItem('fotos');
-
-    try {
-      const aux = await api.get('/offline/fotos',
-        { params :{ data_recadastro : data}}
-      );
-      const dados = aux.data;
-
-      const totalimgs = dados.length
-      if ( totalimgs > 0 ){
-        for (let i = 0; i < dados.length; i++ ) {
-          const verifiImg:any = await useQueryFotos.selectByCodeAndSequenci(dados[i].produto, dados[i].sequencia);
-          if (verifiImg.length > 0) {
-            let data_recadastro =  useMoment.formatarDataHora( dados[i].data_recadastro);
-            console.log(`foto: ${data_recadastro } > ${verifiImg[i].data_recadastro}` )
-            if (data_recadastro > verifiImg[0].data_recadastro ) {
-              await useQueryFotos.update( dados[i], dados[i].produto );
-            }
-          } else {
-            await useQueryFotos.create(dados[i]);
-          }
-          const progressPercentage = Math.floor(((i + 1) / totalimgs) * 100);
-          setProgress(progressPercentage); // Atualiza progresso
-        }
-      }else{
-        console.log("Imagens: ", dados)
-      }
-
-    } catch (e:any) {
-      console.log( "erro : ",e);
-      if(e.status === 400){
-      console.log( "erro : ",e.response.data.msg);
-      }
-    }
-  };
-
-  
-  const fetchUsers = async (data:string ) => {
-    setItem('usuarios');
-
-    try {
-      const aux = await api.get('/usuarios',
-        { params :{ data_recadastro : data} }
-      );
-      const dados = aux.data;
-
-      const totalUsers = dados.length
-       if( totalUsers > 0 ){
-        for (let i = 0; i < dados.length; i++ ) {
-        const verifyUser:any = await useQueryUsuario.selectByCode(dados[i].codigo);
-        if (verifyUser.length > 0) {
-         
-          await useQueryUsuario.create(dados[i]);
-        }
-
-        const progressPercentage = Math.floor(((i + 1) / totalUsers) * 100);
-        setProgress(progressPercentage); // Atualiza progresso
-      
-        } 
-      }else{
-        console.log("Usuários: ", dados)
-      }
-    } catch (e:any) {
-      console.log(e);
-      console.log(e.response.data.msg);
-
-    }
-  };
 
   const verifyDateSinc = async ()=>{
     let validConfig = await useQueryConfigApi.select(1)
@@ -506,21 +140,21 @@ setMsgApi('')
   }
 
   const syncData = async () => {
- let dataSinc =  await verifyDateSinc();
+ let data =  await verifyDateSinc();
     setIsLoading(true);
-    setProgress(0);
     try {
-        await fetchClientes(dataSinc);
-        await fetchProdutos(dataSinc);
-        await fetchFpgt(dataSinc);
-        await fetchServices(dataSinc);
-        await fetchTiposOs(dataSinc);
-        await fetchVeiculos(dataSinc);
-        await fetchCategorias(dataSinc);
-        await fetchMarcas(dataSinc);
-       await fetchImgs(dataSinc);
-        await fetchUsers(dataSinc);
-      setData([]); // Atualiza o estado para mostrar dados após a sincronização
+            await syncProdutos.syncData( { data , setIsLoading, setProgress, setItem } );
+             await syncMarcas.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncCategorias.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncFotos.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncServicos.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncClientes.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncVeiculos.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncTipoDeOs.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncFormasPagamento.syncData( { data, setIsLoading, setProgress, setItem } );
+             await syncUsusarios.syncData( { data, setIsLoading, setProgress, setItem } );
+          
+      setData([]);  
     } catch (e) {
       console.log(e);
     } finally {
@@ -532,7 +166,7 @@ setMsgApi('')
 
 
 
-  const handleSync = () => {
+  const handleSync = async () => {
 
     if(loading){
       Alert.alert('Aguarde!','Estabelecendo conexão...');
@@ -546,7 +180,8 @@ setMsgApi('')
       Alert.alert(msgApi );
       return;
     }
-    syncData();
+    
+     syncData();
   };
 
   async function syncOrders(){
@@ -647,7 +282,8 @@ setMsgApi('')
 
  
           {/** */}
-          <LoadingData isLoading={isLoading} item={item} progress={progress} />
+        <DotIndicatorLoadingData isLoading={isLoading} item={item} progress={progress}   />
+
           <LoadingOrders isLoadingOrder={isLoadingOrder}  />
           {/** */}
                 
@@ -655,14 +291,16 @@ setMsgApi('')
             {/***** enviar cadastros  */}
             <View style={{ marginTop:15, margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:' 98%', alignItems:"center", justifyContent:"center"  }} >
                   <View style={{ flexDirection:"row", gap:5}}>
-                     <Text style={{ color:'#185FED', fontWeight:"bold", fontSize:17}} > cadastrar/atualizar cadastros </Text>
+                     <Text style={{ color:'#185FED', fontWeight:"bold", fontSize:17, flex:1,  textAlign:"center"}} >Sincronizar Dados</Text>
                   </View>         
                   
                   <TouchableOpacity  style={ { flexDirection:"row",alignItems:"center", margin:15, elevation:5,padding:5,borderRadius: 5,backgroundColor:'#185FED' }} onPress={()=>{ handleSync()}}>
                      <MaterialCommunityIcons name="database-sync" size={35} color="#FFF"  />
-                    <Text style={{ color:'#FFF', fontWeight:"bold"}} > cadastrar/atualizar </Text>
+                    <Text style={{ color:'#FFF', fontWeight:"bold"}} > Sincronizar dados </Text>
                   </TouchableOpacity>
             </View >
+
+            
 
           {/***** enviar/receber pedidos */}
               <View style={{margin:5,borderRadius:5, padding:10, backgroundColor:'#FFF', elevation:3, width:'98%', alignItems:"center", justifyContent:"center"  }} >
@@ -698,7 +336,8 @@ setMsgApi('')
                         <Text style={{ color:'#FFF', fontWeight:"bold" }} > enviar/receber pedidos</Text>
                     </TouchableOpacity>
               </View >
-              <TouchableOpacity  style={ { marginTop:50, alignItems:"center", elevation:3,padding:5, flexDirection:"row", borderRadius: 5,backgroundColor:'#185FED' }}  onPress={() =>   restart() } >
+         
+                <TouchableOpacity  style={ { marginTop:50, alignItems:"center", elevation:3,padding:5, flexDirection:"row", borderRadius: 5,backgroundColor:'red' }}  onPress={() =>   restart() } >
                 <MaterialCommunityIcons name="database-remove" size={35} color="#FFF" />
                   <Text style={{ color:'#FFF',fontWeight:"bold" }} > limpar base de dados</Text>
               </TouchableOpacity>

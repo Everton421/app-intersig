@@ -106,12 +106,7 @@ async function gravar(){
       
       <View style={{ backgroundColor: "#185FED" }}>
         <View
-          style={{
-            padding: 15,
-            backgroundColor: "#185FED",
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "space-between",
+          style={{padding: 15,backgroundColor: "#185FED",alignItems: "center",flexDirection: "row",justifyContent: "space-between",
           }}
         >
           <TouchableOpacity
@@ -122,25 +117,10 @@ async function gravar(){
           </TouchableOpacity>
 
           <View
-            style={{
-              flexDirection: "row",
-              marginLeft: 10,
-              gap: 2,
-              width: "100%",
-              alignItems: "center",
-            }}
+            style={{ flexDirection: "row", marginLeft: 10, gap: 2, width: "100%", alignItems: "center"  }}
           >
             <TextInput
-              style={{
-                width: "70%",
-                fontWeight: "bold",
-                padding: 5,
-                margin: 5,
-                textAlign: "center",
-                borderRadius: 5,
-                elevation: 5,
-                backgroundColor: "#FFF",
-              }}
+              style={{  width: "70%",fontWeight: "bold",padding: 5,margin: 5,textAlign: "center",borderRadius: 5,elevation: 5,backgroundColor: "#FFF"  }}
               onChangeText={(value) => setPesquisa(value)}
               placeholder="pesquisar"
             />
@@ -154,13 +134,7 @@ async function gravar(){
 
         <View>
           <Text
-            style={{
-              left: 5,
-              bottom: 5,
-              color: "#FFF",
-              fontWeight: "bold",
-              fontSize: 20,
-            }}
+            style={{ left: 5,bottom: 5,color: "#FFF",fontWeight: "bold",fontSize: 20 }}
           >
             {" "}
             Categorias{" "}
@@ -215,10 +189,8 @@ async function gravar(){
               </TouchableOpacity>
             </View>
           </View>
-
         </View>
-
-                 </Modal>
+       </Modal>
  
       {/**  */}
       <View style={{ marginTop: 10 }}>
@@ -232,18 +204,7 @@ async function gravar(){
       </View>
       {/**  */}
       <TouchableOpacity
-        style={{
-          backgroundColor: "#185FED",
-          width: 50,
-          height: 50,
-          borderRadius: 25,
-          position: "absolute",
-          bottom: 150,
-          right: 30,
-          elevation: 10,
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 999, // Garante que o botão fique sobre os outros itens
+        style={{backgroundColor: "#185FED",width: 50,height: 50,borderRadius: 25,position: "absolute",bottom: 150,right: 30,elevation: 10,alignItems: "center",justifyContent: "center",zIndex: 999, // Garante que o botão fique sobre os outros itens
         }}
         onPress={() => {
           navigation.navigate("cadastro_categorias");

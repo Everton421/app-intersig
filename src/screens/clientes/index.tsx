@@ -5,6 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { RenderItensClients } from "./renderItemsClients/RenderItensClients";
+import { defaultColors } from "../../styles/global";
 
 export type client = 
 {
@@ -29,8 +30,6 @@ export function Clientes({navigation}:any){
 
 
     ////////////////
-
-       
      useEffect(()=>{
     
                 async function filtrar(){
@@ -49,8 +48,6 @@ export function Clientes({navigation}:any){
                         }
                     }  
                 }
-
-
                filtrar();
     
       },[ pesquisa ])
@@ -61,16 +58,14 @@ export function Clientes({navigation}:any){
                 //setVisible(true)
             navigation.navigate('cadastro_cliente',{ codigo_cliente: item.codigo})
             }       
-            
              
             return(
-                <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
+              <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
                 <View style={{ backgroundColor:'#185FED', }}> 
                    <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
                       <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                           <Ionicons name="arrow-back" size={25} color="#FFF" />
                       </TouchableOpacity>
-                  
                         
                       <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
                           < TextInput 
@@ -87,7 +82,7 @@ export function Clientes({navigation}:any){
                    </View>
                        <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Clientes </Text>
                  </View>
-                        {/*
+                       
                         <Modal transparent={true} visible={ visible }>
                             <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
                                 
@@ -108,7 +103,8 @@ export function Clientes({navigation}:any){
                                                 }}
                                                 />
                                              <View style={{ backgroundColor:'#fff', borderRadius:5, height:25, elevation:5 }}>
-                                                 <Text style={{ fontWeight:"bold" }} > Codigo: {cSelecionado?.codigo} </Text>
+                                                 <Text style={{ fontWeight:"bold", fontSize:15 ,color:defaultColors.gray}} >
+                                                     Codigo: {cSelecionado?.codigo} </Text>
                                              </View>   
         
                                                 
@@ -146,31 +142,21 @@ export function Clientes({navigation}:any){
                                  </View>    
                             </View>
                         </Modal>
-                        */}
+                   
                      <FlatList
                          data={dados}
                          renderItem={({item})=> RenderItensClients({item, handleSelect})}
                          keyExtractor={(i)=> i.codigo.toString() }
                      />
 
-                <TouchableOpacity
+             <TouchableOpacity
                 style={{
-                    backgroundColor: '#185FED', 
-                    width: 50, 
-                    height: 50,   
-                    borderRadius: 25,  
-                    position: "absolute",       
-                    bottom: 150,                 
-                    right: 30,                   
-                    elevation: 10,               
-                    alignItems: "center", 
-                    justifyContent: "center",
-                    zIndex: 999,             // Garante que o botão fique sobre os outros itens
+                    backgroundColor: '#185FED', width: 50, height: 50,   borderRadius: 25,  position: "absolute", bottom: 150, right: 30, elevation: 10, alignItems: "center", justifyContent: "center",zIndex: 999,             // Garante que o botão fique sobre os outros itens
                 }}
-                onPress={() => {
-                    navigation.navigate('cadastro_cliente')
-                }}
-            >
+                    onPress={() => {
+                        navigation.navigate('cadastro_cliente')
+                    }}
+                   >
                 <MaterialIcons name="add-circle" size={45} color="#FFF" />
             </TouchableOpacity>
         

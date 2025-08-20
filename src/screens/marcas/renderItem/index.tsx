@@ -1,26 +1,21 @@
 import React from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import { FontAwesome } from "@expo/vector-icons";
 
 import { defaultColors } from "../../../styles/global";
 
-type IClient = {
+type item = {
   codigo: number;
-  cnpj: string;
-  nome: string;
-  ie: string;
-  cep: string;
-  cidade: string;
-  endereco: string;
-  numero: string;
+  descricao: string;
 };
 
 interface Props {
-  item: IClient;
-  handleSelect: (item: IClient) => void;
+  item: item;
+  handleSelect: (item: item) => void;
 }
 
-export function RenderItensClients({ item, handleSelect }: Props) {
+export const RenderItensMarcas = ({ item, handleSelect }: Props)=> {
   return (
     <TouchableOpacity
       onPress={() => handleSelect(item)}
@@ -32,14 +27,13 @@ export function RenderItensClients({ item, handleSelect }: Props) {
 
       <View style={styles.infoContainer}>
         <View style={styles.iconContainer}>
-          <FontAwesome5 name="user" size={24} color={defaultColors.darkBlue} />
+         <FontAwesome name="bookmark" size={24} color={ defaultColors.darkBlue } />
+
         </View>
-        <Text style={styles.nome} numberOfLines={2} ellipsizeMode="tail">
-          {item.nome}
+        <Text style={styles.descricao} numberOfLines={2} ellipsizeMode="tail">
+          {item.descricao}
         </Text>
       </View>
-
-      <Text style={styles.cnpj}>CNPJ/CPF: {item.cnpj}</Text>
     </TouchableOpacity>
   );
 }
@@ -69,9 +63,9 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginRight: 10,
   },
-  nome: {
+  descricao: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 15,
     color: defaultColors.gray,
     flex: 1,
   },

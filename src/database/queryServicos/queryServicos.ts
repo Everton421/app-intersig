@@ -24,14 +24,14 @@ export const useServices = ()=>{
  
   
    
-        async function selectByCode( codigo:number ) {
+        async function selectByCode( codigo:number ):Promise<servico[]> {
             let aux = 0;
             if( isNaN(codigo)){
                 aux = Number(codigo);
             }else{
                 aux = codigo ; 
             }
-                const result = await db.getAllAsync(`SELECT 
+                const result:servico[] = await db.getAllAsync(`SELECT 
                   *,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro 

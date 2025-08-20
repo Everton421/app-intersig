@@ -36,7 +36,53 @@ export const queryConfig_api = ()=>{
                     ` )
             }catch(e){ console.log(`Erro ao tentar atualizar as configurações da api `, e)}
         }
+           type partialApiConf = {
+             codigo :number
+             url?: string,
+             porta?: number,
+             token?: string
+             data_sinc?:string,
+             data_env?:string
+        }
 
+    async function updateByParam( api:partialApiConf  ){
+      
+       
+      let sql = ` update api_config set `
+      let params =[]
+      let values=[]
+      let finalSql = sql;
+    if(api.url){
+        params.push(' url = ? ')
+        values.push(`${api.url}`)
+    }
+    if(api.porta){
+        params.push(' porta = ? ')
+        values.push(`${api.porta}`)
+    }
+    if(api.token){
+        params.push(' token = ? ')
+        values.push(`${api.token}`)
+    }
+    if(api.data_sinc){
+        params.push(' data_sinc = ? ')
+        values.push(`${api.data_sinc}`)
+    }
+    if(api.data_env){
+        params.push(' data_env = ? ')
+        values.push(`${api.data_env}`)
+
+        let whereClause = ` WHERE codigo = ${api.codigo };`;
+    if( params.length > 0 ){
+        finalSql = sql + params.join(' , ') + whereClause
+    }
+  
+        try{
+           // console.log("SQL : ", finalSql, " VALUES : ",values)
+         await db.runAsync( finalSql, values )
+            }catch(e){ console.log(`Erro ao tentar atualizar as configurações da api `, e)}
+        }
+}
 
  async function create( api:ApiConfig ){
 
@@ -51,5 +97,5 @@ export const queryConfig_api = ()=>{
     
  }
 
-    return { select, update , create}
+    return { select, update , create, updateByParam}
 }

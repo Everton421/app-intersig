@@ -8,10 +8,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import useApi from "../../services/api";
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
+import { RenderItensMarcas } from "./renderItem";
+
+type marca= { codigo:number, dscricao:string}
 
 export const Marcas = ({navigation}:any)=>{
     const [ press, setPress ] = useState(false);
-    const [ dados, setDados ] = useState([]);
+    const [ dados, setDados ] = useState<marca[]>();
     const [ pesquisa, setPesquisa ] = useState<string | undefined>('');
     const [ visible, setVisible ] = useState<boolean>(false);
     const [ marcaSelecionada, setMarcaSelecionada ] = useState();
@@ -57,24 +60,7 @@ export const Marcas = ({navigation}:any)=>{
             setVisible(true);
             setMarcaSelecionada(item)
         }
-
-    function renderItem({item}){
-        return(
-            <TouchableOpacity 
-                 onPress={ ()=> handleSelect(item) }
-                style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%' }}
-             >
-               <Text style={{ fontWeight:"bold"}}>
-                  Codigo: {item.codigo}
-               </Text>
-
-               <Text>
-                 {item.descricao}
-               </Text>
-             
-            </TouchableOpacity>
-        )
-    }
+     
 
 
 async function gravar(){
@@ -142,9 +128,9 @@ async function gravar(){
                 </View>
             </View>
 
-                <View>
-                 <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Marcas </Text>
-                </View>
+                  <View style={{ flexDirection:"row" }}>
+                    <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Marcas </Text>
+                  </View>
       </View>
  
             {/*          */}
@@ -202,9 +188,9 @@ async function gravar(){
                  {/**  */}
            <View style={{ marginTop:10}}> 
                 <FlatList
-                data={ dados }
-                renderItem = {(i)=>  renderItem(i)  }
-                keyExtractor={(i)=> i.codigo}
+                    data={ dados }
+                    renderItem = {( { item } )=>  <RenderItensMarcas item={item} handleSelect={handleSelect} />  }
+                    keyExtractor={(i)=> i.codigo.toString()}
                 />
             </View>
         {/**  */}

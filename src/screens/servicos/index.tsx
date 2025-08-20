@@ -9,6 +9,7 @@ import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
 import { FontAwesome5, Octicons } from "@expo/vector-icons";
 import { defaultColors } from "../../styles/global";
+import { RenderItemsService } from "./renderItemServices";
 
 
 type servico  = {
@@ -238,7 +239,8 @@ async function gravar(){
         <View style={ { marginTop:4} } > 
              <FlatList
                  data={dados}
-                 renderItem={(item)=> renderItem(item)}
+                 renderItem={({item})=>  <RenderItemsService handleSelect={handleSelect} item={item} />}
+                 
                  keyExtractor={(i)=>i.codigo}
              />
             </View>

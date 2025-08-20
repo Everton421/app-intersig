@@ -156,19 +156,26 @@ function seleciona(item){
                     ( 
                     <ActivityIndicator size={35} color="#185FED"  /> 
                     ) :(
+                      selectedItem && selectedItem.codigo  ?  ( 
                      <View style={{ width: '100%'}} >
-                    <View style={{margin:2, flexDirection: 'row',  width:'90%' }}>
-                       <Text style={{    fontWeight: 'bold'  ,color: '#6C757D',width:'20%'}}> Cliente:</Text>
-                       <Text style={{  fontWeight: 'bold' ,color: '#6C757D' ,width:'90%' }} numberOfLines={3} > { selectedItem?.nome} </Text>
-                    </View>
+                        <View style={{margin:2, flexDirection: 'row',  width:'90%' }}>
+                           <Text style={{    fontWeight: 'bold'  ,color: '#6C757D',width:'20%'}}> Cliente:</Text>
+                           <Text style={{  fontWeight: 'bold' ,color: '#6C757D' ,width:'90%' }} numberOfLines={3} > { selectedItem?.nome} </Text>
+                        </View>
                    
                         <View style={{ padding:5  ,  justifyContent: 'space-between',width:'98%' }}>
-                          <Text style={{    fontWeight: 'bold'  ,color: '#6C757D' }}> 
-                            cnpj: {selectedItem?.cnpj}
-                          </Text>
-                         <Text style={{ fontWeight: 'bold' ,alignSelf:'flex-end' ,color: '#6C757D'}} numberOfLines={3} > celular: {selectedItem?.celular}</Text>
-                     </View> 
+                            <Text style={{    fontWeight: 'bold'  ,color: '#6C757D' }}> 
+                             cnpj: {selectedItem?.cnpj}
+                            </Text>
+                           <Text style={{ fontWeight: 'bold' ,alignSelf:'flex-end' ,color: '#6C757D'}} numberOfLines={3} > celular: {selectedItem?.celular}</Text>
+                        </View> 
                     </View>
+                    ) : (
+                      <View style={{flex:1}}>
+                        <Text style={{ fontWeight:'bold', fontSize:20, color:'#6C757D', flex:1}}> Selecione um cliente para começar</Text>
+                      </View>
+
+                    )
                      )
                      }
 

@@ -11,6 +11,7 @@ import { useServicosPedido } from '../../../../database/queryPedido/queryServico
 import { useVeiculos } from '../../../../database/queryVceiculos/queryVeiculos';
 import { usePedidos } from '../../../../database/queryPedido/queryPedido';
 import { Ionicons } from '@expo/vector-icons';
+import { defaultColors, globalStyles } from '../../../../styles/global';
 
 export const Servico = ( { codigo_orcamento }:any )=>{
 
@@ -356,30 +357,20 @@ export const Servico = ( { codigo_orcamento }:any )=>{
   }
 
       return(
-        <View  >
+        <View  style={{ flex:1}}>
                     <View style={{flexDirection:'row',margin:2 , alignItems:'center',   justifyContent:'center'  }}>
                       <Text style={{fontSize:20,fontWeight:'bold' ,color:'#6C757D' }}>
                           Serviços
                        </Text>
                       </View>
 
-            <TouchableOpacity style={{backgroundColor:'#185FED',margin:3,  padding:10, elevation:5, borderRadius:5, flexDirection:'row', justifyContent:'space-between'  }}
-            onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
-              { selectedTipo ?
-                ( <Text  style={{ color:'#FFF', fontSize:15,fontWeight:'bold', width:'90%' }}  numberOfLines={2}>    {selectedTipo?.descricao} </Text> ) 
-                :
-                (  < Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold',width:'90%' }}>Tipos De OS</Text> )       
+            <TouchableOpacity style={{backgroundColor:'#185FED', marginHorizontal:10,  padding:10, elevation:5, borderRadius:5, flexDirection:'row',alignItems:'center', justifyContent:'space-between'  }}
+              onPress={ ()=>  { presstipoOs ?  setPresstipoOS(false) : setPresstipoOS(true)    } } >
+                <Text style={{ color:'#FFF', fontSize:15,fontWeight:'bold', alignSelf:'flex-start'}} > Tipo de OS </Text>
+                { selectedTipo &&
+                  ( <Text  style={{  color:'#FFF', fontSize:15,fontWeight:'bold' ,flex:1 }}  numberOfLines={2}>    {selectedTipo?.descricao} </Text> ) 
+                }      
 
-              }      
-
-            {
-              selectedTipo ?
-              (  <FontAwesome5 name="toolbox" size={28} color="#FFF" /> )
-              :
-              (   <AntDesign name="caretdown" size={24} color="white"    />
-
-              )
-            }
             </TouchableOpacity>
 
 
@@ -404,35 +395,30 @@ export const Servico = ( { codigo_orcamento }:any )=>{
           
               {/**modal tipos de OS  */ }
                
-              <Modal visible={presstipoOs} transparent={true}   >
-         <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
-                  <View style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
-           
-                    
-                    
-                            <View style={{flexDirection:'row',  width:"100%" }}>
-                             <TouchableOpacity  onPress={() => {setPresstipoOS(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                                <Ionicons name="close" size={28} color={ '#6C757D' } />
-                              </TouchableOpacity>
-                             <Text style={{margin:15 ,fontWeight:'bold', width:'100%',fontSize:20   }}>
-                                 Tipos De OS 
-                            </Text>
-                            </View>
-              
-                    { tipoOs.length > 0 ? 
-                          <FlatList
-                              data={ tipoOs }
-                              renderItem={ ( {item} )=> renderItemOS(item)}
-                            />
-                        :
-                        <Text style={{textAlign:'center', fontWeight:'bold', fontSize:15 }}>  
-                         nenhum tipo de os encontrada</Text>
-                          }
-                    
-                
+            <Modal visible={presstipoOs} transparent={true}   >
+                <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }} > 
+                      <View 
+                      style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopStartRadius: 20, borderTopEndRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }}>
+                                <View style={{flexDirection:'row',  width:"100%" }}>
+                                   <TouchableOpacity  onPress={() => {setPresstipoOS(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                                      <Ionicons name="close" size={28} color={ '#6C757D' } />
+                                    </TouchableOpacity>
+                                  <Text style={{margin:15 ,fontWeight:'bold', width:'100%',fontSize:20, color:defaultColors.gray  }}>
+                                      Tipos de OS 
+                                  </Text>
+                                </View>
+                  
+                        { tipoOs.length > 0 ? 
+                              <FlatList
+                                  data={ tipoOs }
+                                  renderItem={ ( {item} )=> renderItemOS(item)}
+                                />
+                            :
+                            <Text style={{textAlign:'center', fontWeight:'bold', fontSize:15 }}>  
+                            nenhum tipo de os encontrada</Text>
+                              }
                         </View>
-                        </View>
-            
+                   </View>
               </Modal>
               {/******* */}
            
@@ -454,7 +440,7 @@ export const Servico = ( { codigo_orcamento }:any )=>{
                             <FlatList
                               data={dadosServicos}
                               renderItem={ ({item})=> renderItemServico( item ) }
-                              keyExtractor={(item)=>item.codigo}
+                              keyExtractor={(item)=>item.codigo.toString()}
                             />
                         </View>
                       

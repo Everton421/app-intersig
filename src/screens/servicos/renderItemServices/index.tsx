@@ -2,23 +2,25 @@
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { defaultColors } from "../../../styles/global";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { FontAwesome5, Octicons } from "@expo/vector-icons";
 
-
-
-type category = {
-  codigo: number;
-  descricao: string;
-  data_cadastro:string 
-  data_recadastro:string 
- id:string
-};
-
-interface Props {
-  item: category;
-  handleSelect: (item: category) => void;
+type servico  = {
+    codigo:number | undefined,
+    aplicacao:string | undefined,
+    valor:number | undefined ,
+      data_cadastro : string| undefined,
+      data_recadastro : string | undefined,
+      tipo_serv : number | undefined ,
 }
 
-export const RenderItemsCategory = ({ item, handleSelect }: Props)=> {
+ 
+
+interface Props {
+  item: servico;
+  handleSelect: (item: servico) => void;
+}
+
+export const RenderItemsService = ({ item, handleSelect }: Props)=> {
   return (
     <TouchableOpacity
       onPress={() => handleSelect(item)}
@@ -30,12 +32,15 @@ export const RenderItemsCategory = ({ item, handleSelect }: Props)=> {
 
       <View style={styles.infoContainer}>
         <View style={styles.iconContainer}>
-                    <MaterialIcons name="category" size={30} color={defaultColors.darkBlue} />
+            <FontAwesome5 name="tools" size={30} color={defaultColors.darkBlue}   />
         </View>
         <Text style={styles.descricao} numberOfLines={2} ellipsizeMode="tail">
-          {item.descricao}
+          {item.aplicacao}
         </Text>
       </View>
+       <Text style={{ fontWeight:"bold", flex: 1, fontSize:15, color: defaultColors.gray }}>
+                 R$ {item.valor}
+               </Text>
     </TouchableOpacity>
   );
 }

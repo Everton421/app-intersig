@@ -88,8 +88,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
              let aux:any = await useQuerypedidos.newSelect( queryOrder );
                      setOrcamentosRegistrados(aux);
                      setVisiblePostPedido(false);
-          //console.log("query...", aux)
-            
+                    //console.log("query...", aux)
                     }
  
    
@@ -178,7 +177,6 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
 
     function selecionaOrcamento(item){
     setLoadingEditOrder(true)
-
         try{
 
           setSelecionado(item);

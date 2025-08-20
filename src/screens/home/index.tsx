@@ -1,4 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
+
 import { View, FlatList, Text, Alert,   TouchableOpacity,   Image, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../contexts/auth";
 import { AntDesign } from '@expo/vector-icons';
@@ -337,7 +338,7 @@ async function buscaEmpresa (){
 
       <View style={{  flexDirection: "row", position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor:  defaultColors.darkBlue , padding: 10, justifyContent: "space-between", }}>
         <Text style={{ color: '#FFF', fontSize: 20, fontWeight: "bold", width: '50%' }}>
-          {usuario && usuario.nome}
+        <FontAwesome name="user-circle-o" size={24} color={'#FFF'} /> {usuario && usuario.nome}
         </Text>
 
         <TouchableOpacity onPress={() => alertSair()} style={{ flexDirection: "row" }}>
@@ -346,7 +347,7 @@ async function buscaEmpresa (){
         </TouchableOpacity>
  
       </View>
-
+ 
     </View>
   );
 };

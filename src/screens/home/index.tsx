@@ -2,7 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 
 import { View, FlatList, Text, Alert,   TouchableOpacity,   Image, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../contexts/auth";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';
@@ -261,7 +261,7 @@ async function buscaEmpresa (){
 
                     )
                   }
-            </View>
+            </View> 
 
       <View style={{ margin: 10, alignItems: "center"   }}>
           <FlatList
@@ -284,7 +284,7 @@ async function buscaEmpresa (){
             <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
               onPress={() => { navigation.navigate('ViewTabProdutos') }} >
               <View style={{ backgroundColor: defaultColors.ligthBlue, flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-                <Foundation name="book" size={30} color={defaultColors.darkBlue} />
+                   <FontAwesome name="cubes" size={24} color={defaultColors.darkBlue} />
               </View>
               <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '80%', textAlign: 'center' }} >Produtos</Text>
             </TouchableOpacity>
@@ -304,7 +304,7 @@ async function buscaEmpresa (){
             onPress={() => { navigation.navigate('clientes') }}
           >
             <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-              <Feather name="users" size={30} color={defaultColors.darkBlue} />
+              <FontAwesome6 name="users" size={25} color={defaultColors.darkBlue}/>
             </View>
             <Text style={{ fontWeight: "bold", fontSize: 18, color:   defaultColors.gray, width: '50%', textAlign: 'center' }} >Clientes</Text>
             <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
@@ -315,7 +315,7 @@ async function buscaEmpresa (){
             onPress={() => { navigation.navigate('veiculos') }}
           >
             <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-            <FontAwesome5 name="car" size={24} color={defaultColors.darkBlue} />
+            <MaterialCommunityIcons name="car-multiple" size={30} color={defaultColors.darkBlue} />
             </View>
             <Text style={{ fontWeight: "bold", fontSize: 18, color: defaultColors.gray, width: '50%', textAlign: 'center' }} >Veículos</Text>
             <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
@@ -327,9 +327,9 @@ async function buscaEmpresa (){
             onPress={() => { navigation.navigate('formasPagamento') }}
           >
             <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-              <MaterialIcons name="payment" size={30} color={defaultColors.darkBlue} />
+            <MaterialCommunityIcons name="credit-card-check" size={30}   color={defaultColors.darkBlue}  />
             </View>
-            <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '50%', textAlign: 'center' }} >Formas De Pagamento</Text>
+            <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '50%', textAlign: 'center' }} >Formas de Pagamento</Text>
             <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
           </TouchableOpacity>
 

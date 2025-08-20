@@ -6,6 +6,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { useEffect, useState } from "react";
 import { fpgt, useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
+import { RenderItemsFormaPagamento } from "./renderItensFormaPagamento/RenderItensFormaPagamento";
 
 type IFptg={
     item:fpgt
@@ -114,7 +115,7 @@ function renderItem({item}:IFptg){
            <View style={{ marginTop:10}}> 
                 <FlatList
                 data={ dados }
-                renderItem = {(i)=>  renderItem(i)  }
+                renderItem = {( {item} )=> <RenderItemsFormaPagamento handleSelect={handleSelect} item={item} /> } 
                 keyExtractor={(i:any)=> i.codigo}
                 />
             </View>

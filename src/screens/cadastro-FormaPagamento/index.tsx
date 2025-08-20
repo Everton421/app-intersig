@@ -1,10 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert, Button, FlatList, Image, Text, TouchableOpacity, View } from "react-native"
+import { Alert,  FlatList,    Text, TouchableOpacity, View } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
 import useApi from "../../services/api";
-import { useCategoria } from "../../database/queryCategorias/queryCategorias";
-import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
@@ -16,7 +13,6 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
     const [ codigo, setCodigo ] = useState();
     const [ quantidade, setQuantidade ] = useState(1) ;
     const [ intervalo, setIntervalo ] = useState(1);
-    const [ parcelas, setParcelas ] = useState<parcela[]>();
     const [ descricao, setDescricao ] = useState<string>(); 
     const [ loading, setLoading ] = useState(false);
 
@@ -131,7 +127,6 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
                                     return  Alert.alert('',`Forma De Pagamento registrada com sucesso!`) 
                                 }
                         }
-
                     }catch(e:any){
                         if(e.status === 400 ){
                             return  Alert.alert(`Erro!`, e.response.data.msg); 
@@ -141,9 +136,7 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
                     }finally{
                         setLoading(false)
                     }
-        }
-      
-         
+            }
         }
 
 
@@ -167,7 +160,7 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
                     <View style={{margin:5, flexDirection:"row", alignItems:"center", justifyContent:"space-between",   width:'100%'}}>
 
                     <View style={{ width:'50%' }}>
-                    <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} >quantidade de parcelas:</Text>
+                        <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} >quantidade de parcelas:</Text>
                                 <TextInput
                                     style={{ elevation:2, borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF' }}
                                     placeholder="ex. 2"
@@ -193,7 +186,7 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
 
              <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center", marginTop: 10 }} >
                     <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 15, padding: 5 }}
+                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 7, padding: 5 ,elevation:7 }}
                        onPress={ ()=> gravar()}
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>

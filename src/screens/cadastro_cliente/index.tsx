@@ -3,11 +3,12 @@ import { Alert, Text, TextInput, TouchableOpacity, View, KeyboardAvoidingView, P
 import useApi from "../../services/api";
 import { useClients } from "../../database/queryClientes/queryCliente";
 import { AuthContext } from "../../contexts/auth";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
+import { defaultColors } from "../../styles/global";
 
 export const Cadastro_cliente = ({ route, navigation }: any) => {
     const [cnpj, setCnpj] = useState<string>();
@@ -99,7 +100,6 @@ useEffect(() => {
                 }
 
     }
-
 
 
     async function gravar() {
@@ -213,43 +213,43 @@ useEffect(() => {
 
   
                 <View style={{ width: '97%', margin: 7,  backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                    <Text style={{ fontWeight: "bold" }} > CPF/CNPJ:</Text>
+                    <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > CPF/CNPJ:</Text>
                     <TextInput
-                        style={{ padding: 5,width:'80%' }}
+                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
                         placeholder="00.000.000/0000-00"
                         onChangeText={(value) => setCnpj(value)}
                         defaultValue={cnpj}
                     />
                 </View>
-                <View style={{ width: '97%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                    <Text style={{ fontWeight: "bold" }} > IE/RG:</Text>
+                <View style={{ width: '97%', margin: 7,   backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3  }}>
+                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > IE/RG:</Text>
                     <TextInput
-                         style={{ padding: 5,width:'80%' }}
-                        onChangeText={(value) => setIe(value)}
+                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
+                         onChangeText={(value) => setIe(value)}
                         defaultValue={ie}
                     />
                 </View>
 
                 <View style={{ width: '97%', margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                    <Text style={{ fontWeight: "bold" }} >Razao social:</Text>
+                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} >Razao social:</Text>
                     <TextInput
-                        style={{ padding: 5,width:'80%' }}
+                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
                         onChangeText={(value) => setNome(value)}
                         defaultValue={nome}
                     />
                 </View>
 
-                <View style={{ width: '97%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                    <Text style={{ fontWeight: "bold" }} > celular:</Text>
+                <View style={{ width: '97%', margin: 7,   backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3  }}>
+                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > celular:</Text>
                     <TextInput
-                        style={{ padding: 5,width:'80%' }}
+                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
                         onChangeText={(value) => setCelular(value)}
                         defaultValue={celular}
                     />
                 </View>
 
                     <TouchableOpacity
-                        style={{ backgroundColor: '#185FED', padding: 7  ,width: '80%', alignItems: "center", justifyContent: "space-between", borderRadius: 10,   flexDirection:"row"  }}
+                        style={{ backgroundColor: '#185FED', padding: 7  ,width: '80%', alignItems: "center", marginTop:10, justifyContent: "space-between", borderRadius: 7,   flexDirection:"row"  }}
                         onPress={()=> {setVisibleEndereco(true) }}
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Endereço</Text>
@@ -260,63 +260,63 @@ useEffect(() => {
                     <Modal visible={visibleEndereco}  transparent={true}>
                      <View style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", flex: 1 }} >
                         <View style={{ backgroundColor: "#FFF", flex: 1 , margin:15, borderRadius:15, height:'80%'}} >
-                                    <TouchableOpacity
-                                        style={{ backgroundColor: '#185FED', padding: 7, margin:5 ,width: '15%', alignItems: "center", justifyContent: "space-between", borderRadius: 10,   flexDirection:"row"  }}
-                                        onPress={()=> {setVisibleEndereco(false) }}
-                                    >
-                                        <Text style={{ fontWeight: "bold", color: "#FFF"  }}>voltar</Text>
-                                 </TouchableOpacity>
+
+                            <TouchableOpacity onPress={()=> {setVisibleEndereco(false) }}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                              <Ionicons name="close" size={28} color={ '#6C757D' } />
+                           </TouchableOpacity>
 
                           
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                 <Text style={{ fontWeight: "bold" }} > cep:</Text>
+                                 <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > cep: </Text>
                                 <TextInput
-                                     style={{ padding: 5,width:'80%' }}
+                                     style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     placeholder="0000.00.00"
                                     onChangeText={(value) => setCep(value)}
                                     defaultValue={cep}
                                 />
                             </View>
 
-                            <View style={{ width:'100%', margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                 <Text style={{ fontWeight: "bold" }} >Estado:</Text>
-
-                                <TextInput  style={{ padding: 5,width:'80%' }}
+                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
+                                  <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} >  Estado: </Text>
+                                <TextInput  
+                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     onChangeText={(value) => setEstado(value)}
                                     placeholder="PR" 
                                     defaultValue={estado}
                                     />
                             </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" }} > cidade:</Text>
+                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > cidade: </Text>
                                 <TextInput
-                                     style={{ padding: 5,width:'80%' }}
+                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     onChangeText={(value) => setCidade(value)}
                                     defaultValue={cidade}
                                 />
                             </View>
                              
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" }} > Endereço:</Text>
+                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > Endereço: </Text>
                                 <TextInput
-                                     style={{ padding: 5,width:'80%' }}
+                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     onChangeText={(value) => setEndereco(value)}
                                     placeholder="Avenida."
+                                    multiline
                                     defaultValue={endereco}
+                                    numberOfLines={10}
                                 />
                             </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" }} > bairro:</Text>
+                                 <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > bairro: </Text>
                                 <TextInput
-                                     style={{ padding: 5,width:'80%' }}
+                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     onChangeText={(value) => setBairro(value)}
                                     defaultValue={bairro}
                                 />
                             </View>
                             <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" }} > numero:</Text>
+                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} >  numero: </Text>
                                 <TextInput
-                                     style={{ padding: 5,width:'80%' }}
+                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
                                     onChangeText={(value) => setNumero(value)}
                                     defaultValue={numero}
                                 />
@@ -330,7 +330,7 @@ useEffect(() => {
 
                 <View style={{ flexDirection: "row", marginTop: 30, width: '100%', alignItems: "center", justifyContent: "center", }} >
                     <TouchableOpacity
-                        style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 10, padding: 5 }}
+                        style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 7, padding: 5 }}
                         onPress={() => gravar()}
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>

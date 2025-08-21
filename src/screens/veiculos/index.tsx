@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useVeiculos, Veiculo } from "../../database/queryVceiculos/queryVeiculos";
 import { FontAwesome5, MaterialIcons } from "@expo/vector-icons";
+import { defaultColors } from "../../styles/global";
 
 
 
@@ -31,58 +32,42 @@ function renderItem({item}:any) {
     return(
         <TouchableOpacity 
             onPress={ ()=>  navigation.navigate('cadastro_veiculos', { codigo_veiculo: item.codigo}) }
-            style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'95%'}}
+            style={{ backgroundColor:'#FFF', elevation:2, padding:3, margin:5, borderRadius:5,  width:'98%' }}
          >
             <View style={{ flexDirection:"row", gap: 3 , justifyContent:'space-between', margin:2}}>
                 <View style={{ flexDirection:"row", gap: 3 , justifyContent:'space-between'}}>
-                      <FontAwesome5 name="car-side" size={24} color="#185FED" />
-                   <Text style={{ fontWeight:"bold", marginLeft:10}}>
-                    Codigo: 
+                   
+                   <Text style={{ fontWeight:"bold",fontSize:17, marginLeft:10 , color:defaultColors.gray}}>
+                    Codigo: {item.codigo}
                    </Text>
-                  <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                     {item.codigo}
-                   </Text>
+
                 </View>
                <View style={{ flexDirection:"row", gap:2}}>
-                <Text style={{ fontWeight:"bold" }}>
-                   Placa: 
-                </Text>
-                 <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                   {item.placa}
+                 <Text style={{ fontWeight:"bold",fontSize:17, marginLeft:10 , color:defaultColors.gray}}>
+                   Placa:  {item.placa}
                 </Text>
               </View>
-            </View>
-
-       
+                <View style={{ flexDirection:"row", gap:2}}>
+                   <Text style={{ fontWeight:"bold",fontSize:17, marginLeft:10 , color:defaultColors.gray}}>
+                      Ano: {item.ano}
+                   </Text>
+                </View>
+             </View>
 
             <View style={{ flexDirection:"row", gap:2 }}>
-                <View style={{ flexDirection:"row", gap:2}}>
-                  <Text style={{ fontWeight:"bold" }}>
-                      Ano: 
-                  </Text>
-                  <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                     {item.ano}
-                   </Text>
-                </View>
+              
             </View>
 
-             <View style={{ flexDirection:"row", gap:2 }}>
-                <View style={{ flexDirection:"row", gap:2}}>
-                  <Text style={{ fontWeight:"bold" }}>
-                      Modelo: 
-                  </Text>
-                  <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                     {item.modelo}
+             <View style={{ flexDirection:"row", gap:5, margin:3 }}>
+                    <FontAwesome5 name="car-side" size={35} color="#185FED" />
+                   <Text style={{ fontWeight:"bold",fontSize: 20, marginLeft:10 , color:defaultColors.gray, flex:1}}>
+                     Modelo: {item.modelo}
                    </Text>
-                </View>
             </View>
             
              <View style={{ flexDirection:"row", gap:2 }}>
-                  <Text style={{ fontWeight:"bold" }}>
-                      Cliente: 
-                  </Text>
-                  <Text style={{ fontWeight:"bold" , color:'#868686'}}>
-                     {item.nome}
+                   <Text style={{ fontWeight:"bold", fontSize: 17, marginLeft:10 , color:defaultColors.gray, flex:1 } } numberOfLines={3}>
+                      Cliente: {item.nome}
                    </Text>
                 </View>
         </TouchableOpacity>

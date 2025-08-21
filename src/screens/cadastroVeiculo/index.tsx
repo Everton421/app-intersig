@@ -7,6 +7,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { configMoment } from "../../services/moment";
 import { SelectCliente } from "../../components/selectCliente";
 import { LodingComponent } from "../../components/loading";
+import { defaultColors } from "../../styles/global";
 
  
 
@@ -145,66 +146,62 @@ export default function Cadastro_veiculo({ route, navigation}:any){
                                   <LodingComponent isLoading={loading} />
                                }
 
-                  
-               <Text style={{ marginLeft:10,fontWeight:"bold", fontSize:15}}> Veículo: { codigo_veiculo && codigo_veiculo > 0 ? codigo_veiculo : null }</Text>
+               <Text style={{ marginLeft:10,marginTop:10, fontWeight:"bold", fontSize:20, color: defaultColors.gray }}> Veículo: { codigo_veiculo && codigo_veiculo > 0 ? codigo_veiculo : null }</Text>
 
                <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
-               <Text style={{ fontWeight:"bold"}}> Placa: </Text>
+                   <Text style={{ fontWeight:"bold", color:defaultColors.gray, fontSize:17 }}> Placa: </Text>
                      <TextInput
                           onChangeText={(value:any)=>  setPlaca(value) }
                             defaultValue={   placa}
-                        style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
+                        style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5, fontSize:15, fontWeight:"bold", color:defaultColors.gray }}
                         placeholder="Placa:"
                     />
                 </View>
                 <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
-                 <Text style={{ fontWeight:"bold"}}> Marca: </Text>
-
+                   <Text style={{ fontWeight:"bold", color:defaultColors.gray, fontSize:17 }}> Marca: </Text>
                      <TextInput
                            onChangeText={(value:any)=>  setMarca(value)}
-                           style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
+                            style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5, fontSize:15, fontWeight:"bold", color:defaultColors.gray }}
                            defaultValue={ marca}
                         placeholder="Marca:"
                     />
                 </View>
                 <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
-                 <Text style={{ fontWeight:"bold"}}> Modelo: </Text>
-
+                <Text style={{ fontWeight:"bold", color:defaultColors.gray, fontSize:17 }}> Modelo: </Text>
                      <TextInput
                            onChangeText={(value:any)=>  setModelo(value)}
-                           style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
+                            style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5, fontSize:15, fontWeight:"bold", color:defaultColors.gray }}
                            defaultValue={ modelo}
                         placeholder="Modelo:"
                     />
                 </View>
                 <View style={{ margin: 7 , padding: 2, borderRadius: 5  }}>
-                 <Text style={{ fontWeight:"bold"}}> Combustivel: </Text>
-
+                 <Text style={{ fontWeight:"bold", color:defaultColors.gray, fontSize:17 }}> Combustivel: </Text>
                      <TextInput
                          onChangeText={(value:any)=> setCombustivel(value) }
-                       style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5 }}
-                       defaultValue={ combustivel}
-                        placeholder="Combustivel:"
+                         style={{ padding: 5, backgroundColor: '#FFF', elevation: 2, borderRadius:5, fontSize:15, fontWeight:"bold", color:defaultColors.gray }}
+                         defaultValue={ combustivel}
+                         placeholder="Combustivel:"
                     />
                 </View>
        
 
                 <View style={{ margin: 7,   padding: 2, borderRadius: 5,flexDirection:"row",   width:'100%' }}>
                    <View style={{width:'40%' ,marginLeft:'5%' }}>
-                    <Text style={{ fontWeight:"bold", marginLeft:'5%',}}>Cor: </Text>
+                    <Text style={{ fontWeight:"bold", marginLeft:'5%', color:defaultColors.gray, fontSize:17}}> Cor: </Text>
                         <TextInput
                          onChangeText={(value:any)=> setCor(value) }
                            defaultValue={ cor}
-                            style={{ padding: 5, backgroundColor: '#FFF',   marginLeft:'5%',elevation:2,borderRadius:5 }}
+                            style={{ padding: 5, backgroundColor: '#FFF',   marginLeft:'5%',elevation:2,borderRadius:5,  fontSize:15, fontWeight:"bold", color:defaultColors.gray }}
                             placeholder="Cor:"
                         />
                    </View>
                    <View style={{width:'40%' ,marginLeft:'5%' }}>
-                    <Text style={{ fontWeight:"bold", marginLeft:'5%'  }}>Ano: </Text>
+                    <Text style={{ fontWeight:"bold", marginLeft:'5%' ,color:defaultColors.gray, fontSize:17 }}>Ano: </Text>
                        <TextInput
                          onChangeText={(value:any)=> setAno(value) }
                          defaultValue={ ano}
-                        style={{ padding: 5, backgroundColor: '#FFF',  marginLeft:'5%', elevation:2, borderRadius:5 }}
+                        style={{ padding: 5, backgroundColor: '#FFF',  marginLeft:'5%', elevation:2, borderRadius:5 , fontSize:15, fontWeight:"bold", color:defaultColors.gray}}
                         placeholder="Ano:"
                     />
                    </View>
@@ -215,9 +212,9 @@ export default function Cadastro_veiculo({ route, navigation}:any){
             {/****************************************************** */}    
 
 
-                <View style={{ flexDirection: "row", marginTop:50 ,width: '100%', alignItems: "center", justifyContent: "center" }} >
+                <View style={{ flexDirection: "row",  marginTop:50 ,width: '100%', alignItems: "center", justifyContent: "center" }} >
                     <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius:  10, padding: 5 }}
+                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius:  5, padding: 5 }}
                         onPress={()=>gravar()}
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>

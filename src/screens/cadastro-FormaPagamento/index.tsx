@@ -6,6 +6,8 @@ import { useFormasDePagamentos } from "../../database/queryFormasPagamento/query
 import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
+import { defaultColors } from "../../styles/global";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
 export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
@@ -60,28 +62,42 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
     const Gerar = () => {
         let vencimento = intervalo;
         let parcelas1: parcela[] = [];
-        for (let i = 1; i <= quantidade; i++) {
-          parcelas1.push({ parcela: i, vencimento: vencimento * i });
-        }
+            for (let i = 1; i <= quantidade; i++) {
+            parcelas1.push({ parcela: i, vencimento: vencimento * i });
+            }
     
+       
+      const renderItem = ({ item }:{ item: parcela } )=>{
+        return (
+            <View style={{ elevation:7 ,flexDirection:"row", gap:7, alignItems:"center", width:'90%', backgroundColor:'#FFF',borderRadius:5  ,padding: 2, margin:3}}>
+                
+                <View style={{marginLeft:10 }}>
+                    <FontAwesome name="credit-card-alt" size={24} color={defaultColors.darkBlue } />
+                </View>
+                
+                <View style={{ }}>
+                    <Text style={{ fontWeight:"bold",color:defaultColors.gray, fontSize:15 }} > {` Parcela: ${item.parcela} `}    </Text>
+                    <Text style={{ fontWeight:"bold",color:defaultColors.gray, fontSize:15 }} > Vencimento:  {item.vencimento} dias </Text>
+                </View>
+
+            </View>
+        )
+      }
     
-      const Item = ({ item }: { item: parcela }) => {
-        return <Text>{` Parcela: ${item.parcela},  Vencimento: ${item.vencimento}`} dias </Text>;
-      };
-    
+
       return (
-            <View style={{ flex: 1, backgroundColor: "#EAF4FE" , alignItems:"center" ,maxHeight:150 }}>
-                <View style={{ marginTop: 20, backgroundColor:'#FFF', width:'90%',borderRadius:5, elevation:3 }}>
+                <View style={{ width:'100%', left:5, maxHeight:'70%'}}>
 
                     <FlatList
                     data={parcelas1}  
-                    renderItem={Item}  
+                    renderItem={renderItem}  
                     keyExtractor={(item) => item.parcela.toString()} 
                     />
-
                 </View>
-            </View>
+
+        
         );
+
     };
 
     async function gravar() {
@@ -144,36 +160,35 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
         <View style={{ flex:1 ,  backgroundColor:'#EAF4FE'}}>
 
             <LodingComponent isLoading={loading} />
- 
-            <View style={{ marginTop:20}}>
-                <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} > Descrição:</Text>
-                       <View style={{ margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                            <TextInput
-                                style={{ padding: 5, backgroundColor: '#FFF' }}
-                                placeholder=" 30/60 dias"
-                                 onChangeText={(v:any)=> setDescricao(v)}
-                                 value={descricao}
-                            />
-                      </View>    
-             </View>
-              
+    
+                    <View style={{ marginTop:20}}>
+                     <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:20  }} > Descrição:</Text>
+                        <View style={{ margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
+                                <TextInput
+                                    style={{ padding: 5, backgroundColor: '#FFF' ,fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
+                                    placeholder=" 30/60 dias"
+                                    onChangeText={(v:any)=> setDescricao(v)}
+                                    value={descricao}
+                                />
+                        </View>    
+                    </View>
                     <View style={{margin:5, flexDirection:"row", alignItems:"center", justifyContent:"space-between",   width:'100%'}}>
 
-                    <View style={{ width:'50%' }}>
-                        <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} >quantidade de parcelas:</Text>
-                                <TextInput
-                                    style={{ elevation:2, borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF' }}
-                                    placeholder="ex. 2"
-                                     onChangeText={(v:any)=> setQuantidade(v)}
-                                     defaultValue={String(quantidade)}
-                                     keyboardType="numeric"
+                        <View style={{ width:'50%',marginTop:10 }}>
+                            <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:17  }} > quantidade de parcelas:</Text>
+                                    <TextInput
+                                        style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF',fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
+                                        placeholder="ex. 2"
+                                        onChangeText={(v:any)=> setQuantidade(v)}
+                                        defaultValue={String(quantidade)}
+                                        keyboardType="numeric"
                                 />
-                            </View>
+                           </View>
 
                             <View style={{ width:'50%' }}>
-                            <Text style={{   left:5, bottom:5  ,fontWeight:"bold"  }} >intervalo entre parcelas:</Text>
+                             <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:17   }} >intervalo entre parcelas:</Text>
                                 <TextInput
-                                    style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF' }}
+                                    style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF',fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
                                     placeholder="ex. 30"
                                      onChangeText={(v:any)=> setIntervalo(v)}
                                      defaultValue={String(intervalo)}
@@ -181,7 +196,9 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
                                 />
                             </View>
                     </View>
-                <Gerar/>
+                   
+                  {/*** */}
+                    <Gerar/>
                             
 
              <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center", marginTop: 10 }} >
@@ -191,7 +208,7 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
                     >
                         <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
                     </TouchableOpacity>
-                </View>
+              </View>
   
 
         </View>

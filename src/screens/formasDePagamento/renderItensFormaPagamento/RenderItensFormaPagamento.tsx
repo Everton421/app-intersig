@@ -12,9 +12,20 @@ type category = {
  id:string
 };
 
+type formaPagamento = {
+      codigo: number,
+      data_cadastro: string,
+      data_recadastro: string,
+      desc_maximo: number,
+      descricao: string,
+      intervalo: number,
+      parcelas: number,
+      recebimento: number
+}
+
 interface Props {
-  item: category;
-  handleSelect: (item: category) => void;
+  item: formaPagamento;
+  handleSelect: (item: formaPagamento) => void;
 }
 
 export const RenderItemsFormaPagamento = ({ item, handleSelect }: Props)=> {
@@ -31,10 +42,19 @@ export const RenderItemsFormaPagamento = ({ item, handleSelect }: Props)=> {
         <View style={styles.iconContainer}>
                     <FontAwesome name="credit-card-alt" size={24} color={defaultColors.darkBlue } />
         </View>
-        <Text style={styles.descricao} numberOfLines={2} ellipsizeMode="tail">
+        <Text style={[styles.descricao, { fontSize:20}]} numberOfLines={2} ellipsizeMode="tail">
           {item.descricao}
         </Text>
       </View>
+      <View style={styles.infoContainer}>
+         <Text style={styles.descricao} numberOfLines={2} ellipsizeMode="tail">
+          Parcelas:  {item.parcelas} 
+        </Text>
+         <Text style={styles.descricao} numberOfLines={2} ellipsizeMode="tail">
+          Intervalo: {item.intervalo} dias
+        </Text>
+      </View>
+
     </TouchableOpacity>
   );
 }

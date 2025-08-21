@@ -32,8 +32,7 @@ export const FormasPagamento = ({navigation}:any)=>{
                         if( pesquisa === '' || pesquisa === undefined){
                             busca();
                         }
-                    } ,[pesquisa]
-                )
+                    } ,[pesquisa] )
  
             useEffect(
                 ()=>{   
@@ -46,8 +45,7 @@ export const FormasPagamento = ({navigation}:any)=>{
                     if( pesquisa !== '' || pesquisa !== undefined){
                     busca();
                 }
-                },[ pesquisa ]
-            )
+                },[ pesquisa ] )
 //////////////////////
 
 

@@ -5,7 +5,10 @@ import { defaultColors } from "../../../../styles/global";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRef, useState } from "react";
 import ViewShot, { captureRef } from "react-native-view-shot";
-  
+import { Ionicons } from "@expo/vector-icons";
+  import * as Sharing from 'expo-sharing'
+
+
           type prop =  {  item: produto, handleSelect: ( produto:produto )=>void }  
   
   export const  RenderItem = ({ item, handleSelect  }:prop ) => {
@@ -89,33 +92,48 @@ const compartilharProduto = async () => {
                    
             <Modal  visible={visible}  transparent={true} >
                   <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" , flex:1, alignItems:"center", justifyContent:"flex-start" }}>
-                       <View  ref={viewShotRef} style={{ backgroundColor:'#FFF', width:'95%', height:'95%', marginTop:10, borderRadius:10 }}>  
-                        <View style={{ flexDirection:"row"}}>
-                          { 
-                                  item.fotos && item.fotos.length > 0 && item.fotos[0].link ?
-                                  (
-                                  <Image
-                                    source={{ uri: `${item.fotos[0].link}` }}
-                                    // style={styles.galleryImage}
-                                    style={{ width: 200, height: 200,  borderRadius: 5,}}
-                                      resizeMode="contain"
-                                    />) :(
-                                      <MaterialIcons name="no-photography" size={40} color="#185FED"  />
-                                    )
-                            }     
+                       <View   style={{ backgroundColor:'#FFF', width:'95%', height:'95%', marginTop:10, borderRadius:10 }}>  
+                           <TouchableOpacity onPress={()=> {setVisible(false) }}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
+                              <Ionicons name="close" size={28} color={ '#6C757D' } />
+                           </TouchableOpacity>
                         
-                      
-                        </View>
-                    <Text style={{fontSize:15 ,fontWeight:"bold",  textAlign:"center"}}>
-                          { item && item.descricao}
-                    </Text>
 
-                    <TouchableOpacity
-                        style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 7, padding: 5 }}
-                      //  onPress={() => gravar()}
-                    >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Compartilhar</Text>
-                    </TouchableOpacity>
+                         <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }}  style={{ backgroundColor:'#FFF'}} >
+                              <View style={{ alignItems:"center"}}>
+                                    { 
+                                            item.fotos && item.fotos.length > 0 && item.fotos[0].link ?
+                                            (
+                                            <Image
+                                              source={{ uri: `${item.fotos[0].link}` }}
+                                              // style={styles.galleryImage}
+                                              style={{ width: 200, height: 200,  borderRadius: 5,}}
+                                                resizeMode="contain"
+                                              />) :(
+                                                <MaterialIcons name="no-photography" size={40} color="#185FED"  />
+                                              )
+                                      }     
+
+                              <View style={{ marginTop:15}}>
+                                  <Text style={{fontSize:15 ,   textAlign:"center"}}>
+                                      { item && item.descricao}
+                                  </Text>
+                                 <Text style={{fontSize:20 ,color:'blue', marginLeft:15 }}>
+                                      R$: {item && item.preco?.toFixed(2)}
+                                 </Text>
+                                </View>
+
+                              </View>
+                        </ViewShot>
+
+                      <View style={{ flexDirection:"row", alignItems:"center", justifyContent:"center" , marginTop: 25}} >
+                        <TouchableOpacity
+                            style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 3, padding: 5 }}
+                            onPress={() => compartilharProduto()}
+                          >
+                          <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Compartilhar</Text>
+                        </TouchableOpacity>
+                      </View>
+
                     </View>
                   </View>
             </Modal>

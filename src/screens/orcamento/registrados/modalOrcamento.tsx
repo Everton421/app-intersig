@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView } from "react-native";
-import { Ionicons } from '@expo/vector-icons'; // Usando ícones para um visual mais limpo. Instale com: npx expo install @expo/vector-icons
+import { FontAwesome, Ionicons } from '@expo/vector-icons'; // Usando ícones para um visual mais limpo. Instale com: npx expo install @expo/vector-icons
+import ViewShot, { captureRef } from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing'
+import * as Print from 'expo-print';
+import { shareAsync } from 'expo-sharing';
 
 // --- Constantes de Estilo (Melhor prática para cores e tamanhos) ---
 const COLORS = {
@@ -20,9 +24,9 @@ const SIZES = {
     base: 8,
 };
 
-// --- Componentes de Item da Lista (Extraídos para performance e clareza) ---
 
-// Componente para exibir uma linha de informação (ex: Cliente: Nome do Cliente)
+
+
 const InfoRow = ({ label, value }) => (
     <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>{label}</Text>
@@ -30,7 +34,6 @@ const InfoRow = ({ label, value }) => (
     </View>
 );
 
-// Componente para cabeçalhos de seção (PRODUTOS, SERVIÇOS, etc.)
 const SectionHeader = ({ title }) => (
     <Text style={styles.sectionHeader}>{title}</Text>
 );
@@ -75,15 +78,80 @@ const ParcelaItem = ({ item }) => {
     );
 };
 
+  const html =
+ ` <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+  </head>
+  <body style="text-align: center;">
+    <h1 style="font-size: 50px; font-family: Helvetica Neue; font-weight: normal;">
+      Hello Expo!
+    </h1>
+    <img
+      src="https://d30j33t1r58ioz.cloudfront.net/static/guides/sdk.png"
+      style="width: 90vw;" />
+  </body>
+</html>
+`
 
 // --- Componente Principal do Modal ---
 
 export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
 
+ const [selectedPrinter, setSelectedPrinter] = useState();
+
     if (!orcamento) {
         return null; // Não renderiza nada se o orçamento for nulo
     }
     
+      const viewShotRef = useRef();
+
+
+ const print = async ()=>{
+    await Print.printAsync({
+        html, 
+        //printerUrl:  
+    })
+ }
+
+  const printToFile = async () => {
+    // On iOS/android prints the given html. On web prints the HTML from the current page.
+    const { uri } = await Print.printToFileAsync({ html });
+    console.log('File has been saved to:', uri);
+    await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+  };
+
+  const selectPrinter = async () => {
+    const printer = await Print.selectPrinterAsync(); // iOS only
+    setSelectedPrinter(printer);
+  };
+const compartilharProduto = async () => {
+    try {
+      const uri = await captureRef(viewShotRef, {
+        format: 'png',
+        quality: 0.9, // Qualidade da imagem (0 a 1)
+      });
+
+     console.log('URI da imagem:', uri); // Verifique a URI no console
+      // Compartilhar a imagem
+   if (await Sharing.isAvailableAsync()) {
+        try {
+          await Sharing.shareAsync(uri, {
+            mimeType: 'applicaion/pdf',
+            dialogTitle: 'Compartilhar Produto',
+            UTI: '.pdf', // Uniform Type Identifier (iOS)
+          });
+        } catch (error) {
+          console.error('Erro ao compartilhar com expo-sharing:', error);
+        }
+      } else {
+        console.warn('Compartilhamento não está disponível neste dispositivo.');
+      }
+    } catch (error) {
+      console.error('Erro ao capturar e compartilhar:', error);
+    }
+  };
+
     const getTipoOrcamento = () => {
         if (orcamento.tipo === 1) return `Orçamento: ${orcamento.id}`;
         if (orcamento.tipo === 3) return `Ordem de Serviço: ${orcamento.id}`;
@@ -98,7 +166,18 @@ export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
             onRequestClose={() => setVisible(false)}
         >
             <SafeAreaView style={styles.modalBackground}>
-                <View style={styles.modalContainer}>
+                <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }} style={styles.modalContainer} >
+                    <View  >
+       
+                         <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
+                            // onPress={ ()=> compartilharProduto(true)}
+                             onPress={ ()=> printToFile()}
+                            >
+                          <FontAwesome name="share-square-o" size={30} color="#185FED" />
+
+                         </TouchableOpacity>
+
+                         
                     {/* Cabeçalho do Modal */}
                     <View style={styles.header}>
                         <View>
@@ -171,7 +250,8 @@ export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
                             </View>
                         )}
                     </ScrollView>
-                </View>
+                    </View>
+                </ViewShot>
             </SafeAreaView>
         </Modal>
     );

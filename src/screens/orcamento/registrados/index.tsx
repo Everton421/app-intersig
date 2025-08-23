@@ -43,7 +43,6 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
         const [ orcamentoModal,setOrcamentoModal] = useState();
         
         const [ statusPedido, setStatusPedido ] = useState<  string >('*');
-        
 
 
         const getFitroPedidos = async ()=>{
@@ -59,6 +58,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                 console.log("erro ao consultar AsyncStorage")
             }
         }
+
         const getDataFiltroPedido = async ()=>{ 
               try{
                 const value = await AsyncStorage.getItem('dataPedidos');
@@ -89,7 +89,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
                      setOrcamentosRegistrados(aux);
                      setVisiblePostPedido(false);
                     //console.log("query...", aux)
-                    }
+           }
  
    
     /////////////////////////////////////////////////
@@ -99,10 +99,10 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
     /////////////////////////////////////////////////
     
            useFocusEffect(
-            useCallback(() => {
-                busca();
-            }, [ navigation])  
-    );
+              useCallback(() => {
+                   busca();
+               }, [ navigation])  
+           );
 
      useEffect(()=>{
          async function busca(){

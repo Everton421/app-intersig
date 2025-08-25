@@ -1,14 +1,8 @@
-import { useContext, useEffect } from "react"
-import { Text, TouchableOpacity, View } from "react-native"
-import { OrcamentoContext } from "../../contexts/orcamentoContext"
-import { ClienteContext } from "../../contexts/clienteDoOrcamento";
-import { Orcamento } from "../orcamento/components";
+import { Pedido_Component } from "../../components/pedido-components/components/main";
 
-
- export const NovaOs = ({ navigation})=>{
-    const {  orcamento , setOrcamento } = useContext(OrcamentoContext); 
+ export const NovaOs = ({ navigation}:any)=>{
 
     return(
-              <Orcamento navigation={navigation} orcamentoEditavel={null} tipo={3} codigo_orcamento={0} />
+              <Pedido_Component navigation={navigation} orcamentoEditavel={null} tipo={3} codigo_orcamento={0} />
     )
  }

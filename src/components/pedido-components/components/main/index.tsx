@@ -1,25 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Modal, Text, TouchableOpacity, View, ScrollView, Alert,  ActivityIndicator,  StyleSheet, } from "react-native";
-import { ListaProdutos } from "./produtos";
-import { ListaClientes } from "./clientes";
-import { Parcelas } from "./parcelas";
-import { OrcamentoContext, OrcamentoModel,} from "../../../contexts/orcamentoContext";
-import { ConnectedContext } from "../../../contexts/conectedContext";
-import { usePedidos } from "../../../database/queryPedido/queryPedido";
-import { Detalhes } from "./detalhes";
-import { AuthContext } from "../../../contexts/auth";
-import { Servico } from "./servico";
-import { configMoment } from "../../../services/moment";
-import { generatorId } from "../../../utils/id-generator";
+import { ListaProdutos } from "../produtos";
+import { ListaClientes } from "../clientes";
+import { Parcelas } from "../parcelas";
+import { OrcamentoContext, OrcamentoModel,} from "../../../../contexts/orcamentoContext";
+import { ConnectedContext } from "../../../../contexts/conectedContext";
+import { usePedidos } from "../../../../database/queryPedido/queryPedido";
+import { Detalhes } from "../detalhes";
+import { AuthContext } from "../../../../contexts/auth";
+import { Servico } from "../servico";
+import { configMoment } from "../../../../services/moment";
+import { generatorId } from "../../../../utils/id-generator";
 
 
-export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
+export const Pedido_Component = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcamento, }: any) => {
 
   const [totalGeral, setTotalGeral] = useState<number | undefined>();
   const [descontosGeral, setDescontosGeral] = useState<number>(0);
   const [totalProdutos, setTotalProdutos] = useState<number>();
   const [observacoes, setObservacoes] = useState<string>("");
-  const [formaPagamento, setFormaPagamento] = useState<number | undefined>();
   const [status, setStatus] = useState<number>(0);
   const [response, setResponse] = useState<string>("");
   const [editavel, setEditavel] = useState(false);
@@ -27,8 +26,6 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
   const [dataAtual, setDataAtual] = useState<any>();
   const [dataHora, setDataHora] = useState<any>();
   const [codigoOrcamento, setCodigoOrcamento] = useState<number>();
-  /////
-  ////
   const { usuario }: any = useContext(AuthContext);
 
   const { orcamento, setOrcamento } = useContext(OrcamentoContext);
@@ -48,122 +45,128 @@ export const Orcamento = ({ orcamentoEditavel,  navigation, tipo,  codigo_orcame
   
 
   ////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    let atualDate = useMoment.dataHoraAtual();
 
-    let data = useMoment.dataAtual();
-    setDataAtual(data);
-    setDataHora(atualDate);
-    async function init() {
-      if (!codigo_orcamento || codigo_orcamento === null) {
-        setOrcamento((prevOrcamento:OrcamentoModel) =>  ({
+    useEffect(() => {
+      let atualDate = useMoment.dataHoraAtual();
+
+      let data = useMoment.dataAtual();
+      setDataAtual(data);
+      setDataHora(atualDate);
+      async function init() {
+        if (!codigo_orcamento || codigo_orcamento === null) {
+          setOrcamento((prevOrcamento:OrcamentoModel) =>  ({
+            ...prevOrcamento,
+            vendedor: usuario.codigo,
+            total_produtos: 0,
+            total_geral: 0,
+            descontos: 0,
+            contato: `react-native `,
+            observacoes: observacoes || "",
+            quantidade_parcelas: 0,
+            enviado: "N",
+            cliente: {},
+            situacao: "EA",
+            parcelas: [],
+            produtos: [],
+            servicos: [],
+            data_cadastro: data,
+            veiculo: 0,
+            tipo_os: 0,
+            tipo: tipo,
+          }));
+        } else {
+          setEditavel(true);
+          setCodigoOrcamento(codigo_orcamento);
+        }
+      }
+      init();
+  //   console.log('iniciando compoenente useEffect ****')
+    }, []);
+    
+  ////////////////////////////////////////////////////////////////////////////
+  
+    useEffect(() => {
+      if (status === 200 && response) {
+        setOrcamento((prevOrcamento: OrcamentoModel) => ({
           ...prevOrcamento,
-          vendedor: usuario.codigo,
-          total_produtos: 0,
-          total_geral: 0,
-          descontos: 0,
-          contato: `react-native `,
-          observacoes: observacoes || "",
-          quantidade_parcelas: 0,
-          enviado: "N",
-          cliente: {},
-          situacao: "EA",
-          parcelas: [],
+          cliente: null,
           produtos: [],
-          servicos: [],
-          data_cadastro: data,
-          veiculo: 0,
-          tipo_os: 0,
+          parcelas: [],
+          vendedor: 0,
+          situacao: "EA",
           tipo: tipo,
         }));
-      } else {
-        setEditavel(true);
-        setCodigoOrcamento(codigo_orcamento);
+        setTotalGeral(0);
+        setDescontosGeral(0);
+
+        Alert.alert('',response);
+        navigation.goBack();
       }
-    }
-    init();
- //   console.log('iniciando compoenente useEffect ****')
-  }, []);
+
+      if (status === 500) {
+        setOrcamento((prevOrcamento: OrcamentoModel) => ({
+          ...prevOrcamento,
+          cliente: null,
+          produtos: [],
+          parcelas: [],
+          situacao: "EA",
+          vendedor: 0,
+          tipo: tipo,
+        }));
+        setTotalGeral(0);
+        setDescontosGeral(0);
+        Alert.alert(response);
+        navigation.goBack();
+      }
+
+    }, [status, response, navigation, setOrcamento]);
+    
   ////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    if (status === 200 && response) {
+
+    useEffect(() => {
+      let novoTotalGeralProdutos = 0;
+      let totaDescontosProdutos = 0;
+      let totalValorProdutos = 0;
+
+      let novoTotalGeralServicos = 0;
+      let totaDescontosServicos = 0;
+      let totalValorServicos = 0;
+      let totalGeralOrcamento = 0;
+      ////**** total de descontos esta considerando somente os
+      ////**** descontos dos produtos
+
+      if (orcamento.produtos.length > 0) {
+        orcamento.produtos.forEach((i: any) => {
+          novoTotalGeralProdutos += i.total;
+          totaDescontosProdutos += i.desconto;
+          totalValorProdutos += i.preco * i.quantidade;
+        });
+        setTotalProdutos(totalValorProdutos);
+        setDescontosGeral(totaDescontosProdutos);
+      }
+
+      if (   orcamento.servicos.length > 0) {
+        orcamento.servicos.forEach((i: any) => {
+          novoTotalGeralServicos += i.total;
+          totaDescontosServicos += i.desconto;
+          totalValorServicos += i.valor * i.quantidade;
+        });
+      }
+      totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos;
+      setTotalGeral(totalGeralOrcamento);
+
       setOrcamento((prevOrcamento: OrcamentoModel) => ({
         ...prevOrcamento,
-        cliente: null,
-        produtos: [],
-        parcelas: [],
-        vendedor: 0,
-        situacao: "EA",
-        tipo: tipo,
+        total_produtos: totalValorProdutos,
+        total_servicos: totalValorServicos,
+        contato: `react-native `,
+        total_geral: totalGeralOrcamento,
+        descontos: totaDescontosProdutos,
+        data_recadastro: dataHora,
       }));
-      setTotalGeral(0);
-      setDescontosGeral(0);
 
-      Alert.alert('',response);
-      navigation.goBack();
-    }
-
-    if (status === 500) {
-      setOrcamento((prevOrcamento: OrcamentoModel) => ({
-        ...prevOrcamento,
-        cliente: null,
-        produtos: [],
-        parcelas: [],
-        situacao: "EA",
-        vendedor: 0,
-        tipo: tipo,
-      }));
-      setTotalGeral(0);
-      setDescontosGeral(0);
-      Alert.alert(response);
-      navigation.goBack();
-    }
-
-  }, [status, response, navigation, setOrcamento]);
-  ////////////////////////////////////////////////////////////////////////////
-  useEffect(() => {
-    let novoTotalGeralProdutos = 0;
-    let totaDescontosProdutos = 0;
-    let totalValorProdutos = 0;
-
-    let novoTotalGeralServicos = 0;
-    let totaDescontosServicos = 0;
-    let totalValorServicos = 0;
-    let totalGeralOrcamento = 0;
-    ////**** total de descontos esta considerando somente os
-    ////**** descontos dos produtos
-
-    if (orcamento.produtos.length > 0) {
-      orcamento.produtos.forEach((i: any) => {
-        novoTotalGeralProdutos += i.total;
-        totaDescontosProdutos += i.desconto;
-        totalValorProdutos += i.preco * i.quantidade;
-      });
-      setTotalProdutos(totalValorProdutos);
-      setDescontosGeral(totaDescontosProdutos);
-    }
-
-    if (   orcamento.servicos.length > 0) {
-      orcamento.servicos.forEach((i: any) => {
-        novoTotalGeralServicos += i.total;
-        totaDescontosServicos += i.desconto;
-        totalValorServicos += i.valor * i.quantidade;
-      });
-    }
-    totalGeralOrcamento = novoTotalGeralServicos + novoTotalGeralProdutos;
-    setTotalGeral(totalGeralOrcamento);
-
-    setOrcamento((prevOrcamento: OrcamentoModel) => ({
-      ...prevOrcamento,
-      total_produtos: totalValorProdutos,
-      total_servicos: totalValorServicos,
-      contato: `react-native `,
-      total_geral: totalGeralOrcamento,
-      descontos: totaDescontosProdutos,
-      data_recadastro: dataHora,
-    }));
-
-  }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
+    }, [ orcamento.produtos, orcamento.parcelas, orcamento.descontos, orcamento.servicos, ]);
+  
   ////////////////////////////////////////////////////////////////////////////
   
  

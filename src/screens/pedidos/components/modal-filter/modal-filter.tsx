@@ -2,7 +2,7 @@ import { Modal, Text, TouchableOpacity, View } from "react-native"
 import {   useEffect, useState } from "react"
 import Fontisto from '@expo/vector-icons/Fontisto';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { configMoment } from "../../../services/moment";
+import { configMoment } from "../../../../services/moment"; 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 

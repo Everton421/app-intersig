@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView } from "react-native";
-import { FontAwesome, Ionicons } from '@expo/vector-icons'; // Usando ícones para um visual mais limpo. Instale com: npx expo install @expo/vector-icons
+import {   Ionicons } from '@expo/vector-icons'; // Usando ícones para um visual mais limpo. Instale com: npx expo install @expo/vector-icons
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing'
 import * as Print from 'expo-print';
@@ -97,7 +97,7 @@ const html =
 */
 // --- Componente Principal do Modal ---
 
-export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
+export const ModalPrint = ({ visible, orcamento, setVisible }) => {
 
  const [selectedPrinter, setSelectedPrinter] = useState();
 

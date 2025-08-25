@@ -1,8 +1,6 @@
 import { useContext, useEffect, useState } from "react"
-import { Text, TouchableOpacity, View,ActivityIndicator } from "react-native"
 import { OrcamentoContext } from "../../contexts/orcamentoContext"
-import { ClienteContext } from "../../contexts/clienteDoOrcamento";
-import { Orcamento } from "../orcamento/components";
+import { Pedido_Component } from "../../components/pedido-components/components/main";
 
 
  export const EditarOS = ({ navigation, route }:any)=>{
@@ -13,9 +11,6 @@ import { Orcamento } from "../orcamento/components";
    const codigo_orcamento = route.params;
 
     return(
-    
-            <Orcamento navigation={navigation} orcamentoEditavel={orcamento} tipo={3}  codigo_orcamento={codigo_orcamento} />
-        
-      
+            <Pedido_Component navigation={navigation} orcamentoEditavel={orcamento} tipo={3}  codigo_orcamento={codigo_orcamento} />
     )
  }

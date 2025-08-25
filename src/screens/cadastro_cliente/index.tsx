@@ -28,6 +28,7 @@ export const Cadastro_cliente = ({ route, navigation }: any) => {
 
     const api = useApi();
     const useQueryClient = useClients();
+    
     const { usuario }: any = useContext(AuthContext);
     const useMoment = configMoment();
 

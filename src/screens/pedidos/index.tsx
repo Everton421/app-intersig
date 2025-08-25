@@ -1,24 +1,24 @@
 import { useCallback, useContext, useEffect, useState } from "react"
 import { Text, View, FlatList, Modal, TextInput, StyleSheet, Alert,  TouchableOpacity, ActivityIndicator} from "react-native"
 import Feather from '@expo/vector-icons/Feather';
-import { OrcamentoContext } from "../../../contexts/orcamentoContext";
-import { usePedidos } from "../../../database/queryPedido/queryPedido";
-import { AuthContext } from "../../../contexts/auth";
-import { configMoment } from "../../../services/moment";
+import { OrcamentoContext } from "../../contexts/orcamentoContext";   
+import { usePedidos } from "../../database/queryPedido/queryPedido";
+import { AuthContext } from "../../contexts/auth";
+import { configMoment } from "../../services/moment";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { ModalOrcamento } from "./modalOrcamento";
-import { ModalFilter } from "./modal-filter";
-import { ConnectedContext } from "../../../contexts/conectedContext";
-import { enviaPedidos } from "../../../services/sendOrders";
-import { receberPedidos } from "../../../services/getOrders";
+import { ModalFilter } from "./components/modal-filter/modal-filter"; 
+import { ConnectedContext } from "../../contexts/conectedContext";
+import { enviaPedidos } from "../../services/sendOrders";
+import { receberPedidos } from "../../services/getOrders";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ModalPrint } from "./components/modal-print-pedido";   
                 
    
 
-export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
+export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         
     const useQuerypedidos = usePedidos();
         const useMoment = configMoment();
@@ -342,7 +342,7 @@ export const OrcamentosRegistrados = ({navigation, tipo, to, route }:any)=>{
         {/******************************************* */}
                         <ModalFilter visible={visible} setVisible={ setVisible}  setStatus={setStatusPedido} setDate={setData_cadastro} />
         {/******************************************* */}
-                       <ModalOrcamento visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
+                       <ModalPrint visible={visibleModal} orcamento={ orcamentoModal} setVisible={setVisibleModal} />
         {/******************************************* */}
 
         {/******************************************* */}

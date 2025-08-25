@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView } from "react-native";
 import { FontAwesome, Ionicons } from '@expo/vector-icons'; // Usando ícones para um visual mais limpo. Instale com: npx expo install @expo/vector-icons
 import ViewShot, { captureRef } from 'react-native-view-shot';
@@ -78,7 +78,8 @@ const ParcelaItem = ({ item }) => {
     );
 };
 
-  const html =
+/*  
+const html =
  ` <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
@@ -93,7 +94,7 @@ const ParcelaItem = ({ item }) => {
   </body>
 </html>
 `
-
+*/
 // --- Componente Principal do Modal ---
 
 export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
@@ -104,7 +105,7 @@ export const ModalOrcamento = ({ visible, orcamento, setVisible }) => {
         return null; // Não renderiza nada se o orçamento for nulo
     }
     
-      const viewShotRef = useRef();
+    //  const viewShotRef = useRef();
 
 
  const print = async ()=>{
@@ -166,17 +167,19 @@ const compartilharProduto = async () => {
             onRequestClose={() => setVisible(false)}
         >
             <SafeAreaView style={styles.modalBackground}>
-                <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 0.9 }} style={styles.modalContainer} >
+             {/** <View ref={viewShotRef} options={{ format: 'png', quality: 0.9 }} style={styles.modalContainer} >*/}   
+                <View   style={styles.modalContainer} >
+                 
                     <View  >
        
+                      {/** 
                          <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
                             // onPress={ ()=> compartilharProduto(true)}
                              onPress={ ()=> printToFile()}
                             >
                           <FontAwesome name="share-square-o" size={30} color="#185FED" />
-
                          </TouchableOpacity>
-
+                        */}
                          
                     {/* Cabeçalho do Modal */}
                     <View style={styles.header}>
@@ -196,8 +199,6 @@ const compartilharProduto = async () => {
 
                             <InfoRow label="Cliente:" value={`${orcamento.cliente.codigo} - ${orcamento.cliente.nome}`} />
                             <InfoRow label="Última alteração::" value={   new Date(orcamento?.data_recadastro).toLocaleTimeString("pt-br", { month: "short", day: "numeric"  })   } />
-                           
-
                         </View>
 
                         {/* Totais */}
@@ -251,7 +252,7 @@ const compartilharProduto = async () => {
                         )}
                     </ScrollView>
                     </View>
-                </ViewShot>
+                </View>
             </SafeAreaView>
         </Modal>
     );

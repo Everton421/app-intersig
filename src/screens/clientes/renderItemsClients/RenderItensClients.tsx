@@ -32,7 +32,9 @@ export function RenderItensClients({ item, handleSelect }: Props) {
 
       <View style={styles.infoContainer}>
         <View style={styles.iconContainer}>
-          <FontAwesome5 name="user" size={24} color={defaultColors.darkBlue} />
+ 
+         <FontAwesome5 name="user" size={24} color={defaultColors.darkBlue} />
+       
         </View>
         <Text style={styles.nome} numberOfLines={2} ellipsizeMode="tail">
           {item.nome}

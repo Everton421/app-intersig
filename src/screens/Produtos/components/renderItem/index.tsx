@@ -5,7 +5,7 @@ import { defaultColors } from "../../../../styles/global";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useRef, useState } from "react";
 import ViewShot, { captureRef } from "react-native-view-shot";
-import { Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
   import * as Sharing from 'expo-sharing'
 
 
@@ -86,7 +86,7 @@ const compartilharProduto = async () => {
                        <TouchableOpacity 
                          onPress={()=>{ setVisible(true)}} 
                          style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width: 40,height: 40, padding:5, alignItems:"center", flexDirection:"row"}} >
-                          <FontAwesome name="share-square-o" size={30} color="#185FED" />
+                         <AntDesign name="sharealt" size={24}  color={defaultColors.darkBlue}  />
                       </TouchableOpacity>
                     </View> 
                    

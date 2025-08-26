@@ -170,7 +170,6 @@ const compartilharProduto = async () => {
              {/** <View ref={viewShotRef} options={{ format: 'png', quality: 0.9 }} style={styles.modalContainer} >*/}   
                 <View   style={styles.modalContainer} >
                  
-                    <View  >
        
                       {/** 
                          <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
@@ -251,7 +250,6 @@ const compartilharProduto = async () => {
                             </View>
                         )}
                     </ScrollView>
-                    </View>
                 </View>
             </SafeAreaView>
         </Modal>

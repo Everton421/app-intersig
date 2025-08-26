@@ -15,19 +15,23 @@ import { enviaPedidos } from "../../services/sendOrders";
 import { receberPedidos } from "../../services/getOrders";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ModalPrint } from "./components/modal-print-pedido";   
-                
-   
+import { FontAwesome6, MaterialCommunityIcons } from "@expo/vector-icons";
+import { defaultColors,   } from "../../styles/global";
+import { shareAsync } from 'expo-sharing';     
+import { generateOrderHTML } from "./utils/generateHTML";
+ import * as FileSystem from 'expo-file-system';
+      import * as Print from 'expo-print';
 
 export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         
-    const useQuerypedidos = usePedidos();
-        const useMoment = configMoment();
-        const {    setOrcamento } = useContext(OrcamentoContext);
-        const { usuario }:any = useContext(AuthContext);
-        const {connected, setConnected }:any = useContext(ConnectedContext);
+            const useQuerypedidos = usePedidos();
+            const useMoment = configMoment();
+            const {    setOrcamento } = useContext(OrcamentoContext);
+            const { usuario }:any = useContext(AuthContext);
+            const {connected,    }:any = useContext(ConnectedContext);
+            const usePostPedidos = enviaPedidos();
+            const useGetPedidos =  receberPedidos();  
 
-          const usePostPedidos = enviaPedidos();
-          const useGetPedidos =  receberPedidos();  
         const [ orcamentosRegistrados, setOrcamentosRegistrados] = useState([]);
         const [ visibleModal, setVisibleModal ] = useState<boolean>(false);
         const [ selecionado, setSelecionado ] = useState();
@@ -36,14 +40,69 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
        
         const [ visiblePostPedido, setVisiblePostPedido ] = useState(false);
         const [ loadingPedidoId, setLoadingPedidoId ] = useState<number>(0)
-
-        const [  loadingEditOrder, setLoadingEditOrder ] = useState(false);
-
-        const [data_cadastro , setData_cadastro] = useState( useMoment.primeiroDiaMes())
-        const [ orcamentoModal,setOrcamentoModal] = useState();
-        
+        const [ loadingEditOrder, setLoadingEditOrder ] = useState(false);
+        const [ data_cadastro , setData_cadastro] = useState( useMoment.primeiroDiaMes())
+        const [ orcamentoModal, setOrcamentoModal] = useState();
         const [ statusPedido, setStatusPedido ] = useState<  string >('*');
 
+
+            const [selectedPrinter, setSelectedPrinter] = useState();
+
+            const print = async () => {
+                // On iOS/android prints the given html. On web prints the HTML from the current page.
+                await Print.printAsync({
+                html,
+                printerUrl: selectedPrinter?.url, // iOS only
+                });
+            };
+
+ /*
+    const html = ` <html>
+                    <head>
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+                    </head>
+                    <body style="text-align: center;">
+                        <h1 style="font-size: 50px; font-family: Helvetica Neue; font-weight: normal;">
+                        Hello Expo!
+                        </h1>
+                        <img
+                        src="https://i.ibb.co/tpDk4DD5/i5.png"
+                        style="width: 90vw;" />
+                    </body>
+                </html> `;
+
+ 
+
+            const printToFile = async () => {
+                // On iOS/android prints the given html. On web prints the HTML from the current page.
+                const { uri } = await Print.printToFileAsync( { html });
+                console.log('File has been saved to:', uri);
+                await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf'} );
+            };
+            */
+
+             
+            async function printOrder ( codigo: number ){
+             let aux:any = await useQuerypedidos.selectCompleteOrderByCode(codigo);
+                
+                 const newFileName = `${FileSystem.documentDirectory}Pedido_N°-${aux.id}  - ${new Date().getTime()}.pdf`;
+
+                const html =  generateOrderHTML(aux)
+
+                const  pdfFile = await Print.printToFileAsync( { html });
+
+                    await FileSystem.moveAsync({
+                        from:  pdfFile.uri,
+                        to: newFileName,
+                     });
+
+                await shareAsync(newFileName, { UTI: '.pdf', mimeType: 'application/pdf'} );
+            } 
+
+            const selectPrinter = async () => {
+                const printer = await Print.selectPrinterAsync(); // iOS only
+                setSelectedPrinter(printer);
+            };
 
         const getFitroPedidos = async ()=>{
             try{
@@ -73,7 +132,6 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         }
 
         async function busca(){
-
           let filtroStatus =   await getFitroPedidos();
            let dataFiltroPedidos = await  getDataFiltroPedido();
 
@@ -90,31 +148,27 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                      setVisiblePostPedido(false);
                     //console.log("query...", aux)
            }
- 
    
     /////////////////////////////////////////////////
         useEffect(()=>{
             busca()
            },[ data_cadastro,   statusPedido , pesquisa])
     /////////////////////////////////////////////////
-    
            useFocusEffect(
               useCallback(() => {
                    busca();
-               }, [ navigation])  
-           );
-
-     useEffect(()=>{
-         async function busca(){
-             if( selecionado !== undefined ){
-                 let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
-                  setOrcamento(aux );
-             }else { return }  
- 
-         }
-      busca()
-     },[selecionado])
-     
+               }, [ navigation])  );
+    /////////////////////////////////////////////////
+        useEffect(()=>{
+            async function busca(){
+                if( selecionado !== undefined ){
+                    let aux = await useQuerypedidos.selectCompleteOrderByCode(selecionado?.codigo);
+                    setOrcamento(aux );
+                }else { return }  
+    
+            }
+        busca()
+        },[selecionado])
     /////////////////////////////////////////////////
     
   
@@ -129,14 +183,10 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                           await useQuerypedidos.deleteOrder(item.codigo)
                           setOrcamentosRegistrados(
                             orcamentosRegistrados.filter( (i:any) => i.codigo !== item.codigo)
-                        )
-                          ;
+                        )  ;
                 }
             }
         ] )
-        
-         
-
     }
 
     async function selecionaOrcamentoModal( item ){
@@ -147,8 +197,6 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
     }
 
     async function postPedido( item ){
-        
-
         try{
                 setVisiblePostPedido(true);
               let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
@@ -168,8 +216,8 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                              setLoadingPedidoId(0)
                                 setVisiblePostPedido(false)
                             busca();
-                        } 
-                    }
+                            } 
+                        }
                     ]   
                 )
         }
@@ -220,100 +268,113 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
             return cor;
     }
 
-  
-
     const ItemOrcamento = ({item})=>{
         return(
                 <View style={ [ stiloItem(item),{    margin:20 , borderRadius:10, elevation:9, padding:10 } ]}>
                    <View style={{ flexDirection:"row", justifyContent:"space-between" }} >         
-                         <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5, alignItems:"center" }} 
+                        
+
+
+                         <TouchableOpacity style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5,  alignItems:"center" }} 
                              onPress={ ()=> selecionaOrcamentoModal(item)}>
-                                 <Feather name="eye" size={24} color="#009de2" />
+                                 <Feather name="eye" size={24}  color={defaultColors.darkBlue} />
                          </TouchableOpacity>
-                       <View style={{   }} >
-                             { item.id && item.id !== '0' && <Text style={{ fontWeight:'bold', color:'#FFF'}}> id:  {item.id}</Text>
-                             }
+                                 
+                                        { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI' && item.situacao !== "FP" ? 
+                                                    <TouchableOpacity 
+                                                    onPress={()=>  deleteOrder(item)  }
+                                                    style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5,  alignItems:"center" }} 
+                                                    >
+                                                        <MaterialCommunityIcons name="delete" size={24} color="red" />
+                                                    </TouchableOpacity>
+                                            : 
+                                             <TouchableOpacity 
+                                                    onPress={()=>  Alert.alert('Não será possivel excluir o pedido!','Não é possivel excluir um pedido/reprovado/parcial/faturado') }
+                                                    style={{   backgroundColor: '#FFF',   height:30,padding:2, borderRadius: 5, width: 35, elevation: 5,  alignItems:"center" }} 
+                                                    >
+                                                 <MaterialCommunityIcons name="delete-off" size={24} color="red" />
+                                              </TouchableOpacity>
+                                            }
+                    </View>
+                         <View style={{  }} >
+
+                         <View style={{ flexDirection:'row', justifyContent:'space-between', }}>
+                                <Text style={{fontWeight:"bold", color:'white'  }}>
+                                    Total R$: {item?.total_geral.toFixed(2)}
+                                </Text>
+                                { item.id && item.id !== '0' && <Text style={{ fontWeight:'bold', color:'#FFF'}}> id:  {item.id}</Text>
+                                }
+                           </View>
+
                              {
-                                 item.id_externo && item.id_externo !== '0' && <Text style={{ fontWeight:'bold', color:'#FFF'}}> id externo:  {item.id_externo}</Text>
+                                 item.id_externo   && <Text style={{ fontWeight:'bold', color:'#FFF', alignSelf:"flex-end"}}> id externo: {item.id_externo}</Text>
                              }
                        </View>
-                    </View>
-            <Modal visible={false }>
-            <TouchableOpacity onPress={() => {setVisible(false)  }}
-                style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
-                <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                  voltar
-                </Text>
-              </TouchableOpacity>
-            </Modal>
-                        <View style={{ flexDirection:'row', justifyContent:'space-between', }}>
-                       
-                            <Text style={{fontWeight:"bold", color:'white', margin:3 ,width:'90%' }}>
-                                   Total R$: {item?.total_geral.toFixed(2)}
-                            </Text>
-                                { item?.situacao !== 'RE' && item.situacao !== 'FI' && item.situacao !== 'AI' && item.situacao !== "FP" ? 
-                                            <TouchableOpacity 
-                                            onPress={()=>  deleteOrder(item)  }
-                                            >
-                                                <AntDesign name="closecircle" size={24} color="red" />
-                                            </TouchableOpacity>
-                                    : null
-                                    }
-                        </View>
 
-                        <Text style={{ margin:3 ,fontWeight:"bold", color:'white', fontSize:20 }}>
+                        <Modal visible={false }>
+                        <TouchableOpacity onPress={() => {setVisible(false)  }}
+                            style={{ margin: 15, backgroundColor: '#009de2', padding: 7, borderRadius: 7, width: '20%', elevation: 5 }} >
+                            <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
+                            voltar
+                            </Text>
+                        </TouchableOpacity>
+                        </Modal>
+
+                        <Text style={{ margin:3 ,fontWeight:"bold", color:'white', fontSize:20, flex:1  }}>
                             {item?.nome}
                         </Text>
-                        
-                { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
-                      <TouchableOpacity onPress={()=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
-                              <Feather name="edit" size={24} color="#009de2" />
-                      </TouchableOpacity>
-                      : null     
-                  }
+                                
+                                { item?.situacao !== 'RE' && item.situacao !== 'FI'    ? 
+                                        <TouchableOpacity onPress={()=>{ selecionaOrcamento(item)}} style={{  borderRadius:5, elevation:5,alignSelf:"flex-start" ,backgroundColor:'white' ,width:35, padding:5}} >
+                                                <Feather name="edit" size={24}   color={defaultColors.darkBlue} />
+                                        </TouchableOpacity>
+                                        : null     
+                                    }
 
-                      <Text style={{fontWeight:"bold", color:'white', marginTop:2}}>
-                          Cadatrado: { new Date(item?.data_cadastro).toLocaleString("pt-br", {    year: "numeric", month: "short", day: "numeric"  }) }
-                      </Text>
-                   
-
-
-                     <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
-                            {
-                            item.enviado === 'S'?
-                            <Ionicons name="checkmark-done" size={24} color="#73FBFD" />
-                            :
-                            <Ionicons name="checkmark" size={24} color="#75F94D" />
-                        }
-                        { !connected ? ( 
-                          <TouchableOpacity   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
-                            <MaterialIcons name="sync-disabled" size={24} color="#009de2" />
-                          </TouchableOpacity>
-                            ):(
-                              visiblePostPedido && loadingPedidoId === item.codigo ? 
-                          <View   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
-                                <ActivityIndicator size={25}/>
-                          </View>
-                          :
-                          <TouchableOpacity  onPress={()=> postPedido(item) } style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
-                                <Ionicons name="sync-sharp" size={24} color="#009de2" />
-                          </TouchableOpacity>
-                          
-                            )
-                        }
-
-                      </View>
-                     <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
+                               <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
+                                    {
+                                    item.enviado === 'S'?
+                                    <Ionicons name="checkmark-done" size={30} color="#73FBFD" />
+                                            :
+                                            <Ionicons name="checkmark" size={30} color="#75F94D" />
+                                        }
+                                    { !connected ? ( 
+                                        <TouchableOpacity   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5 }} >
+                                            <MaterialIcons name="sync-disabled" size={24}  color={defaultColors.darkBlue} />
+                                        </TouchableOpacity>
+                                        ):(
+                                        visiblePostPedido && loadingPedidoId === item.codigo ? 
+                                            <View   style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                                                    <ActivityIndicator size={25}/>
+                                            </View>
+                                      :
+                                            null
+                                        )
+                                    }
+                                     <TouchableOpacity   style={{  borderRadius:5, alignSelf:"flex-end", elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} 
+                                     //onPress={()=>  printToFile() }
+                                     onPress={()=> printOrder( item.codigo)   }
+                                     >
+                                          <AntDesign name="sharealt" size={24}  color={defaultColors.darkBlue}  />
+                                     </TouchableOpacity>
+                            </View>
+                                
                     
-                         <Text style={{fontWeight:"bold", color:'white', marginTop:2}}>
-                             Última alteração: { new Date(item?.data_recadastro).toLocaleTimeString("pt-br", { month: "short", day: "numeric"  }) }
-                        </Text>
-                      </View>
+                             <Text style={{fontWeight:"bold",alignSelf:"flex-end", color:'white', marginTop:2}}>
+                                Cadastrado: { new Date(item?.data_cadastro).toLocaleString("pt-br", {    year: "numeric", month: "short", day: "numeric"  }) }
+                           </Text>
+                        <View style={{  flexDirection:"row", justifyContent:"space-between"}}>
+                                <TouchableOpacity  onPress={()=> postPedido(item) } style={{  borderRadius:5, elevation:5 ,backgroundColor:'white' ,width:35, padding:5}} >
+                                                <Ionicons name="sync-sharp" size={24} color={defaultColors.darkBlue} />
+                                      </TouchableOpacity>
+                                <Text style={{fontWeight:"bold",alignSelf:"flex-end", color:'white', marginTop:2}}>
+                                    Última alteração: { new Date(item?.data_recadastro).toLocaleTimeString("pt-br", { month: "short", day: "numeric"  }) }
+                                </Text>
+                         </View>
 
                </View>
         )
     }
-
 
     
     return (
@@ -322,23 +383,23 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                  <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
                      <Ionicons name="arrow-back" size={25} color="#FFF" />
                  </TouchableOpacity>
-                 <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                    < TextInput 
-                        style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5,   borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                        onChangeText={(value)=>setPesquisa(value)}
-                        placeholderTextColor="#a0a0a0ff"
-                        placeholder="pesquisar:  cliente, id pedido ..."
-                    /> 
-                      <TouchableOpacity  onPress={()=> setVisible(true )} style={{  padding:2}}>
-                            <AntDesign name="filter" size={35} color="#FFF" />
-                        </TouchableOpacity>
-                </View>
+                    <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
+                        < TextInput 
+                            style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5,   borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
+                            onChangeText={(value)=>setPesquisa(value)}
+                            placeholderTextColor="#a0a0a0ff"
+                            placeholder="pesquisar:"
+                        /> 
+                        <TouchableOpacity  onPress={()=> setVisible(true )} style={{  padding:2}}>
+                                <AntDesign name="filter" size={35} color="#FFF" />
+                            </TouchableOpacity>
+                    </View>
               </View>  
                     <Modal  visible={loadingEditOrder}  transparent={true} >
                             <View style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" , flex:1, alignItems:"center", justifyContent:"center" }}>
                                 <ActivityIndicator size={50} color="#185FED" /> 
                         </View>  
-              </Modal> 
+                  </Modal> 
         {/******************************************* */}
                         <ModalFilter visible={visible} setVisible={ setVisible}  setStatus={setStatusPedido} setDate={setData_cadastro} />
         {/******************************************* */}
@@ -402,16 +463,8 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                                 </Text>
                             </View>
                         </View>
- 
                    </View>
         </View >
     )
-
 }
-
-const  styles = StyleSheet.create({
-    containerItemOrcamento:{
-        
-    }
-
-})
+ 

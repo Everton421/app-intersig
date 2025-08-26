@@ -2,7 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
-import { defaultColors } from "../../../styles/global";
+import { defaultColors } from "../../../../styles/global";
 
 type IClient = {
   codigo: number;
@@ -36,7 +36,7 @@ export function RenderItensClients({ item, handleSelect }: Props) {
          <FontAwesome5 name="user" size={24} color={defaultColors.darkBlue} />
        
         </View>
-        <Text style={styles.nome} numberOfLines={2} ellipsizeMode="tail">
+        <Text testID='nameClient' style={styles.nome} numberOfLines={2} ellipsizeMode="tail">
           {item.nome}
         </Text>
       </View>

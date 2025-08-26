@@ -4,7 +4,7 @@ import { useClients } from "../../database/queryClientes/queryCliente";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { RenderItensClients } from "./renderItemsClients/RenderItensClients";
+import { RenderItensClients } from "./components/renderItemsClients/RenderItensClients";
 import { defaultColors } from "../../styles/global";
 
 export type client = 

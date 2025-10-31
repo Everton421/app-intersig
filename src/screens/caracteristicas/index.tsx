@@ -1,34 +1,35 @@
+ 
 import { Text, View ,TouchableOpacity, TextInput, FlatList, Modal, Image, Alert} from "react-native"
 import Ionicons from '@expo/vector-icons/Ionicons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useEffect, useState } from "react";
-import { useMarcas } from "../../database/queryMarcas/queryMarcas";
 import { useFocusEffect } from "@react-navigation/native";
 import useApi from "../../services/api";
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
-import { RenderItensMarcas } from "./renderItem";
+import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas";
+import { RenderItensCaracteristicas } from "./renderItem";
 
-type marca= { codigo:number, dscricao:string}
+type caracteristica= { codigo:number, descricao:string, unidade:string}
 
-export const Marcas = ({navigation}:any)=>{
+export const Caracteristicas = ({navigation}:any)=>{
     const [ press, setPress ] = useState(false);
-    const [ dados, setDados ] = useState<marca[]>();
+    const [ dados, setDados ] = useState<caracteristica[]>();
     const [ pesquisa, setPesquisa ] = useState<string | undefined>('');
     const [ visible, setVisible ] = useState<boolean>(false);
-    const [ marcaSelecionada, setMarcaSelecionada ] = useState();
+    const [ caracteristicaSelecionada, setCaracteristicaSelecionada ] = useState();
     const [ loading , setLoading ] = useState(false);
 
-    const useQueryMarcas = useMarcas();
+    const useQueryCaracterisca = useCaracteristica();
     const api = useApi();
-         const dateService = configMoment();
+    const dateService = configMoment();
     
     useFocusEffect(
                 ()=>{
                     
                     async function busca(){ 
-                            let data:any  = await useQueryMarcas.selectAll();
+                            let data:any  = await useQueryCaracterisca.selectAll(0)
                             if( data?.length > 0  ){
                                 setDados(data) 
                             }   
@@ -43,7 +44,7 @@ export const Marcas = ({navigation}:any)=>{
             useEffect(
                 ()=>{   
                     async function busca(){
-                        let data:any  = await useQueryMarcas.selectByDescription(pesquisa);
+                        let data:any  = await useQueryCaracterisca.selectByDescription(String(pesquisa));
                         if( data?.length > 0  ){
                             setDados(data) 
                         }  
@@ -58,10 +59,10 @@ export const Marcas = ({navigation}:any)=>{
 
         function handleSelect(item){
             setVisible(true);
-            setMarcaSelecionada(item)
+            setCaracteristicaSelecionada(item)
         }
 
-
+/*
 async function gravar(){
   if( !marcaSelecionada?.descricao ) return Alert.alert("Erro!", "É necessario informar a descrição para poder gravar!") 
 
@@ -100,6 +101,7 @@ async function gravar(){
         setLoading(false);
     }
 }
+*/
 
     return(
 
@@ -128,11 +130,11 @@ async function gravar(){
             </View>
 
                   <View style={{ flexDirection:"row" }}>
-                    <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Marcas </Text>
+                    <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Caracteristicas </Text>
                   </View>
       </View>
  
-            {/*          */}
+            {/*        
                  <Modal transparent={true} visible={ visible && visible}>
                  <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
                      <View style={{ width:'96%',height:'97%', backgroundColor:'#FFF', borderRadius:10}} >
@@ -184,11 +186,11 @@ async function gravar(){
                  </View>
          
                  </Modal>
-                 {/**  */}
+                  */}
            <View style={{ marginTop:10}}> 
                 <FlatList
                     data={ dados }
-                    renderItem = {( { item } )=>  <RenderItensMarcas item={item} handleSelect={handleSelect} />  }
+                     renderItem = {( { item } )=>  <RenderItensCaracteristicas item={item} handleSelect={handleSelect} />  }
                     keyExtractor={(i)=> i.codigo.toString()}
                 />
             </View>
@@ -197,7 +199,7 @@ async function gravar(){
                 style={{ backgroundColor: '#185FED',  width: 50, height: 50, borderRadius: 25,  position: "absolute", bottom: 150,   right: 30,  elevation: 10,  alignItems: "center", justifyContent: "center", zIndex: 999,             // Garante que o botão fique sobre os outros itens
                 }}
                 onPress={() => {
-                    navigation.navigate('cadastro_marcas')
+                    navigation.navigate('cadastro_caracteristicas')
                 }}
             >
                 <MaterialIcons name="add-circle" size={45} color="#FFF" />

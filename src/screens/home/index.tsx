@@ -7,7 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { restartDatabaseService } from "../../services/restartDatabase";
+import { restartDatabaseService } from "../../database/restart-database"; 
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
 import  useApi from "../../services/api";
 import { defaultColors } from "../../styles/global";

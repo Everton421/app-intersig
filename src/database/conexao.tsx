@@ -25,7 +25,7 @@ export async function construtor(db: SQLiteDatabase) {
       senha TEXT NOT NULL, 
       email TEXT NOT NULL,
       lembrar TEXT DEFAULT 'N',
-      token TEXT
+      token TEXT 
     ); 
 
 
@@ -36,6 +36,7 @@ export async function construtor(db: SQLiteDatabase) {
       grupo           INTEGER DEFAULT 0,
       origem          TEXT,   
       descricao       TEXT NOT NULL,
+      unidade_medida  TEXT NOT NULL,
       num_fabricante  TEXT,
       num_original    TEXT,
       sku             TEXT,
@@ -118,6 +119,7 @@ export async function construtor(db: SQLiteDatabase) {
     CREATE TABLE IF NOT EXISTS produtos_pedido (
       pedido INTEGER NOT NULL,
       codigo INTEGER NOT NULL,
+      sequencia INTEGER NOT NULL,
       desconto REAL DEFAULT 0.00,
       quantidade REAL DEFAULT 0.00,
       preco REAL DEFAULT 0.00,
@@ -205,9 +207,9 @@ export async function construtor(db: SQLiteDatabase) {
        foto TEXT NOT NULL,
        data_cadastro TEXT NOT NULL,
        data_recadastro TEXT NOT NULL
-      )
+      );
      `); 
- 
+   
   console.log('banco carregado com sucesso !');
   
   } 

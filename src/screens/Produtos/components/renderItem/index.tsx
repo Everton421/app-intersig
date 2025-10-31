@@ -58,14 +58,14 @@ const compartilharProduto = async () => {
                    <Text style={{fontSize:15 ,fontWeight:"bold", color:defaultColors.gray}}>
                      { item && item.descricao}
                    </Text>
-                   <View style={{ flexDirection:"row"}}>
+                   <View  style={{ padding:1,  borderWidth:1,borderRadius:5, borderColor:'#CCC', alignSelf:'flex-start'}}  >
                     { 
                             item.fotos && item.fotos.length > 0 && item.fotos[0].link ?
                             (
                             <Image
                               source={{ uri: `${item.fotos[0].link}` }}
                               // style={styles.galleryImage}
-                              style={{ width: 100, height: 100,  borderRadius: 5,}}
+                              style={{ width: 100, height: 100, }}
                                 resizeMode="contain"
                               />) :(
                                 <MaterialIcons name="no-photography" size={40} color="#185FED"  />

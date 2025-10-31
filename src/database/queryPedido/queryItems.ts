@@ -5,8 +5,8 @@ export const useItemsPedido = () =>{
 const db = useSQLiteContext();
 
 type produto_pedido = {
-    
     codigo:number,
+    sequencia:number
     desconto:number,
     quantidade:number,
     preco:number,
@@ -21,6 +21,7 @@ type produto_pedido = {
                    (
                     pedido,
                     codigo,
+                    sequencia,
                     desconto,
                     quantidade,
                     preco,
@@ -28,6 +29,7 @@ type produto_pedido = {
                     ) VALUES (
                     ${codeOrder},
                     ${produto.codigo},
+                    ${produto.sequencia},
                     ${produto.desconto},
                     ${produto.quantidade},
                     ${produto.preco},
@@ -120,6 +122,7 @@ type produto_pedido = {
                         `
                         UPDATE produtos_pedido SET 
                         desconto = ${produto.desconto}, 
+                        sequencia: ${produto.sequencia},
                         quantidade = ${produto.quantidade},
                         preco =     ${produto.preco},
                         total = ${produto.total} 

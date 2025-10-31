@@ -27,6 +27,7 @@
 
  export type produto_pedido = {
         codigo:number,
+        sequencia:number
         desconto:number,
         quantidade:number,
         preco:number,

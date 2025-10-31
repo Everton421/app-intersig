@@ -1,33 +1,9 @@
-import { Alert } from "react-native";
-import { useClients } from "../database/queryClientes/queryCliente";
-import { useFormasDePagamentos } from "../database/queryFormasPagamento/queryFormasPagamento";
-import { useParcelas } from "../database/queryParcelas/queryParcelas";
-import { useItemsPedido } from "../database/queryPedido/queryItems";
 import { usePedidos } from "../database/queryPedido/queryPedido";
-import { useProducts } from "../database/queryProdutos/queryProdutos";
-import { useTipoOs } from "../database/queryTipoOs/queryTipoOs";
-import { useVeiculos } from "../database/queryVceiculos/queryVeiculos";
 import useApi from "./api";
-import { useServicosPedido } from "../database/queryPedido/queryServicosPedido";
-import { configMoment } from "./moment";
-import { useContext } from "react";
-import { AuthContext } from "../contexts/auth";
 
 export const enviaPedidos = () => {
 
-    const useQueryProdutos = useProducts();
-    const useQueryClientes = useClients();
-    const useQueryFpgt = useFormasDePagamentos();
     const useQuerypedidos = usePedidos();
-    const useQueryParcelas = useParcelas();
-    const useQueryItems = useItemsPedido();
-    const useQueryTipoOs = useTipoOs();
-    const useQueryVeiculos = useVeiculos();
-
-    const useQueryItemsPedido = useItemsPedido();
-    const usequeryServicosPedido = useServicosPedido();
-    const useMoment = configMoment();  
-    const { usuario }:any = useContext(AuthContext);
 
     const api = useApi();
 

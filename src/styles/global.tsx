@@ -10,5 +10,6 @@ export const globalStyles = StyleSheet.create({
 export const defaultColors = {
     gray:'#5f666dff',
      ligthBlue:'#EAF4FE',
-     darkBlue:'#185FED'
+     darkBlue:'#185FED',
+     ligthGray:'#CCC'
 }

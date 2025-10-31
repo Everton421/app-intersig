@@ -24,6 +24,7 @@ import Cadastro_veiculo from "../../screens/cadastroVeiculo";
 import { CadastroUsuario } from "../../screens/cadastrarUsuarios";
 import { Lista_pedidos } from "../../screens/pedidos";
 import { Tela_pedidos } from "../../screens/tela_pedidos";
+import { Cadastro_caracteristicas } from "../../screens/cadastro-caracteristicas";
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,9 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="OS"                        component={Tela_os}  options={{headerShown:false}} />
                     <Stack.Screen name="formasPagamento"           component={FormasPagamento }      options={{headerShown:false}} />
                     <Stack.Screen name="cadastro_formaPagamento"   component={Cadastro_FormaPagamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="cadastro_caracteristicas"   component={Cadastro_caracteristicas}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+              
+              
                 </Stack.Navigator>
         )
     }

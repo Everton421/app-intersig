@@ -9,6 +9,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Marcas } from "../../screens/marcas";
 import { Text, View } from "react-native";
+import { Caracteristicas } from "../../screens/caracteristicas";
 const BottomProduto = createBottomTabNavigator()
 
 export const BottomTabProdutos= ()=>{
@@ -22,7 +23,8 @@ export const BottomTabProdutos= ()=>{
                 tabBarActiveBackgroundColor: '#00129A',
                 tabBarActiveTintColor:'red',
                 tabBarLabelStyle:{ color:"#FFF", fontSize:13  },
-                tabBarIcon:()=> <FontAwesome name="home" size={24} color="#FFF" />,
+                tabBarIcon:()=>                    <FontAwesome name="cubes" size={22} color="#FFF"  />
+,
                 headerShown:false,
               }}
               
@@ -51,6 +53,18 @@ export const BottomTabProdutos= ()=>{
                 headerShown:false,
 
               }} />
+
+              <BottomProduto.Screen
+                name="caracteristicas"
+                component={Caracteristicas}
+                options={{
+                  tabBarStyle:{ backgroundColor:'#185FED' , height:55 },
+                  tabBarActiveBackgroundColor: '#00129A',
+                  tabBarLabelStyle:{ color:"#FFF", fontSize:13},
+                  tabBarIcon:()=> <Ionicons name="options" size={24} color="#FFF" />,
+                  headerShown:false,
+              }}
+              />
 
               {/* <FontAwesome name="bookmark" size={24} color="black" />*/}
            

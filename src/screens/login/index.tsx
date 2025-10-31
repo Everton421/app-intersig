@@ -6,7 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/auth";
 import { useUsuario } from "../../database/queryUsuario/queryUsuario";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { restartDatabaseService } from "../../services/restartDatabase";
+import { restartDatabaseService } from "../../database/restart-database";  
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
 
 

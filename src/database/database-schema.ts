@@ -34,6 +34,7 @@ export const databaseSchema =
       grupo           INTEGER DEFAULT 0,
       origem          TEXT,   
       descricao       TEXT NOT NULL,
+      caracteristica  INTEGER DEFAULT 0,
       unidade_medida  TEXT NOT NULL,
       num_fabricante  TEXT,
       num_original    TEXT,
@@ -262,13 +263,14 @@ export const databaseSchema =
     ); 
 
 
-     CREATE TABLE IF NOT EXISTS produtos (
+CREATE TABLE IF NOT EXISTS produtos (
       codigo          INTEGER PRIMARY KEY NOT NULL,
       estoque         REAL DEFAULT 0,
       preco           REAL DEFAULT 0,
       grupo           INTEGER DEFAULT 0,
       origem          TEXT,   
       descricao       TEXT NOT NULL,
+      caracteristica  INTEGER DEFAULT 0,
       unidade_medida  TEXT NOT NULL,
       num_fabricante  TEXT,
       num_original    TEXT,

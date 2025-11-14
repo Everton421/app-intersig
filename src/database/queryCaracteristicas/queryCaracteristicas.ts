@@ -45,7 +45,7 @@ const db = useSQLiteContext();
        
     }
 
-    async function selectByCode( code:number ){
+    async function selectByCode( code:number ):Promise<caracteristica[] | undefined>{
         let aux = 0;
         if( isNaN(code)){
             aux = Number(code);
@@ -53,7 +53,7 @@ const db = useSQLiteContext();
             aux = code ; 
         }
         try{
-            let result   = await db.getAllAsync   ( `SELECT * ,
+            let result:caracteristica[]   = await db.getAllAsync   ( `SELECT * ,
                   strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro FROM caracteristicas WHERE codigo = ${aux} `)
             //console.log(result);
@@ -72,17 +72,52 @@ const db = useSQLiteContext();
     }  
 
 
+  async function selectAllLimit(limit?:number){
+        try{
+                const sql = `SELECT *,
+                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  from caracteristicas `
 
+                const conditions =[]
+                const values=[]
+                if(limit){
+                    conditions.push( ' limit  ? ');
+                    values.push(`${limit}`);
+                }
+
+                  let finalsql = sql + conditions ; 
+
+                let result = await db.getAllAsync(finalsql, values);
+            return result;
+        }catch(e){ console.log( "erro ao buscar as caracteristica ",e) }
+    }  
+
+
+
+    /**
+     * 
+     * @param descricao descrição a ser pesquisada, campos a ser pesquisados: descrição, unidade,codigo
+     * @returns 
+     */
+
+
+   
     async function selectByDescription( descricao:string ){
         try{
-            let result   = await db.getAllAsync   ( `SELECT * ,
-                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
-                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro FROM caracteristicas WHERE descricao like ?   `,  `%${descricao}%` )
-            //console.log(result);
+            const sql = `SELECT * ,
+                       strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                       strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro
+                    FROM caracteristicas 
+                  WHERE
+                   descricao like '%${descricao}'
+                       OR   codigo like '%${descricao}%'
+                       OR unidade like '%${descricao}%' 
+                           ;`;
+            let result   = await db.getAllAsync   ( sql  )
             return result;
         }catch(e){ console.log(`erro ao consultar o caracteristica ${descricao} `,e)}
     }
  
-    return { selectAll, selectByCode, create,update,selectByDescription  } 
+    return { selectAll,selectAllLimit, selectByCode, create,update,selectByDescription  } 
  
 }

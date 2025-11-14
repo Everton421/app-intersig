@@ -10,6 +10,7 @@ import { typeFotoProduto } from "../../screens/cadastro_produto/types/fotos";
         grupo?:number,
         origem?:string,
         descricao:string,
+        caracteristica:number,
         ativo?:string,
         unidade_medida?:string
         sku?:string,
@@ -120,6 +121,7 @@ export const useProducts = ()=>{
                        origem,
                        descricao,
                        unidade_medida,
+                       caracteristica,
                        ativo,
                        sku, 
                        marca, 
@@ -141,6 +143,7 @@ export const useProducts = ()=>{
                         '${produto.origem}', 
                         '${descricao}',
                         '${produto.unidade_medida}',
+                        ${produto.caracteristica},
                         '${produto.ativo}',
                         '${produto.sku}',
                          ${produto.marca}, 
@@ -182,6 +185,7 @@ export const useProducts = ()=>{
                       grupo           = ${produto.grupo},  
                       origem          = '${produto.origem}',
                       descricao       = '${descricao}',
+                      caracteristica  = '${produto.caracteristica}',
                       unidade_medida  = '${produto.unidade_medida}',
                       ativo           = '${produto.ativo}',
                       sku             = '${produto.sku}',    
@@ -241,6 +245,10 @@ export const useProducts = ()=>{
                   if(produto.descricao){
                     conditions.push(' descricao = ? ');
                     values.push(`${produto.descricao}`)
+                  }
+                   if(produto.caracteristica){
+                    conditions.push(' caracteristica = ? ');
+                    values.push( produto.caracteristica )
                   }
                   if(produto.unidade_medida){
                     conditions.push(' unidade_medida = ? ');
@@ -343,6 +351,7 @@ export const useProducts = ()=>{
                       grupo,
                       origem,
                       descricao,
+                      caracteristica,
                       unidade_medida,
                       ativo,
                       sku,
@@ -365,6 +374,7 @@ export const useProducts = ()=>{
                        ${produto.grupo},
                       '${produto.origem}',
                       '${descricao}',
+                      ${produto.caracteristica},
                       '${produto.unidade_medida}',
                       '${produto.ativo}',
                       '${produto.sku}', 

@@ -14,12 +14,18 @@ import { useFotosProdutos } from "../../database/queryFotosProdutos/queryFotosPr
 import { typeFotoProduto } from "./types/fotos";
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
+import { RenderModalCaracteristicas } from "./modal-caracteristicas";
+import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas";
 
 // ... (seus types 'produtoBancoLocal' e 'typeFotoProduto' permanecem os mesmos)
 type produtoBancoLocal = { 
-    ativo : string, class_fiscal : string, codigo : number, cst: string, data_cadastro:  string, data_recadastro: string, descricao :string, estoque: number, grupo: number, marca: number, num_fabricante: string, num_original : string, observacoes1: string, observacoes2 : string, observacoes3 : string, origem : string, preco : number, sku : string, tipo : string
+    ativo : string,caracteristica:number, class_fiscal : string, codigo : number, cst: string, data_cadastro:  string, data_recadastro: string, descricao :string, estoque: number, grupo: number, marca: number, num_fabricante: string, num_original : string, observacoes1: string, observacoes2 : string, observacoes3 : string, origem : string, preco : number, sku : string, tipo : string
 };
-
+  type caracteristica = {
+      codigo:number,
+      descricao: string
+      unidade:string
+    }
 export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
 
     // ... (toda a sua lógica de state, useEffect e funções como 'carregarProduto', 'gravar', etc., permanece a mesma)
@@ -31,7 +37,7 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
     const [ descricao, setDescricao] = useState<string>('');
     const [ gtim, setGtim ] = useState<string>('');
     const [ referencia, setReferencia ] = useState<string>('');
-
+    const [ caracteristicaSelecionada, setCaracteristicaSelecionada ] = useState<caracteristica>();
 
     const [visible, setVisible] = useState<Boolean>(false);
     const [link, setLink] = useState("");
@@ -46,8 +52,8 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
     const useQueryFotos = useFotosProdutos();
     const useQueryProdutos = useProducts();
     const useMoment = configMoment();
+    const useQueryCaracteristica = useCaracteristica();
 
-    const [ loading2, setLoading2 ] = useState(false);
 
     let { codigo_produto } =   route.params || { codigo_produto : 0};
     
@@ -59,14 +65,21 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
 
             if( codigo_produto && codigo_produto > 0 ){
             let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
-                
+
+             console.log(dataProd)
                 let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
                 dataProd[0].fotos = dadosFoto;
                 
                 setDados(dataProd);
 
                 setImgs(dadosFoto)
-            let prod:produtoBancoLocal = dataProd[0]  
+            let prod:produtoBancoLocal = dataProd[0] 
+            let caract ;
+            if(prod.caracteristica){
+                let auxCaract =await useQueryCaracteristica.selectByCode(prod.caracteristica);
+                if(auxCaract &&  auxCaract?.length >  0  ) caract = auxCaract[0]
+            } 
+
             setProduto(prod)
             if(dataProd.length > 0 ){
                     setCategoriaSelecionada(prod.grupo);
@@ -77,6 +90,7 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                     setSku(prod.sku);
                     setDescricao(prod.descricao)
                     setGtim(prod.num_fabricante)
+                    setCaracteristicaSelecionada(caract)
                 }
             } 
         }catch(e) {
@@ -108,7 +122,7 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
 
         setLoading(true);
         if( codigo_produto && codigo_produto > 0   ){
-            let data =   { "codigo":codigo_produto, "preco":preco, "estoque":estoque, "descricao":descricao, "sku":sku,"num_original ":referencia, "num_fabricante":gtim, "marca":  {codigo: marcaSelecionada.codigo} , "grupo": {codigo:categoriaSelecionada } };
+            let data =   { "codigo":codigo_produto, caracteristica:caracteristicaSelecionada?.codigo ,"preco":preco, "estoque":estoque, "descricao":descricao, "sku":sku,"num_original ":referencia, "num_fabricante":gtim, "marca":  {codigo: marcaSelecionada.codigo} , "grupo": {codigo:categoriaSelecionada } };
                 console.log(data)
             let obj = { produto: codigo_produto, fotos: imgs};
                     console.log(obj)
@@ -317,12 +331,13 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
         // --- Botões ---
         saveButton: {
             backgroundColor: colors.primary,
-            borderRadius: 10,
-            paddingVertical: 14,
+            borderRadius: 5,
+            paddingVertical: 10,
             alignItems: 'center',
             justifyContent: 'center',
             marginVertical: 20,
             elevation: 2,
+            flexDirection:'row'
         },
         saveButtonText: {
             color: colors.card,
@@ -456,6 +471,16 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                         <Text style={styles.inputLabel}>Categoria</Text>
                         <RenderModalCategorias codigoCategoria={categoriaSelecionada} setCategoria={setCategoriaSelecionada} />
                     </View>
+
+                    <View>
+                        <Text style={styles.inputLabel}>Caracteristica</Text>
+
+                     <RenderModalCaracteristicas
+                        setCaracteristica={setCaracteristicaSelecionada}
+                        codigoCaracteristica={caracteristicaSelecionada?.codigo}
+                        />
+                    </View>
+
                 </View>
 
                 {/* --- BOTÃO DE GRAVAR --- */}
@@ -464,6 +489,8 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                     onPress={() => gravar()}
                 >
                     <Text style={styles.saveButtonText}>Gravar Produto</Text>
+                                <MaterialIcons name="save" size={20} color="#FFF" />
+
                 </TouchableOpacity>
 
             </ScrollView>

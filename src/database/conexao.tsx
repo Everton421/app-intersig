@@ -1,8 +1,11 @@
 import {  type SQLiteDatabase } from 'expo-sqlite';
+import { databaseSchema } from './database-schema';
  
 
 export async function construtor(db: SQLiteDatabase) {
     
+    await db.execAsync(databaseSchema )
+  /*
     await db.execAsync(` 
   PRAGMA journal_mode = 'wal';
     --  DROP TABLE IF EXISTS produtos;
@@ -207,8 +210,26 @@ export async function construtor(db: SQLiteDatabase) {
        foto TEXT NOT NULL,
        data_cadastro TEXT NOT NULL,
        data_recadastro TEXT NOT NULL
+      ); 
+      
+      CREATE TABLE IF NOT EXISTS caracteristicas(
+       codigo INTEGER PRIMARY KEY NOT NULL,
+       descricao TEXT NOT NULL,
+       unidade TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL
+      );
+
+    CREATE TABLE IF NOT EXISTS caracteristicas_produtos (
+       produto INTEGER NOT NULL DEFAULT 0,
+       caracteristica INTEGER NOT NULL DEFAULT 0,
+       descricao TEXT NOT NULL,
+       unidade TEXT NOT NULL,
+       data_cadastro TEXT NOT NULL,
+       data_recadastro TEXT NOT NULL
       );
      `); 
+     */
    
   console.log('banco carregado com sucesso !');
   

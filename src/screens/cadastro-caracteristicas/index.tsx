@@ -10,6 +10,10 @@ import { defaultColors } from "../../styles/global"
 import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas"
 import Ionicons from '@expo/vector-icons/Ionicons';
 
+
+
+
+
 export const Cadastro_caracteristicas = ({navigation}:any) => {
 
     const [ descricao , setDescricao ] = useState();
@@ -17,7 +21,7 @@ export const Cadastro_caracteristicas = ({navigation}:any) => {
     const [ unidade, setUnidade ] = useState<string>()
 
     const api = useApi();
-    const  useQuerCaracteristica = useCaracteristica();
+    const  useQueryCaracteristica = useCaracteristica();
     const [ loading, setLoading] = useState(false);
 
     const {connected,  setConnected} = useContext(ConnectedContext)
@@ -81,9 +85,9 @@ export const Cadastro_caracteristicas = ({navigation}:any) => {
 
              try{
 
-                    const result = await useQuerCaracteristica.create(
+                    const result = await useQueryCaracteristica.create(
                         {
-                            codigo:1,
+                            codigo:7,
                             data_cadastro:'2025-10-31',
                             data_recadastro:'2025-10-31 00:00:00',
                             descricao:descricao,
@@ -121,7 +125,7 @@ export const Cadastro_caracteristicas = ({navigation}:any) => {
                                  onChangeText={(value:any)=> setUnidade( value )}
                                   style={{ height:'auto',backgroundColor:'#FFF',color:defaultColors.gray, fontWeight:"bold", fontSize:15, width: '50%', elevation:2, borderRadius:5}}
                                   placeholder="Ex.: Und:"
-                                  placeholderTextColor={defaultColors.gray}
+                                  placeholderTextColor={defaultColors.ligthGray}
                                 />
 
                     </View>
@@ -130,11 +134,11 @@ export const Cadastro_caracteristicas = ({navigation}:any) => {
 
                        <View style={{    alignItems:"center"}}>
                            <Text style={{ fontSize:20, fontWeight:'bold',color:defaultColors.gray , alignSelf:"flex-start", marginLeft:15 }}> Descrição </Text>
-
                               <TextInput
                                 onChangeText={(value:any)=> setDescricao( value )}
                                 style={{ height:'auto',backgroundColor:'#FFF',color:defaultColors.gray, fontWeight:"bold", fontSize:15,width: '90%', elevation:2, borderRadius:5}}
-                                placeholder="Ex.: Metros"   
+                                placeholder="Ex.: Metros"  
+                                  placeholderTextColor={defaultColors.ligthGray}
                           />
                         </View> 
 

@@ -66,12 +66,9 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
             if( codigo_produto && codigo_produto > 0 ){
             let dataProd:any= await useQueryProdutos.selectByCode(codigo_produto);
 
-             console.log(dataProd)
                 let dadosFoto:any = await useQueryFotos.selectByCode(codigo_produto)   
                 dataProd[0].fotos = dadosFoto;
-                
                 setDados(dataProd);
-
                 setImgs(dadosFoto)
             let prod:produtoBancoLocal = dataProd[0] 
             let caract ;
@@ -139,7 +136,7 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                 let responseProdutoApi = await api.put('/produto', data);
                 if(responseProdutoApi.status === 200 && responseProdutoApi.data.codigo > 0 ){
                     // ... seu código de sucesso de update
-                            let dadosUpdateLocal =  { "codigo":codigo_produto, "preco":preco, "estoque":estoque, "descricao":descricao, "sku":sku,"num_original ":referencia, "num_fabricante":gtim, "marca":  marcaSelecionada.codigo, "grupo": categoriaSelecionada };
+                            let dadosUpdateLocal =  { "codigo":codigo_produto,caracteristica:caracteristicaSelecionada?.codigo, "preco":preco, "estoque":estoque, "descricao":descricao, "sku":sku,"num_original ":referencia, "num_fabricante":gtim, "marca":  marcaSelecionada.codigo, "grupo": categoriaSelecionada };
                         await useQueryProdutos.updateByParam(dadosUpdateLocal, data.codigo)
                     navigation.goBack();
                     return Alert.alert('', `Produto ${responseProdutoApi.data.codigo} Alterado Com Sucesso! `)     
@@ -176,6 +173,7 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                         "observacoes2":'',
                         "observacoes3":'',
                         "tipo":'0',
+                        "caracteristica":caracteristicaSelecionada?.codigo || 0
                         };
                     
                   await useQueryProdutos.createByCode(dadosInsertLocal, response.data.codigo)
@@ -228,138 +226,6 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
         setLink('');
     };
     
-    // ===================================================================================
-    // ESTILOS CENTRALIZADOS - AQUI FICA TODA A ESTILIZAÇÃO
-    // ===================================================================================
-    const colors = {
-        primary: '#185FED',
-        background: '#F0F4F8',
-        card: '#FFFFFF',
-        text: '#333333',
-        textSecondary: '#6c757d',
-        placeholder: '#adb5bd',
-        border: '#DEE2E6',
-        danger: '#E53935',
-    };
-
-    const styles = {
-        // --- Containers Principais ---
-        mainContainer: { flex: 1, backgroundColor: colors.background },
-        scrollView: { paddingHorizontal: 16, paddingTop: 16 },
-
-        // --- Card do Cabeçalho (Imagem e Infos) ---
-        headerCard: {
-            flexDirection: 'row',
-            backgroundColor: colors.card,
-            borderRadius: 12,
-            padding: 16,
-            marginBottom: 20,
-            elevation: 3,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            gap: 16,
-        },
-        imagePicker: {
-            width: 100,
-            height: 100,
-            borderRadius: 8,
-            backgroundColor: colors.border,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 1,
-            borderColor: colors.border,
-        },
-        productImage: { width: '100%', height: '100%', borderRadius: 8 },
-        headerInfoContainer: { flex: 1, justifyContent: 'space-between' },
-
-        // --- Card do Formulário Principal ---
-        formCard: {
-            backgroundColor: colors.card,
-            borderRadius: 12,
-            padding: 16,
-            marginBottom: 20,
-            elevation: 3,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            gap: 16, // Espaçamento entre os campos do formulário
-        },
-
-        // --- Estilos de Formulário (Labels e Inputs) ---
-        inputGroup: { width: '100%' },
-        inputLabel: {
-            fontSize: 14,
-            fontWeight: '600',
-            color: colors.textSecondary,
-            marginBottom: 6,
-        },
-        textInput: {
-            borderWidth: 1,
-            borderColor: colors.border,
-            borderRadius: 8,
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            fontSize: 16,
-            color: colors.text,
-            backgroundColor: '#F9F9F9'
-        },
-        infoBox: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#F9F9F9',
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: colors.border
-        },
-        infoBoxLabel: {
-            fontWeight: 'bold',
-            color: colors.textSecondary,
-            fontSize: 16,
-        },
-        infoBoxValue: {
-            fontSize: 16,
-            color: colors.text,
-            marginLeft: 4,
-        },
-        numericInput: { fontSize: 16, color: colors.text, flex: 1, marginLeft: 4 },
-
-        // --- Botões ---
-        saveButton: {
-            backgroundColor: colors.primary,
-            borderRadius: 5,
-            paddingVertical: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginVertical: 20,
-            elevation: 2,
-            flexDirection:'row'
-        },
-        saveButtonText: {
-            color: colors.card,
-            fontSize: 18,
-            fontWeight: 'bold',
-        },
-
-        // --- Estilos do Modal de Imagens ---
-        modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
-        modalContainer: { width: '90%', height: '80%', backgroundColor: colors.card, borderRadius: 15, padding: 15 },
-        modalHeader: { flexDirection: 'row', justifyContent: 'flex-start' },
-        modalBackButton: { backgroundColor: colors.primary, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, elevation: 2 },
-        modalBackButtonText: { color: colors.card, fontWeight: 'bold' },
-        modalImageListContainer: { alignItems: 'center', paddingVertical: 15, minHeight: 150 },
-        modalImageItem: { margin: 5, padding: 4, borderRadius: 10, backgroundColor: "#FFF", elevation: 3, alignItems: 'center' },
-        modalDeleteButton: { position: 'absolute', top: -5, right: -5, zIndex: 1 },
-        modalImageThumbnail: { width: 120, height: 120, borderRadius: 5 },
-        modalAddImageContainer: { alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 15, marginTop: 10, gap: 10 },
-        modalImagePreview: { width: 100, height: 100, borderWidth: 1, borderColor: colors.border, borderRadius: 8 },
-        modalAddButton: { alignItems: 'center' },
-    };
-    // ===================================================================================
 
     return (
         <View style={styles.mainContainer}>
@@ -489,7 +355,6 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
                     onPress={() => gravar()}
                 >
                     <Text style={styles.saveButtonText}>Gravar Produto</Text>
-                                <MaterialIcons name="save" size={20} color="#FFF" />
 
                 </TouchableOpacity>
 
@@ -542,3 +407,140 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
         </View>
     );
 }
+
+
+
+    // ===================================================================================
+    // ESTILOS CENTRALIZADOS - AQUI FICA TODA A ESTILIZAÇÃO
+    // ===================================================================================
+    const colors = {
+        primary: '#185FED',
+        background: '#F0F4F8',
+        card: '#FFFFFF',
+        text: '#333333',
+        textSecondary: '#6c757d',
+        placeholder: '#adb5bd',
+        border: '#DEE2E6',
+        danger: '#E53935',
+    };
+
+  
+
+  const styles = {
+        // --- Containers Principais ---
+        mainContainer: { flex: 1, backgroundColor: colors.background },
+        scrollView: { paddingHorizontal: 16, paddingTop: 16 },
+
+        // --- Card do Cabeçalho (Imagem e Infos) ---
+        headerCard: {
+            flexDirection: 'row',
+            backgroundColor: colors.card,
+            borderRadius: 12,
+            padding: 16,
+            marginBottom: 20,
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            gap: 16,
+        },
+        imagePicker: {
+            width: 100,
+            height: 100,
+            borderRadius: 8,
+            backgroundColor: colors.border,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: colors.border,
+        },
+        productImage: { width: '100%', height: '100%', borderRadius: 8 },
+        headerInfoContainer: { flex: 1, justifyContent: 'space-between' },
+
+        // --- Card do Formulário Principal ---
+        formCard: {
+            backgroundColor: colors.card,
+            borderRadius: 12,
+            padding: 16,
+            marginBottom: 20,
+            elevation: 3,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            gap: 16, // Espaçamento entre os campos do formulário
+        },
+
+        // --- Estilos de Formulário (Labels e Inputs) ---
+        inputGroup: { width: '100%' },
+        inputLabel: {
+            fontSize: 14,
+            fontWeight: '600',
+            color: colors.textSecondary,
+            marginBottom: 6,
+        },
+        textInput: {
+            borderWidth: 1,
+            borderColor: colors.border,
+            borderRadius: 8,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            fontSize: 16,
+            color: colors.text,
+            backgroundColor: '#F9F9F9'
+        },
+        infoBox: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#F9F9F9',
+            paddingHorizontal: 12,
+            paddingVertical: 10,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: colors.border
+        },
+        infoBoxLabel: {
+            fontWeight: 'bold',
+            color: colors.textSecondary,
+            fontSize: 16,
+        },
+        infoBoxValue: {
+            fontSize: 16,
+            color: colors.text,
+            marginLeft: 4,
+        },
+        numericInput: { fontSize: 16, color: colors.text, flex: 1, marginLeft: 4 },
+
+        // --- Botões ---
+        saveButton: {
+            backgroundColor: colors.primary,
+            borderRadius: 5,
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginVertical: 20,
+            elevation: 2,
+            flexDirection:'row'
+        },
+        saveButtonText: {
+            color: colors.card,
+            fontSize: 18,
+            fontWeight: 'bold',
+        },
+
+        // --- Estilos do Modal de Imagens ---
+        modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', alignItems: 'center' },
+        modalContainer: { width: '90%', height: '80%', backgroundColor: colors.card, borderRadius: 15, padding: 15 },
+        modalHeader: { flexDirection: 'row', justifyContent: 'flex-start' },
+        modalBackButton: { backgroundColor: colors.primary, paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, elevation: 2 },
+        modalBackButtonText: { color: colors.card, fontWeight: 'bold' },
+        modalImageListContainer: { alignItems: 'center', paddingVertical: 15, minHeight: 150 },
+        modalImageItem: { margin: 5, padding: 4, borderRadius: 10, backgroundColor: "#FFF", elevation: 3, alignItems: 'center' },
+        modalDeleteButton: { position: 'absolute', top: -5, right: -5, zIndex: 1 },
+        modalImageThumbnail: { width: 120, height: 120, borderRadius: 5 },
+        modalAddImageContainer: { alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 15, marginTop: 10, gap: 10 },
+        modalImagePreview: { width: 100, height: 100, borderWidth: 1, borderColor: colors.border, borderRadius: 8 },
+        modalAddButton: { alignItems: 'center' },
+    };
+    // ===================================================================================

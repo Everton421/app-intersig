@@ -4,7 +4,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas";
 import { Entypo, Ionicons } from "@expo/vector-icons";
 import { defaultColors } from "../../styles/global";
-import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 
   type caracteristica = {
       codigo:number,
@@ -25,8 +24,19 @@ export  const RenderModalCaracteristicas = ({ setCaracteristica,codigoCaracteris
     const [ data, setData] = useState([])
     const [  caracteristicaSelecionada, setCaracteristicaSelecionada ] = useState<caracteristica>();
     const [ pesquisar, setPesquisar ] = useState<string | undefined>();
-    const [loadingData, setLoadingData] = useState(true);
+    const [loadingData, setLoadingData] = useState(false);
     
+  async function selectByCode(){
+      if(!codigoCaracteristica ) return;
+            try{
+              let dados:any = await useQueryCaracteristica.selectByCode(codigoCaracteristica);   
+              if(dados?.length > 0 ){
+                  setCaracteristicaSelecionada(dados[0])
+                }
+            }catch(e){
+            }finally{
+            }
+          }
 
       async function selectByDescription(){
         if(!pesquisar ) return;
@@ -70,6 +80,12 @@ export  const RenderModalCaracteristicas = ({ setCaracteristica,codigoCaracteris
             }
         }, [ pesquisar  ])
 
+
+        useEffect(()=>{
+          if(codigoCaracteristica){
+                selectByCode();
+          }
+      },[ codigoCaracteristica ])
  
 
 function selecionaCaracterisca(item:caracteristica){
@@ -98,7 +114,6 @@ function selecionaCaracterisca(item:caracteristica){
                          
                       <View   style={{ alignSelf:"flex-end"}}> 
                                 <Ionicons name="checkmark-circle" size={25} color={defaultColors.green} />
-                              
                       </View>
                         }
                         

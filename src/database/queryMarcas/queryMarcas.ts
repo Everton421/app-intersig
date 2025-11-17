@@ -71,7 +71,22 @@ const db = useSQLiteContext();
         }catch(e){ console.log( "erro ao buscar as marcas ",e) }
     }  
 
+    async function selectAllLimit(limit?:number){
+        
+        const sql = `SELECT *,
+                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  from marcas `;
 
+                const conditions =[]
+                const values=[]
+                 if(limit){
+                    conditions.push( ' limit  ? ');
+                    values.push(`${limit}`);
+                 }
+                let finalsql = sql + conditions ; 
+                let result = await db.getAllAsync(finalsql, values);
+                return result;
+        }  
 
     async function selectByDescription( descricao:string ){
         try{
@@ -80,9 +95,9 @@ const db = useSQLiteContext();
                   strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro FROM marcas WHERE descricao like ?   `,  `%${descricao}%` )
             //console.log(result);
             return result;
-        }catch(e){ console.log(`erro ao consultar o categoria ${descricao} `,e)}
+        }catch(e){ console.log(`erro ao consultar o marca com a descricao ${descricao} `,e)}
     }
  
-    return { selectAll, selectByCode, create,update,selectByDescription  } 
+    return { selectAll, selectByCode,selectAllLimit, create,update,selectByDescription  } 
  
 }

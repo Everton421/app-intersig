@@ -69,6 +69,26 @@ const db = useSQLiteContext();
         }catch(e){ console.log( "erro ao buscar as categorias ",e) }
     }  
 
+     async function selectAllLimit(limit?:number){
+        try{
+                const sql = `SELECT *,
+                  strftime('%Y-%m-%d',  data_cadastro) AS data_cadastro,
+                  strftime('%Y-%m-%d %H:%M:%S',  data_recadastro) AS data_recadastro  from categorias`;
+                      const conditions =[]
+                const values=[]
+                if(limit){
+                    conditions.push( ' limit  ? ');
+                    values.push(`${limit}`);
+                }
+
+                  let finalsql = sql + conditions ; 
+
+                let result = await db.getAllAsync(finalsql, values);
+            return result;
+         
+        }catch(e){ console.log( "erro ao buscar as categorias ",e) }
+    }  
+
     async function selectByDescription( descricao:string ){
         try{
             let result   = await db.getAllAsync   ( `SELECT * ,
@@ -79,6 +99,6 @@ const db = useSQLiteContext();
         }catch(e){ console.log(`erro ao consultar o categoria ${descricao} `,e)}
     }
  
-    return { selectAll, selectByCode, create,update ,selectByDescription } 
+    return { selectAll, selectByCode,selectAllLimit, create,update ,selectByDescription } 
  
 }

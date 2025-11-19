@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useMarcas } from "../../database/queryMarcas/queryMarcas"
 import { ActivityIndicator, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { useCategoria } from "../../database/queryCategorias/queryCategorias";
@@ -18,8 +17,6 @@ import { Entypo, Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 export  const RenderModalCategorias = ({setCategoria,codigoCategoria   }:any) => {
 
- 
-        const useQueryMarcas = useMarcas();
         const useQuerCategorias = useCategoria();
 
     let [ active, setActive ] = useState<boolean>(false);

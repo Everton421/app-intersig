@@ -26,6 +26,8 @@ type produtoBancoLocal = {
       descricao: string
       unidade:string
     }
+
+    console.log({ RenderModalCategorias, RenderModalMarcas, RenderModalCaracteristicas, LodingComponent });
 export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
 
     // ... (toda a sua lógica de state, useEffect e funções como 'carregarProduto', 'gravar', etc., permanece a mesma)

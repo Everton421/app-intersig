@@ -8,7 +8,6 @@ import {
   FlatList,
   TextInput,
 } from "react-native";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Entypo from "@expo/vector-icons/Entypo";
 import { typeFotoProduto } from "./types/fotos";
@@ -26,7 +25,7 @@ export const Modal_fotos = ({ imgs, codigo_produto, setImgs }: Props) => {
   const [fotos, setFotos] = useState<typeFotoProduto[]>([]);
 
   const deleteItemListImgs = (item:typeFotoProduto) => {
-    setImgs((prev: any) => {
+    setImgs((prev ) => {
       let aux = prev.filter((i: typeFotoProduto) => i.sequencia !== item.sequencia);
         setFotos(aux);
        return aux;

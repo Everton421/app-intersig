@@ -188,6 +188,7 @@ function selecionaCaracterisca(item:caracteristica){
                  </View>
                </View>
             </Modal>
+          
         </View>
     )
 }

@@ -80,7 +80,7 @@ export const ModalSelectedProduct =   ({    isSelected,visible, setVisible  }:pr
 
         return (    
           <Modal  visible={visible} style={{ flex:1 }} transparent={true } >
-            <View style={{ backgroundColor:'rgba(255,255,255, 0.1 )', flex:1, alignItems:"center",justifyContent:"center" }}>
+            <View style={{ backgroundColor:'rgba(255,255,255, 0.1 )', flex:1, alignItems:"center",justifyContent:"center" , elevation:5 }}>
               <View style={{ flex:1, backgroundColor:'#FFF', width:'95%', borderRadius:10, marginTop:5 }}>
                       <TouchableOpacity onPress={() => setVisible(false)}  style={ { width:'15%'  ,padding: 10, borderRadius: 12    }}>
                                    <Ionicons name="close" size={28} color={ '#6C757D' } />
@@ -93,7 +93,7 @@ export const ModalSelectedProduct =   ({    isSelected,visible, setVisible  }:pr
                                 (<MaterialIcons name="no-photography" size={100} color='#6C757D' />)
                             }
                         </View>
-                            <View style={{ flex:1, flexDirection:'row',justifyContent:"space-around", alignItems:"center"}}>
+                            <View style={{ flex:1,  alignSelf:'flex-start' ,gap:5, alignItems:"center"}}>
                                     <View  style={{ borderWidth:1, borderRadius:5, padding:4,borderColor:'#CCC'}} > 
                                         <Text style={styles.label} >R${ Number(isSelected.preco).toFixed(2) }</Text>
                                     </View>
@@ -103,14 +103,14 @@ export const ModalSelectedProduct =   ({    isSelected,visible, setVisible  }:pr
                             </View>
                     </View>
 
-                    <Text style={[styles.label,{ marginTop:3, margin:5} ]} numberOfLines={1} >
+                    <Text style={[styles.label,{ marginTop:3, margin:5} ]} numberOfLines={2} >
                             { isSelected.descricao}
                         </Text>
                     
                 <View style={{ alignItems: "center" }}>
 
-                    <View style={[styles.quantityContainer,{ flexDirection:"row",marginTop:5, marginBottom:5}]}>
-                 <Text style={styles.label}>Total R$:  </Text>
+                 <View style={[styles.quantityContainer,{borderColor:'#CCC',borderWidth:1, flexDirection:"row",marginTop:5, marginBottom:5, }]}>
+                     <Text style={styles.label} >Total R$:  </Text>
                         <Text style={styles.label} >  { Number((  preco - desconto  ) * quantidade ).toFixed(2) } </Text>
                     </View>
 
@@ -155,7 +155,7 @@ export const ModalSelectedProduct =   ({    isSelected,visible, setVisible  }:pr
         descontoContainer: { flexDirection:"row", justifyContent:"center", alignItems:"center" },
         selectedControls: { flexDirection: "row", justifyContent: "space-between", alignItems: 'flex-end', marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.3)' },
         inputDesconto: { backgroundColor: "white",marginLeft:3, borderWidth:1, borderColor:'#CCC',elevation:2, borderRadius: 5, padding: 5, width: 80, textAlign: "center", marginTop: 5 },
-        quantityContainer: { backgroundColor: "white", borderRadius: 25, elevation: 4, paddingVertical: 8, paddingHorizontal: 15, justifyContent: "center", alignItems: "center" },
+        quantityContainer: { backgroundColor: "white", borderRadius: 5, elevation: 4, paddingVertical: 8, paddingHorizontal: 15, justifyContent: "center", alignItems: "center" },
         quantityText: { fontWeight: "bold", fontSize: 16 },
         buttonsContainer: { flexDirection: "row" },
         buttonText: { fontWeight: "bold", fontSize: 20, color:'#FFF' },

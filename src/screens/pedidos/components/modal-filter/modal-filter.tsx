@@ -91,17 +91,18 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
     // Se o evento for 'dismissed', não fazemos nada, pois o seletor já foi fechado.
 };
         return(
-                 <Modal  visible={visible}  transparent={true} >
-                            <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" , flex:1, alignItems:"center", justifyContent:"flex-start" }}>
-                                <View style={{ backgroundColor:'#FFF', width:'80%', height:'80%', marginTop:10, borderRadius:10 }}>    
-                                               
-                                                       <TouchableOpacity onPress={() => setVisible(false)}  style={ { width:'15%'  ,padding: 10, borderRadius: 12    }}>
-                                                                           <Ionicons name="close" size={28} color={ '#6C757D' } />
-                                                         </TouchableOpacity>
-                                        
-                                        <View style={{   width:'95%', height:"100%", marginLeft: 5 } } >
-                                                        <View style={{  borderColor: '#DDD', borderWidth: 1,padding: 10,marginVertical: 5, borderRadius: 5, width: '95%'  }}>
-                                                          <Text style={{ fontWeight:"bold"}}> Data Cadastro:</Text>   
+                 <Modal visible={visible} transparent={true}>
+                   <View style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", flex: 1, justifyContent: 'flex-end' }}>
+                     <View style={{ backgroundColor: '#FFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, width: '100%', height: '90%', elevation: 10, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 }}>
+                       <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                         <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Filtrar Pedidos</Text>
+                         <TouchableOpacity onPress={() => setVisible(false)} style={{ padding: 4 }}>
+                           <Ionicons name="close" size={24} color="#FFF" />
+                         </TouchableOpacity>
+                       </View>
+                       <View style={{ flex: 1, padding: 16 }}>
+                        <View style={{ borderColor: '#DEE2E6', borderWidth: 1, padding: 12, marginBottom: 12, borderRadius: 8 }}>
+                          <Text style={{ fontWeight: '600', color: '#6C757D', marginBottom: 6 }}>Data Cadastro</Text>
 
                                                         <TouchableOpacity onPress={() => setShowPicker(true)} style={{ flexDirection: 'row', gap: 7 }}>
                                                                <Fontisto name="date" size={24} color="black" />
@@ -306,12 +307,11 @@ export const ModalFilter = ({ visible , setVisible, setStatus,   setDate }:props
                                                                 </TouchableOpacity>
                                                             </View>
                             
-                                              </View>
-                                        </View>
-
-                                </View>
-                            </View>
-                        </Modal>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  </Modal>
 
         )
 }

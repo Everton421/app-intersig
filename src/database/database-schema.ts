@@ -225,7 +225,31 @@ export const databaseSchema =
        data_recadastro TEXT NOT NULL
       );
 
-     ` ;
+    
+      CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+      CREATE INDEX IF NOT EXISTS idx_produtos_num_fabricante ON produtos(num_fabricante);
+      CREATE INDEX IF NOT EXISTS idx_produtos_num_original ON produtos(num_original);
+      CREATE INDEX IF NOT EXISTS idx_produtos_sku ON produtos(sku);
+      CREATE INDEX IF NOT EXISTS idx_produtos_marca ON produtos(marca);
+      CREATE INDEX IF NOT EXISTS idx_produtos_descricao ON produtos(descricao);
+      CREATE INDEX IF NOT EXISTS idx_clientes_vendedor ON clientes(vendedor);
+      CREATE INDEX IF NOT EXISTS idx_clientes_cnpj ON clientes(cnpj);
+      CREATE INDEX IF NOT EXISTS idx_clientes_nome ON clientes(nome);
+      CREATE INDEX IF NOT EXISTS idx_clientes_cidade ON clientes(cidade);
+      CREATE INDEX IF NOT EXISTS idx_clientes_estado ON clientes(estado);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos(data_cadastro);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_vendedor ON pedidos(vendedor);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_situacao ON pedidos(situacao);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_tipo ON pedidos(tipo);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_enviado ON pedidos(enviado);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_cliente ON pedidos(cliente);
+      CREATE INDEX IF NOT EXISTS idx_produtos_pedido_pedido ON produtos_pedido(pedido);
+      CREATE INDEX IF NOT EXISTS idx_produtos_pedido_codigo ON produtos_pedido(codigo);
+      CREATE INDEX IF NOT EXISTS idx_servicos_pedido_pedido ON servicos_pedido(pedido);
+      CREATE INDEX IF NOT EXISTS idx_parcelas_pedido ON parcelas(pedido);
+      CREATE INDEX IF NOT EXISTS idx_fotos_produto ON fotos_produtos(produto);
+      CREATE INDEX IF NOT EXISTS idx_empresas_cnpj ON empresas(cnpj);
+      ` ;
      
      
      export const restartDatabaseSchema=
@@ -458,8 +482,30 @@ CREATE TABLE IF NOT EXISTS produtos (
        descricao TEXT NOT NULL,
        unidade TEXT NOT NULL,
        data_cadastro TEXT NOT NULL,
-       data_recadastro TEXT NOT NULL
-      );
-
-      
-     `
+        data_recadastro TEXT NOT NULL
+       );
+      CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+      CREATE INDEX IF NOT EXISTS idx_produtos_num_fabricante ON produtos(num_fabricante);
+      CREATE INDEX IF NOT EXISTS idx_produtos_num_original ON produtos(num_original);
+      CREATE INDEX IF NOT EXISTS idx_produtos_sku ON produtos(sku);
+      CREATE INDEX IF NOT EXISTS idx_produtos_marca ON produtos(marca);
+      CREATE INDEX IF NOT EXISTS idx_produtos_descricao ON produtos(descricao);
+      CREATE INDEX IF NOT EXISTS idx_clientes_vendedor ON clientes(vendedor);
+      CREATE INDEX IF NOT EXISTS idx_clientes_cnpj ON clientes(cnpj);
+      CREATE INDEX IF NOT EXISTS idx_clientes_nome ON clientes(nome);
+      CREATE INDEX IF NOT EXISTS idx_clientes_cidade ON clientes(cidade);
+      CREATE INDEX IF NOT EXISTS idx_clientes_estado ON clientes(estado);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_data ON pedidos(data_cadastro);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_vendedor ON pedidos(vendedor);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_situacao ON pedidos(situacao);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_tipo ON pedidos(tipo);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_enviado ON pedidos(enviado);
+      CREATE INDEX IF NOT EXISTS idx_pedidos_cliente ON pedidos(cliente);
+      CREATE INDEX IF NOT EXISTS idx_produtos_pedido_pedido ON produtos_pedido(pedido);
+      CREATE INDEX IF NOT EXISTS idx_produtos_pedido_codigo ON produtos_pedido(codigo);
+      CREATE INDEX IF NOT EXISTS idx_servicos_pedido_pedido ON servicos_pedido(pedido);
+      CREATE INDEX IF NOT EXISTS idx_parcelas_pedido ON parcelas(pedido);
+      CREATE INDEX IF NOT EXISTS idx_fotos_produto ON fotos_produtos(produto);
+      CREATE INDEX IF NOT EXISTS idx_empresas_cnpj ON empresas(cnpj);
+ 
+      `

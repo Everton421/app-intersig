@@ -1,12 +1,11 @@
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native"
-
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Api_config } from "../api_config";
 import { useState } from "react";
 import useApi from "../../services/api";
 import { LodingComponent } from "../../components/loading";
+import { CustomHeader } from "../../components/custom-header";
 
 export const CadastroUsuario = ({navigation}:any) => {
 
@@ -57,74 +56,65 @@ export const CadastroUsuario = ({navigation}:any) => {
 
 
     return (
-        <View style={{ flex: 1,alignItems:"center", justifyContent:"center" }}>
-                     <LodingComponent isLoading={loading} />
-
-            <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={100}   >
-
-                <ScrollView contentContainerStyle={{ flexGrow: 1, backgroundColor: '#EAF4FE', alignItems: "center", justifyContent: "center" }}>
-                  
-                 <View   style={{ backgroundColor: "#FFF", borderRadius: 60, height: 120,  width: 120,   alignItems: "center", justifyContent: "center",  elevation: 3,   }}
-                    >
-                        <FontAwesome6 name="user-tie" size={60} color="#185FED" />
-                    </View>  
-                    <View style={{ backgroundColor: '#FFF', padding: 3, margin: 5, borderRadius: 5, elevation: 3, paddingBottom: 25 }}>
-                        <Text style={{ color: '#185FED', fontSize: 20, marginLeft: 10, fontWeight: 'bold' }}> Usuário </Text>
-
-                        <View style={{ width: '100%', marginTop: 20 }}>
-                            <Text style={{ color: '#185FED', marginLeft: 10 }}> Usuário:</Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
-                                <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="usuário"
-                                    onChangeText={(v: any) => setNomeUsuario(v)}
-                                />
-                                <FontAwesome name="user" size={24} color="#185FED" />
-                            </View>
-                        </View>
-
-                        {/*      <View style={{ width: '100%', marginTop: 20 }}>
-            <Text style={{ color: '#185FED', marginLeft: 10 }}> cnpj/cpf da empresa:</Text>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
-                <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="cnpj/cpf:"
-                       onChangeText={(v:any)=> setCnpj(v)}
-                />
-                 <MaterialCommunityIcons name="store" size={24} color="#185FED" />
-            </View>
-        </View>
-*/}
-
-                        <View style={{ width: '100%', marginTop: 20 }}>
-                            <Text style={{ color: '#185FED', marginLeft: 10 }}> Email: </Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
-                                <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="example@example.com"
-                                    onChangeText={(v: any) => setEmail(v)}
-                                />
-                                <MaterialIcons name="email" size={24} color="#185FED" />
-                            </View>
-
-
-                        </View>
-
-                        <View style={{ width: '100%', marginTop: 20 }}>
-                            <Text style={{ color: '#185FED', marginLeft: 10 }}> Senha: </Text>
-                            <View style={{ flexDirection: "row", alignItems: "center", gap: 5, justifyContent: "center" }}>
-                                <TextInput style={{ borderBottomWidth: 1, width: '85%' }} placeholder="Senha:" secureTextEntry
-                                    onChangeText={(v: any) => setSenha(v)}
-                                />
-                                <MaterialIcons name="password" size={24} color="#185FED" />
-                            </View>
-                        </View>
-                        <TouchableOpacity
-                            style={{ alignItems: "center", padding: 10, borderRadius: 20, backgroundColor: '#185FED', margin: 15, elevation: 2 }}
-                            onPress={() => gravar()}
-                        >
-                            <Text style={{ color: '#FFF', fontSize: 20 }}>Registrar </Text>
-                        </TouchableOpacity>
-                    </View>
-
-
-
-                </ScrollView>
-            </KeyboardAvoidingView>
+        <View style={{ flex: 1, backgroundColor: '#F0F4F8' }}>
+          <LodingComponent isLoading={loading} />
+          <CustomHeader
+            title="Novo Usuário"
+            showSearch={false}
+            onBack={() => navigation.goBack()}
+          />
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1, alignItems: "center", justifyContent: "center", padding: 16 }}>
+              <View style={{ backgroundColor: "#FFF", borderRadius: 60, height: 110, width: 110, alignItems: "center", justifyContent: "center", elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.15, shadowRadius: 5, marginBottom: 20 }}>
+                <FontAwesome6 name="user-tie" size={55} color="#185FED" />
+              </View>
+              <View style={{ backgroundColor: '#FFF', borderRadius: 12, padding: 20, width: '100%', elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ color: '#185FED', fontSize: 16, fontWeight: '600', marginBottom: 6 }}>Usuário</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#F9F9F9' }}>
+                    <TextInput
+                      style={{ flex: 1, paddingVertical: 10, fontSize: 16, color: '#333' }}
+                      placeholder="Nome do usuário"
+                      placeholderTextColor="#999"
+                      onChangeText={(v) => setNomeUsuario(v)}
+                    />
+                    <FontAwesome name="user" size={20} color="#185FED" />
+                  </View>
+                </View>
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ color: '#185FED', fontSize: 16, fontWeight: '600', marginBottom: 6 }}>Email</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#F9F9F9' }}>
+                    <TextInput
+                      style={{ flex: 1, paddingVertical: 10, fontSize: 16, color: '#333' }}
+                      placeholder="example@example.com"
+                      placeholderTextColor="#999"
+                      onChangeText={(v) => setEmail(v)}
+                    />
+                    <MaterialIcons name="email" size={20} color="#185FED" />
+                  </View>
+                </View>
+                <View style={{ marginBottom: 20 }}>
+                  <Text style={{ color: '#185FED', fontSize: 16, fontWeight: '600', marginBottom: 6 }}>Senha</Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, backgroundColor: '#F9F9F9' }}>
+                    <TextInput
+                      style={{ flex: 1, paddingVertical: 10, fontSize: 16, color: '#333' }}
+                      placeholder="Senha"
+                      placeholderTextColor="#999"
+                      secureTextEntry
+                      onChangeText={(v) => setSenha(v)}
+                    />
+                    <MaterialIcons name="password" size={20} color="#185FED" />
+                  </View>
+                </View>
+                <TouchableOpacity
+                  style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 }}
+                  onPress={() => gravar()}
+                >
+                  <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Registrar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
     )
 } 

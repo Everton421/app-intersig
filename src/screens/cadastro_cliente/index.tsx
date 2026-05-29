@@ -9,6 +9,7 @@ import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
 import { defaultColors } from "../../styles/global";
+import { CustomHeader } from "../../components/custom-header";
 
 export const Cadastro_cliente = ({ route, navigation }: any) => {
     const [cnpj, setCnpj] = useState<string>();
@@ -204,137 +205,153 @@ useEffect(() => {
     return (
         <KeyboardAvoidingView
             style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'} // Tente ajustar aqui
-           // keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0} // Ajuste fino para o ios
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <LodingComponent isLoading={loading} />
-    
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View  style={{ flex: 1, backgroundColor: '#EAF4FE', alignItems: "center",  width: '100%' }}  >
+            <CustomHeader
+              title={codigo ? `Cliente #${codigo}` : 'Novo Cliente'}
+              showSearch={false}
+              onBack={() => navigation.goBack()}
+            />
+            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16 }}>
+            <View style={{ flex: 1, backgroundColor: '#F0F4F8', alignItems: "center", width: '100%' }}>
 
   
-                <View style={{ width: '97%', margin: 7,  backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                    <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > CPF/CNPJ:</Text>
+                <View style={{ width: '100%', marginBottom: 10, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+                    <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }} >CPF/CNPJ</Text>
                     <TextInput
-                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
+                        style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
                         placeholder="00.000.000/0000-00"
+                        placeholderTextColor="#999"
                         onChangeText={(value) => setCnpj(value)}
                         defaultValue={cnpj}
                     />
                 </View>
-                <View style={{ width: '97%', margin: 7,   backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3  }}>
-                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > IE/RG:</Text>
+                <View style={{ width: '100%', marginBottom: 10, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+                     <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }} >IE/RG</Text>
                     <TextInput
-                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
-                         onChangeText={(value) => setIe(value)}
+                        style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                        placeholder="Inscrição Estadual"
+                        placeholderTextColor="#999"
+                        onChangeText={(value) => setIe(value)}
                         defaultValue={ie}
                     />
                 </View>
 
-                <View style={{ width: '97%', margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} >Razao social:</Text>
+                <View style={{ width: '100%', marginBottom: 10, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+                     <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }} >Razão Social</Text>
                     <TextInput
-                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
+                        style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                        placeholder="Nome do cliente"
+                        placeholderTextColor="#999"
                         onChangeText={(value) => setNome(value)}
                         defaultValue={nome}
                     />
                 </View>
 
-                <View style={{ width: '97%', margin: 7,   backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3  }}>
-                     <Text style={{ fontWeight: "bold", fontSize:20 ,color: defaultColors.gray }} > celular:</Text>
+                <View style={{ width: '100%', marginBottom: 10, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+                     <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }} >Celular</Text>
                     <TextInput
-                        style={{  padding: 5,width:'80%',fontWeight: "bold", fontSize:17 ,color: defaultColors.gray }}
+                        style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                        placeholder="(41) 99999-9999"
+                        placeholderTextColor="#999"
                         onChangeText={(value) => setCelular(value)}
                         defaultValue={celular}
                     />
                 </View>
 
                     <TouchableOpacity
-                        style={{ backgroundColor: '#185FED', padding: 7  ,width: '80%', alignItems: "center", marginTop:10, justifyContent: "space-between", borderRadius: 7,   flexDirection:"row"  }}
+                        style={{ backgroundColor: '#185FED', paddingVertical: 12, paddingHorizontal: 16, width: '100%', alignItems: "center", marginBottom: 10, justifyContent: "space-between", borderRadius: 10, flexDirection: "row", elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.3, shadowRadius: 5 }}
                         onPress={()=> {setVisibleEndereco(true) }}
                     >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>Endereço</Text>
-                        <AntDesign name="caretdown" size={24} color="#FFF" />
+                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 17 }}>Endereço</Text>
+                        <AntDesign name="caret-down" size={22} color="#FFF" />
                     </TouchableOpacity>
                 
                 {/********* */}
-                    <Modal visible={visibleEndereco}  transparent={true}>
-                     <View style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", flex: 1 }} >
-                        <View style={{ backgroundColor: "#FFF", flex: 1 , margin:15, borderRadius:15, height:'80%'}} >
-
-                            <TouchableOpacity onPress={()=> {setVisibleEndereco(false) }}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                              <Ionicons name="close" size={28} color={ '#6C757D' } />
-                           </TouchableOpacity>
-
-                          
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                 <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > cep: </Text>
-                                <TextInput
-                                     style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    placeholder="0000.00.00"
-                                    onChangeText={(value) => setCep(value)}
-                                    defaultValue={cep}
-                                />
+                    <Modal visible={visibleEndereco} transparent={true} animationType="slide">
+                      <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }}>
+                        <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, width: "100%", height: "90%", elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 }}>
+                          <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Endereço</Text>
+                            <TouchableOpacity onPress={() => setVisibleEndereco(false)} style={{ padding: 4 }}>
+                              <Ionicons name="close" size={24} color="#FFF" />
+                            </TouchableOpacity>
+                          </View>
+                          <ScrollView style={{ padding: 16 }}>
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>CEP</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="00.000-000"
+                                placeholderTextColor="#999"
+                                onChangeText={(value) => setCep(value)}
+                                defaultValue={cep}
+                              />
                             </View>
-
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                  <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} >  Estado: </Text>
-                                <TextInput  
-                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    onChangeText={(value) => setEstado(value)}
-                                    placeholder="PR" 
-                                    defaultValue={estado}
-                                    />
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>Estado</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="PR"
+                                placeholderTextColor="#999"
+                                onChangeText={(value) => setEstado(value)}
+                                defaultValue={estado}
+                              />
                             </View>
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > cidade: </Text>
-                                <TextInput
-                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    onChangeText={(value) => setCidade(value)}
-                                    defaultValue={cidade}
-                                />
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>Cidade</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="Curitiba"
+                                placeholderTextColor="#999"
+                                onChangeText={(value) => setCidade(value)}
+                                defaultValue={cidade}
+                              />
                             </View>
-                             
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > Endereço: </Text>
-                                <TextInput
-                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    onChangeText={(value) => setEndereco(value)}
-                                    placeholder="Avenida."
-                                    multiline
-                                    defaultValue={endereco}
-                                    numberOfLines={10}
-                                />
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>Endereço</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="Avenida..."
+                                placeholderTextColor="#999"
+                                multiline
+                                defaultValue={endereco}
+                              />
                             </View>
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                 <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} > bairro: </Text>
-                                <TextInput
-                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    onChangeText={(value) => setBairro(value)}
-                                    defaultValue={bairro}
-                                />
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>Bairro</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="Centro"
+                                placeholderTextColor="#999"
+                                onChangeText={(value) => setBairro(value)}
+                                defaultValue={bairro}
+                              />
                             </View>
-                            <View style={{  margin: 7, alignItems: "center", backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3, flexDirection: "row" }}>
-                                <Text style={{ fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} >  numero: </Text>
-                                <TextInput
-                                    style={{ padding: 5,width:'80%',fontWeight: "bold" , color:defaultColors.gray, fontSize:17}} 
-                                    onChangeText={(value) => setNumero(value)}
-                                    defaultValue={numero}
-                                />
+                            <View style={{ marginBottom: 12, backgroundColor: '#FFF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12, elevation: 2, borderWidth: 1, borderColor: '#F0F0F0' }}>
+                              <Text style={{ fontWeight: "600", fontSize: 14, color: '#6C757D', marginBottom: 4 }}>Número</Text>
+                              <TextInput
+                                style={{ paddingVertical: 8, fontWeight: "500", fontSize: 16, color: '#333' }}
+                                placeholder="123"
+                                placeholderTextColor="#999"
+                                onChangeText={(value) => setNumero(value)}
+                                defaultValue={numero}
+                              />
                             </View>
-
-                            </View>
+                          </ScrollView>
                         </View>
+                      </View>
                     </Modal>
 
                
 
-                <View style={{ flexDirection: "row", marginTop: 30, width: '100%', alignItems: "center", justifyContent: "center", }} >
+                <View style={{ flexDirection: "row", marginVertical: 30, width: '100%', alignItems: "center", justifyContent: "center" }} >
                     <TouchableOpacity
-                        style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 7, padding: 5 }}
+                        style={{ backgroundColor: '#185FED', width: '85%', alignItems: "center", justifyContent: "center", borderRadius: 10, paddingVertical: 14, elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 }}
                         onPress={() => gravar()}
                     >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
+                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 18 }}>Gravar Cliente</Text>
                     </TouchableOpacity>
                 </View>
             </View>

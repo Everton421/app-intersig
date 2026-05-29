@@ -10,6 +10,9 @@ import { RenderItemsCategory } from "./renderItensCategory/RenderItensCategory";
 import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
 import useApi from "../../services/api";
+import { CustomHeader } from "../../components/custom-header";
+import { EmptyState } from "../../components/empty-state";
+import { Fab } from "../../components/fab";
 
 type category = {
   codigo: number;
@@ -22,7 +25,7 @@ type category = {
 export const Categoria = ({ navigation }: any) => {
   const [dados, setDados] = useState<category[]>([]);
   const [pesquisa, setPesquisa] = useState<string>("");
-  const [ categoriaSelecionada , setCategoriaSelecionada ] = useState<category>();
+  const [ categoriaSelecionada , setCategoriaSelecionada ] = useState<any>();
   const [ loading , setLoading ] = useState(false);
 
  const [ visible, setVisible ] = useState(false); 
@@ -104,114 +107,59 @@ async function gravar(){
     <View style={{ flex: 1, backgroundColor: "#EAF4FE" }}>
                          <LodingComponent isLoading={loading} />
       
-      <View style={{ backgroundColor: "#185FED" }}>
-        <View
-          style={{padding: 15,backgroundColor: "#185FED",alignItems: "center",flexDirection: "row",justifyContent: "space-between",
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={{ margin: 5 }}
-          >
-            <Ionicons name="arrow-back" size={25} color="#FFF" />
-          </TouchableOpacity>
-
-          <View
-            style={{ flexDirection: "row", marginLeft: 10, gap: 2, width: "100%", alignItems: "center"  }}
-          >
-            <TextInput
-              style={{  width: "70%",fontWeight: "bold",padding: 5,margin: 5,textAlign: "center",borderRadius: 5,elevation: 5,backgroundColor: "#FFF"  }}
-              onChangeText={(value) => setPesquisa(value)}
-              placeholder="pesquisar"
-            />
-
-            <TouchableOpacity //onPress={()=> setShowPesquisa(true)}
-            >
-              <AntDesign name="filter" size={35} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View>
-          <Text
-            style={{ left: 5,bottom: 5,color: "#FFF",fontWeight: "bold",fontSize: 20 }}
-          >
-            {" "}
-            Categorias{" "}
-          </Text>
-        </View>
-      </View>
+      <CustomHeader
+        title="Categorias"
+        onBack={() => navigation.goBack()}
+        showSearch
+        searchValue={pesquisa}
+        onSearchChange={(v) => setPesquisa(v)}
+        showFilter
+      />
  
-  {/*          */}
-      <Modal transparent={true} visible={visible && visible}>
-        <View style={{ width: '100%', height: '100%', alignItems: "center", justifyContent: "center", backgroundColor: 'rgba(50,50,50, 0.5)' }} >
-          <View style={{ width: '96%', height: '97%', backgroundColor: '#FFF', borderRadius: 10 }} >
-            <View style={{ margin: 8 }}>
-              <TouchableOpacity
-                onPress={() => setVisible(false)}
-                style={{ margin: 10, backgroundColor: "#185FED", padding: 7, borderRadius: 7, width: "20%", elevation: 5, }}
-              >
-                <Text style={{ color: "#FFF", fontWeight: "bold" }}>
-                  voltar
-                </Text>
+      <Modal transparent={true} visible={visible} animationType="fade">
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ width: '85%', backgroundColor: '#FFF', borderRadius: 16, overflow: 'hidden', elevation: 10 }}>
+            <View style={{ backgroundColor: '#185FED', padding: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ color: '#FFF', fontSize: 16, fontWeight: 'bold' }}>Editar Categoria</Text>
+              <TouchableOpacity onPress={() => setVisible(false)}>
+                <Ionicons name="close" size={24} color="#FFF" />
               </TouchableOpacity>
             </View>
+            <View style={{ padding: 20 }}>
+              <Text style={{ fontSize: 14, color: '#757575', marginBottom: 4 }}>Código</Text>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 15 }}>
+                {categoriaSelecionada?.codigo}
+              </Text>
 
-            <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
-              <Image
-                style={{ width: 70, height: 70 }}
-                source={{
-                  uri: 'https://reactnative.dev/img/tiny_logo.png'
-                }}
-              />
-              <View style={{ backgroundColor: '#fff', borderRadius: 5, height: 25, flexDirection: "row", elevation: 5 }}>
-                <Text style={{}}> Codigo: </Text>
-                <Text style={{ fontWeight: "bold" }}> {  categoriaSelecionada?.codigo  } </Text>
-
-              </View>
-            </View>
-
-            <View style={{ margin: 7, backgroundColor: '#FFF', borderRadius: 5, padding: 5 }}>
-              <Text style={{}} >Descrição: </Text>
+              <Text style={{ fontSize: 14, color: '#757575', marginBottom: 4 }}>Descrição</Text>
               <TextInput
-                style={{ backgroundColor: '#fff', elevation: 3, width: '100%', borderRadius: 5, alignContent: "flex-start", }}
-                defaultValue={ categoriaSelecionada ? categoriaSelecionada?.descricao : '' }
-               onChangeText={ (v)=> setCategoriaSelecionada((prev:any) => { return { ...prev, descricao: v }} ) }
-               />
-            </View>
+                style={{ backgroundColor: '#F5F7FA', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, paddingHorizontal: 12, height: 47, fontSize: 15, color: '#333' }}
+                defaultValue={categoriaSelecionada?.descricao}
+                onChangeText={(v) => setCategoriaSelecionada((prev: any) => ({ ...prev, descricao: v }))}
+              />
 
-            <View style={{ flexDirection: "row", marginTop: 50, width: '100%', alignItems: "center", justifyContent: "center" }} >
               <TouchableOpacity
-                style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 10, padding: 5 }}
-               onPress={()=>gravar()}
+                style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: 25, elevation: 3 }}
+                onPress={() => gravar()}
               >
-                <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
+                <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 16 }}>Gravar</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-       </Modal>
+      </Modal>
  
       {/**  */}
       <View style={{ marginTop: 10 }}>
         <FlatList
           data={dados}
-           // renderItem={(i ) => RenderItemsCategory(   i, handleSelect   ) }
           renderItem={( {item} ) => ( <RenderItemsCategory  handleSelect={handleSelect} item={item} />) }
-
           keyExtractor={(i) => i.codigo.toString()}
+          ListEmptyComponent={() => <EmptyState icon="category" message="Nenhuma categoria encontrada" />}
         />
       </View>
       {/**  */}
-      <TouchableOpacity
-        style={{backgroundColor: "#185FED",width: 50,height: 50,borderRadius: 25,position: "absolute",bottom: 150,right: 30,elevation: 10,alignItems: "center",justifyContent: "center",zIndex: 999, // Garante que o botão fique sobre os outros itens
-        }}
-        onPress={() => {
-          navigation.navigate("cadastro_categorias");
-        }}
-      >
-        <MaterialIcons name="add-circle" size={45} color="#FFF" />
-      </TouchableOpacity>
+      <Fab onPress={() => navigation.navigate('cadastro_categorias')} />
     </View>
   );
 };

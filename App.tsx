@@ -10,20 +10,24 @@ import ConnectedProvider, { ConnectedContext } from './src/contexts/conectedCont
 import NetInfo from '@react-native-community/netinfo';
 // Only import react-native-gesture-handler on native platforms
 import 'react-native-gesture-handler';
-import { StatusBar } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
 
   return (
+    <SafeAreaView style={{ flex:1 }}>
     <ConnectedProvider>
           <AuthProvider>
               <SQLite.SQLiteProvider databaseName="test.db" onInit={construtor }>
-            <StatusBar backgroundColor={'#185FED'  }     />
+            
+                 <StatusBar  style="auto" backgroundColor="#185FED"  />
                 
                 <Routes/>
             </SQLite.SQLiteProvider>
           </AuthProvider>
     </ConnectedProvider>
+      </SafeAreaView>
  
   );
 }

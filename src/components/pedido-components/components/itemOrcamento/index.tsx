@@ -100,7 +100,7 @@ export const ListaItemOrcamento = ( ) => {
                     <Text style={{ fontSize:20, fontWeight:'bold',color:'#FFF'  }} >
                         itens do orçamento
             
-                    <AntDesign name="caretdown" size={23} color="#FFF" style={{elevation:7}} />
+                    <AntDesign name="caret-down" size={23} color="#FFF" style={{elevation:7}} />
            
 
                     </Text>

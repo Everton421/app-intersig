@@ -11,6 +11,7 @@ import OrcamentoProvider from "../contexts/orcamentoContext";
 import ConnectedProvider, { ConnectedContext } from "../contexts/conectedContext";
 import NetInfo from '@react-native-community/netinfo';
 import { AuthStack } from "./stack/authStack";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export const Routes = ( )=>{
     const { logado, setLogado, usuario , setUsuario }:any = useContext(AuthContext)
@@ -39,6 +40,7 @@ export const Routes = ( )=>{
         
 
     return(
+        <SafeAreaProvider>
         <NavigationContainer>
           { 
              logado ?
@@ -53,6 +55,7 @@ export const Routes = ( )=>{
 
    {/**  <MyDrawer/>  */}
         </NavigationContainer> 
+            </SafeAreaProvider>    
          
          
               

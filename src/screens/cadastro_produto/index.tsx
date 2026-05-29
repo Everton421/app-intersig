@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View, ScrollView, StyleSheet } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View, ScrollView, StyleSheet, TextInput } from "react-native";
 import { RenderModalCategorias } from "./modalCategorias";
 import { RenderModalMarcas } from "./modalMarcas";
 import useApi from "../../services/api";
@@ -16,6 +15,7 @@ import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
 import { RenderModalCaracteristicas } from "./modal-caracteristicas";
 import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas";
+import { CustomHeader } from "../../components/custom-header";
 
 // ... (seus types 'produtoBancoLocal' e 'typeFotoProduto' permanecem os mesmos)
 type produtoBancoLocal = { 
@@ -232,7 +232,11 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
     return (
         <View style={styles.mainContainer}>
             <LodingComponent isLoading={loading} />
-            
+            <CustomHeader
+              title={codigo_produto ? `Produto #${codigo_produto}` : 'Novo Produto'}
+              showSearch={false}
+              onBack={() => navigation.goBack()}
+            />
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {/* --- CARD CABEÇALHO: IMAGEM E INFOS BÁSICAS --- */}
                 <View style={styles.headerCard}>
@@ -517,13 +521,18 @@ export const Cadastro_produto: React.FC = ({ route, navigation }: any) => {
         // --- Botões ---
         saveButton: {
             backgroundColor: colors.primary,
-            borderRadius: 5,
-            paddingVertical: 10,
+            borderRadius: 10,
+            paddingVertical: 14,
+            paddingHorizontal: 24,
             alignItems: 'center',
             justifyContent: 'center',
             marginVertical: 20,
-            elevation: 2,
-            flexDirection:'row'
+            elevation: 4,
+            shadowColor: '#185FED',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 6,
+            flexDirection: 'row',
         },
         saveButtonText: {
             color: colors.card,

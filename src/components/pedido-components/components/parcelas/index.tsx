@@ -240,10 +240,10 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                  
                    <View style={{flexDirection:'row', backgroundColor:'#185FED', justifyContent:'space-between', padding:10, borderRadius:7, elevation:5}}>
                      
-                         <AntDesign name="creditcard" size={25} color="white" />
+                         <AntDesign name="credit-card" size={25} color="white" />
                      <Text style={{color:'white', fontWeight:"bold",fontSize:20, width:90  }}> 
-                            parcelas</Text>
-                     <AntDesign name="caretdown" size={22} color="white" />
+                            Parcelas</Text>
+                     <AntDesign name="caret-down" size={22} color="white" />
                     </View> 
 
             </TouchableOpacity>
@@ -261,16 +261,15 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                                             />
                 </View>
 
-            <Modal
-                visible={visible}
-                animationType="slide"
-                transparent={true}
-            >
-                <View style={ { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end',width: "100%", }}>
-                    <View  style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopEndRadius: 20, borderTopStartRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }} >
-                    <TouchableOpacity onPress={() => setVisible(false)}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                            <Ionicons name="close" size={28} color={ '#6C757D' } />
+            <Modal visible={visible} animationType="slide" transparent={true}>
+              <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }}>
+                <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, width: "100%", height: "90%", elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 }}>
+                  <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Parcelas</Text>
+                    <TouchableOpacity onPress={() => setVisible(false)} style={{ padding: 4 }}>
+                      <Ionicons name="close" size={24} color="#FFF" />
                     </TouchableOpacity>
+                  </View>
                         <View>
 
                             
@@ -299,23 +298,23 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
                             <View style={{ height: '70%'  }}>
                                  
                                     <Modal visible={press} transparent={true}>
-                                  <View style={ { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end',width: "100%", }}>
-                                          <View  style={{ margin: 0, backgroundColor: "#F0F4F8", borderTopEndRadius: 20, borderTopStartRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5  }} >   
-                                        <TouchableOpacity onPress={() => {setPress(false)  }} style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                                                    <Ionicons name="close" size={28} color={ '#6C757D' } />
+                                      <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }}>
+                                        <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, width: "100%", height: "90%", elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 }}>
+                                          <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Formas de Pagamento</Text>
+                                            <TouchableOpacity onPress={() => setPress(false)} style={{ padding: 4 }}>
+                                              <Ionicons name="close" size={24} color="#FFF" />
                                             </TouchableOpacity>
-                                                    <View style={{alignItems:"center",padding:5}} >
-                                                        <Text style={{fontWeight:"bold"}}> Formas De Pagamento </Text>
-                                                     </View>
-
-                                                    <FlatList
-                                                        data={formas}
-                                                        renderItem={({ item }) => <ItemFormas item={item} />}
-                                                        keyExtractor={(i: any) => i.codigo}
-                                                    />
-                                              </View>
                                           </View>
-                                        </Modal>
+                                          <FlatList
+                                            data={formas}
+                                            renderItem={({ item }) => <ItemFormas item={item} />}
+                                            keyExtractor={(i: any) => i.codigo}
+                                            contentContainerStyle={{ padding: 12 }}
+                                          />
+                                        </View>
+                                      </View>
+                                    </Modal>
      
                                     <View>
                                         {parcelasGeradas.length > 0 && (

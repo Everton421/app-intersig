@@ -1,14 +1,13 @@
-import {  useContext, useEffect, useState } from "react"
-import { Alert, Button, FlatList, Image, Modal, Text, TouchableOpacity, View } from "react-native"
-import { TextInput } from "react-native-gesture-handler"
+import { useContext, useEffect, useState } from "react"
+import { Alert, Text, TouchableOpacity, View, TextInput, ScrollView } from "react-native"
 import useApi from "../../services/api"
-import { useServices } from "../../database/queryServicos/queryServicos"
 import { ConnectedContext } from "../../contexts/conectedContext"
 import NetInfo from '@react-native-community/netinfo';
 import { LodingComponent } from "../../components/loading"
 import { defaultColors } from "../../styles/global"
 import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas"
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { CustomHeader } from "../../components/custom-header"
 
 
 
@@ -107,52 +106,42 @@ export const Cadastro_caracteristicas = ({navigation}:any) => {
 
 
     return (
-        <View style={{ flex: 1 }}>
- 
-        <LodingComponent isLoading={loading} />
+        <View style={{ flex: 1, backgroundColor: '#F0F4F8' }}>
+          <LodingComponent isLoading={loading} />
+          <CustomHeader
+            title="Nova Característica"
+            showSearch={false}
+            onBack={() => navigation.goBack()}
+          />
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <View style={{ backgroundColor: '#FFF', borderRadius: 12, padding: 16, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+              <View style={{ marginBottom: 16 }}>
+                <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Unidade</Text>
+                <TextInput
+                  onChangeText={(value) => setUnidade(value)}
+                  style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                  placeholder="Ex: Und"
+                  placeholderTextColor="#999"
+                />
+              </View>
+              <View style={{ marginBottom: 8 }}>
+                <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Descrição</Text>
+                <TextInput
+                  onChangeText={(value) => setDescricao(value)}
+                  style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                  placeholder="Ex: Metros"
+                  placeholderTextColor="#999"
+                />
+              </View>
+            </View>
 
-            <View style={{ flex: 1 ,width: '100%',  backgroundColor: '#F0F4F8' }} >
-                           <Text style={{ fontSize:20, fontWeight:'bold',color:defaultColors.gray , alignSelf:"flex-start", marginLeft:15 }}> Nova Característica </Text>
-
-                <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
-                      <View style={{ backgroundColor:'#FFF',elevation:4, alignItems:"center", width:'20%', height:60, borderRadius:5  }}>
-                          <Ionicons name="options" size={55} color={defaultColors.darkBlue} />
-                       </View>
-                    <View style={{width:'100%', gap:10 }}>
-
-                           <Text style={{ fontSize:15, fontWeight:'bold',color:defaultColors.gray  }}> Unidade </Text>
-                                <TextInput
-                                 onChangeText={(value:any)=> setUnidade( value )}
-                                  style={{ height:'auto',backgroundColor:'#FFF',color:defaultColors.gray, fontWeight:"bold", fontSize:15, width: '50%', elevation:2, borderRadius:5}}
-                                  placeholder="Ex.: Und:"
-                                  placeholderTextColor={defaultColors.ligthGray}
-                                />
-
-                    </View>
-                </View>
-
-
-                       <View style={{    alignItems:"center"}}>
-                           <Text style={{ fontSize:20, fontWeight:'bold',color:defaultColors.gray , alignSelf:"flex-start", marginLeft:15 }}> Descrição </Text>
-                              <TextInput
-                                onChangeText={(value:any)=> setDescricao( value )}
-                                style={{ height:'auto',backgroundColor:'#FFF',color:defaultColors.gray, fontWeight:"bold", fontSize:15,width: '90%', elevation:2, borderRadius:5}}
-                                placeholder="Ex.: Metros"  
-                                  placeholderTextColor={defaultColors.ligthGray}
-                          />
-                        </View> 
-
-                
-                <View style={{ flexDirection: "row", marginTop:50 ,width: '100%', alignItems: "center", justifyContent: "center" }} >
-                    <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center",elevation:3, justifyContent: "center", borderRadius:  5, padding: 5 }}
-                        onPress={()=>gravar()}
-                    >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 21 }}>gravar</Text>
-                    </TouchableOpacity>
-                </View> 
-               </View>
-
+            <TouchableOpacity
+              style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: 24, elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 }}
+              onPress={() => gravar()}
+            >
+              <Text style={{ fontWeight: 'bold', color: '#FFF', fontSize: 18 }}>Gravar Característica</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
     )
 }

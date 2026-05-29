@@ -10,6 +10,9 @@ import { configMoment } from "../../services/moment";
 import { FontAwesome5, Octicons } from "@expo/vector-icons";
 import { defaultColors } from "../../styles/global";
 import { RenderItemsService } from "./renderItemServices";
+import { CustomHeader } from "../../components/custom-header";
+import { EmptyState } from "../../components/empty-state";
+import { Fab } from "../../components/fab";
 
 
 type servico  = {
@@ -135,32 +138,17 @@ async function gravar(){
 
 
     return(
-        <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
+        <View style={{ flex:1, backgroundColor:'#EAF4FE', width:"100%" }}>
             
             <LodingComponent isLoading={loading} />
 
-        <View style={{ backgroundColor:'#185FED', }}> 
-           <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-              <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                  <Ionicons name="arrow-back" size={25} color="#FFF" />
-              </TouchableOpacity>
-          
-                
-              <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                  < TextInput 
-                      style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                      onChangeText={(value)=>setPesquisa(value)}
-                      placeholder="pesquisar"
-                  /> 
-
-                  <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
-                      >
-                          <AntDesign name="filter" size={35} color="#FFF" />
-                      </TouchableOpacity>
-                  </View>
-           </View>
-               <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Serviços </Text>
-         </View>
+            <CustomHeader
+                title="Serviços"
+                onBack={() => navigation.goBack()}
+                showSearch
+                searchValue={pesquisa}
+                onSearchChange={(v) => setPesquisa(v)}
+            />
          
         {/*          */}
         <Modal transparent={true} visible={ visible && visible}>
@@ -237,34 +225,15 @@ async function gravar(){
 
 
         <View style={ { marginTop:4} } > 
-             <FlatList
-                 data={dados}
-                 renderItem={({item})=>  <RenderItemsService handleSelect={handleSelect} item={item} />}
-                 
-                 keyExtractor={(i)=>i.codigo}
-             />
+              <FlatList
+                  data={dados || []}
+                  renderItem={({item})=>  <RenderItemsService handleSelect={handleSelect} item={item} />}
+                  keyExtractor={(i)=>i.codigo}
+                  ListEmptyComponent={() => <EmptyState icon="build" message="Nenhum serviço encontrado" />}
+              />
             </View>
 
-            <TouchableOpacity
-                style={{
-                    backgroundColor: '#185FED', 
-                    width: 50, 
-                    height: 50,   
-                    borderRadius: 25,  
-                    position: "absolute",       
-                    bottom: 150,                 
-                    right: 30,                   
-                    elevation: 10,               
-                    alignItems: "center", 
-                    justifyContent: "center",
-                    zIndex: 999,             // Garante que o botão fique sobre os outros itens
-                }}
-                onPress={() => {
-                     navigation.navigate('cadastro_servico')
-                }}
-            >
-                <MaterialIcons name="add-circle" size={45} color="#FFF" />
-            </TouchableOpacity>
+            <Fab onPress={() => navigation.navigate('cadastro_servico')} />
         
         </View>
     )

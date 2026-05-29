@@ -7,6 +7,9 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useEffect, useState } from "react";
 import { fpgt, useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
 import { RenderItemsFormaPagamento } from "./renderItensFormaPagamento/RenderItensFormaPagamento";
+import { CustomHeader } from "../../components/custom-header";
+import { EmptyState } from "../../components/empty-state";
+import { Fab } from "../../components/fab";
 
 type IFptg={
     item:fpgt
@@ -86,47 +89,27 @@ function renderItem({item}:IFptg){
         <View style={{ flex:1 ,    backgroundColor:'#EAF4FE'}}>
             
             
-            <View style={{   padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-                     <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                         <Ionicons name="arrow-back" size={25} color="#FFF" />
-                     </TouchableOpacity>
-                       
-                     <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                         < TextInput  
-                             style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                             onChangeText={(value)=>setPesquisa(value)}
-                             placeholder="pesquisar"
-        
-                         /> 
-        
-                             <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
-                             >
-                                 <AntDesign name="filter" size={35} color="#FFF" />
-                             </TouchableOpacity>
-                             
-                       </View>
-
-                 </View>
+            <CustomHeader
+                title="Formas de Pagamento"
+                onBack={() => navigation.goBack()}
+                showSearch
+                searchValue={pesquisa}
+                onSearchChange={(v) => setPesquisa(v)}
+                showFilter
+            />
           
 
 {/**  */}
            <View style={{ marginTop:10}}> 
-                <FlatList
-                data={ dados }
-                renderItem = {( {item} )=> <RenderItemsFormaPagamento handleSelect={handleSelect} item={item} /> } 
-                keyExtractor={(i:any)=> i.codigo}
-                />
+                 <FlatList
+                 data={ dados }
+                 renderItem = {( {item} )=> <RenderItemsFormaPagamento handleSelect={handleSelect} item={item} /> } 
+                 keyExtractor={(i:any)=> i.codigo}
+                 ListEmptyComponent={() => <EmptyState icon="payment" message="Nenhuma forma de pagamento encontrada" />}
+                 />
             </View>
         {/**  */}
-            <TouchableOpacity
-                style={{ backgroundColor: '#185FED',  width: 50, height: 50, borderRadius: 25,  position: "absolute", bottom: 150,   right: 30,  elevation: 10,  alignItems: "center", justifyContent: "center", zIndex: 999,             // Garante que o botão fique sobre os outros itens
-                }}
-                onPress={() => {
-                   navigation.navigate('cadastro_formaPagamento')
-                }}
-            >
-                <MaterialIcons name="add-circle" size={45} color="#FFF" />
-            </TouchableOpacity>
+            <Fab onPress={() => navigation.navigate('cadastro_formaPagamento')} />
 
         </View>
     )

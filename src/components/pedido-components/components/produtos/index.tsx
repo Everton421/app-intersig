@@ -30,6 +30,7 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
 
       const useFunctions = useFunctionsProducts();
  
+      /*
   useEffect(() => {
     const busca = async () => {
       if (pesquisa.trim() === "") {
@@ -61,7 +62,8 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
     return () => clearTimeout(timerId);
 
   }, [pesquisa  ]);
-
+*/
+  /** 
   useEffect(() => {
     async function init() {
       if (codigo_orcamento && codigo_orcamento > 0 && orcamento.codigo === codigo_orcamento) {
@@ -92,7 +94,9 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
     console.log('carregando produtos...')
     init();
     // A dependência setOrcamento é estável, mas é bom incluí-la
-  }, [codigo_orcamento  ]);
+  }, []);
+*/
+  //  }, [codigo_orcamento  ]);
 
  
 
@@ -101,24 +105,29 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
       <TouchableOpacity onPress={() => setVisibleProdutos(true)} style={styles.searchButton}>
         <FontAwesome name="search" size={22} color="#FFF" />
         <Text style={styles.searchButtonText}>Produtos</Text>
-        <AntDesign name="caretdown" size={22} color="white" />
+        <AntDesign name="caret-down" size={22} color="white" />
       </TouchableOpacity>
 
       <Modal visible={visibleProdutos} animationType="slide" transparent={true} onRequestClose={() => setVisibleProdutos(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.searchContainer}>
-            
-                <TouchableOpacity onPress={() => setVisibleProdutos(false)}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                   <Ionicons name="close" size={28} color={ '#6C757D' } />
-                 </TouchableOpacity>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Pesquisar produto..."
-                onChangeText={setPesquisa} // Direto, pois o useEffect já tem debounce
-                placeholderTextColor= {defaultColors.gray}
-                autoFocus
-              />
+            <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Selecionar Produto</Text>
+              <TouchableOpacity onPress={() => setVisibleProdutos(false)} style={{ padding: 4 }}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 10, borderWidth: 1, borderColor: '#E0E0E0', paddingHorizontal: 12, height: 45 }}>
+                <Ionicons name="search" size={20} color="#185FED" style={{ marginRight: 8 }} />
+                <TextInput
+                  style={{ flex: 1, color: '#333', fontSize: 15 }}
+                  placeholder="Pesquisar produto..."
+                  placeholderTextColor="#999"
+                  onChangeText={setPesquisa}
+                  autoFocus
+                />
+              </View>
             </View>
             {loading ? (
               <ActivityIndicator size="large" color="#185FED" style={{ flex: 1 }} />
@@ -164,15 +173,14 @@ export const ListaProdutos = React.memo(({ codigo_orcamento }: any) => {
   );
 });
 
-// Estilos otimizados e mais organizados
 const styles = StyleSheet.create({
-     container: { flex: 1 },
-      searchContainer: { padding: 10, backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 10 },
-      searchButton: { marginTop: 5, margin: 5, elevation: 10, flexDirection: "row", justifyContent: "space-between", backgroundColor: "#185FED", padding: 10, borderRadius: 7, width: "98%", alignItems: 'center' },
-      searchButtonText: { color: "white", fontWeight: "bold", fontSize: 20, flex: 1, textAlign: "center" },
-      modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' },
-      modalContent: { margin: 0, backgroundColor: "#F0F4F8", borderRadius: 20, width: "100%", height: "90%", shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
-      searchInput: { backgroundColor: "#FFF",fontSize:15, fontWeight:"bold",borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd' },
-      totalContainer: { flexDirection: "row", justifyContent: "space-between", margin: 10 },
-      totalProdutosText: { fontSize: 15, fontWeight: "bold", color: '#6C757D' },
+  container: { flex: 1 },
+  searchContainer: { padding: 10, backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, elevation: 10 },
+  searchButton: { marginTop: 5, margin: 5, elevation: 10, flexDirection: "row", justifyContent: "space-between", backgroundColor: "#185FED", padding: 10, borderRadius: 7, width: "98%", alignItems: 'center' },
+  searchButtonText: { color: "white", fontWeight: "bold", fontSize: 20, flex: 1, textAlign: "center" },
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, width: "100%", height: "90%", elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 },
+  searchInput: { backgroundColor: "#FFF", fontSize: 15, fontWeight: "bold", borderRadius: 8, width: "95%", alignSelf: 'center', marginTop: 5, elevation: 3, padding: 15, borderWidth: 1, borderColor: '#ddd' },
+  totalContainer: { flexDirection: "row", justifyContent: "space-between", margin: 10 },
+  totalProdutosText: { fontSize: 15, fontWeight: "bold", color: '#6C757D' },
 });

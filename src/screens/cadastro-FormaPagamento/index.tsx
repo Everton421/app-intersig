@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Alert,  FlatList,    Text, TouchableOpacity, View } from "react-native"
-import { TextInput } from "react-native-gesture-handler"
+import { Alert, FlatList, Text, TouchableOpacity, View, TextInput, ScrollView } from "react-native"
 import useApi from "../../services/api";
 import { useFormasDePagamentos } from "../../database/queryFormasPagamento/queryFormasPagamento";
 import NetInfo from '@react-native-community/netinfo';
@@ -8,6 +7,7 @@ import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
 import { defaultColors } from "../../styles/global";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { CustomHeader } from "../../components/custom-header";
 
 
 export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
@@ -157,60 +157,60 @@ export const Cadastro_FormaPagamento = ( { route, navigation}:any ) => {
 
 
     return (
-        <View style={{ flex:1 ,  backgroundColor:'#EAF4FE'}}>
-
-            <LodingComponent isLoading={loading} />
-    
-                    <View style={{ marginTop:20}}>
-                     <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:20  }} > Descrição:</Text>
-                        <View style={{ margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 3 }}>
-                                <TextInput
-                                    style={{ padding: 5, backgroundColor: '#FFF' ,fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
-                                    placeholder=" 30/60 dias"
-                                    onChangeText={(v:any)=> setDescricao(v)}
-                                    value={descricao}
-                                />
-                        </View>    
-                    </View>
-                    <View style={{margin:5, flexDirection:"row", alignItems:"center", justifyContent:"space-between",   width:'100%'}}>
-
-                        <View style={{ width:'50%',marginTop:10 }}>
-                            <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:17  }} > quantidade de parcelas:</Text>
-                                    <TextInput
-                                        style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF',fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
-                                        placeholder="ex. 2"
-                                        onChangeText={(v:any)=> setQuantidade(v)}
-                                        defaultValue={String(quantidade)}
-                                        keyboardType="numeric"
-                                />
-                           </View>
-
-                            <View style={{ width:'50%' }}>
-                             <Text style={{   left:5, bottom:5  ,fontWeight:"bold", color:defaultColors.gray, fontSize:17   }} >intervalo entre parcelas:</Text>
-                                <TextInput
-                                    style={{ elevation:2,borderRadius:5 ,width:'90%',margin:5,padding: 5, backgroundColor: '#FFF',fontWeight:"bold", color:defaultColors.gray, fontSize:20 }}
-                                    placeholder="ex. 30"
-                                     onChangeText={(v:any)=> setIntervalo(v)}
-                                     defaultValue={String(intervalo)}
-                                     keyboardType="numeric"
-                                />
-                            </View>
-                    </View>
-                   
-                  {/*** */}
-                    <Gerar/>
-                            
-
-             <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center", marginTop: 10 }} >
-                    <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 7, padding: 5 ,elevation:7 }}
-                       onPress={ ()=> gravar()}
-                    >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
-                    </TouchableOpacity>
+        <View style={{ flex: 1, backgroundColor: '#F0F4F8' }}>
+          <LodingComponent isLoading={loading} />
+          <CustomHeader
+            title="Forma de Pagamento"
+            showSearch={false}
+            onBack={() => navigation.goBack()}
+          />
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <View style={{ backgroundColor: '#FFF', borderRadius: 12, padding: 16, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+              <View style={{ marginBottom: 16 }}>
+                <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Descrição</Text>
+                <TextInput
+                  style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                  placeholder="Ex: 30/60 dias"
+                  placeholderTextColor="#999"
+                  onChangeText={(v) => setDescricao(v)}
+                  value={descricao}
+                />
               </View>
-  
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Qtd. Parcelas</Text>
+                  <TextInput
+                    style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                    placeholder="Ex: 2"
+                    placeholderTextColor="#999"
+                    onChangeText={(v) => setQuantidade(v)}
+                    defaultValue={String(quantidade)}
+                    keyboardType="numeric"
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Intervalo (dias)</Text>
+                  <TextInput
+                    style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                    placeholder="Ex: 30"
+                    placeholderTextColor="#999"
+                    onChangeText={(v) => setIntervalo(v)}
+                    defaultValue={String(intervalo)}
+                    keyboardType="numeric"
+                  />
+                </View>
+              </View>
+            </View>
 
+            <Gerar />
+
+            <TouchableOpacity
+              style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: 20, elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 }}
+              onPress={() => gravar()}
+            >
+              <Text style={{ fontWeight: 'bold', color: '#FFF', fontSize: 18 }}>Gravar</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
     )
 }

@@ -211,7 +211,7 @@ export const ParcelasPersonalizadas = ({orcamentoEditavel}) => {
                          <AntDesign name="creditcard" size={25} color="white" />
                      <Text style={{color:'white', fontWeight:"bold",fontSize:20}}> 
                             parcelas</Text>
-                     <AntDesign name="caretdown" size={23} color="white" />
+                     <AntDesign name="caret-down" size={23} color="white" />
                     </View> 
 
             </TouchableOpacity>

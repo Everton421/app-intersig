@@ -265,7 +265,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
                             )
                  }
                 {  isSelected ? null : (
-                  <AntDesign name="caretdown" size={24} color={"black"} />
+                  <AntDesign name="caret-down" size={24} color={"black"} />
                 )}
             </View>
         <Text
@@ -366,7 +366,7 @@ export const ListaProdutos = ({ codigo_orcamento }:any) => {
             textAlign:"center"  }} >
           produtos
         </Text>
-        <AntDesign name="caretdown" size={22} color="white" />
+        <AntDesign name="caret-down" size={22} color="white" />
       </TouchableOpacity>
 
       <View>

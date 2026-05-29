@@ -27,7 +27,7 @@ type props={
     
 }
 export const SelectCliente = ({codigoCliente, setCodigoCliente}:props ) =>{
-    const [pesquisa, setPesquisa] = useState('');
+    const [pesquisa, setPesquisa] = useState<string>('');
     const [ data, setData ] = useState([])
     const [ visible, setVisible]= useState<boolean>(false)
     const [ nomeCliente, setNomeCliente ] = useState<string>();
@@ -35,7 +35,7 @@ export const SelectCliente = ({codigoCliente, setCodigoCliente}:props ) =>{
      const useQueryClients = useClients();
 
     ////////////////////
-        useEffect(() => {
+  /*      useEffect(() => {
           const busca = async () => {
               try{
                 let aux:any = await  useQueryClients.selectByDescription(pesquisa,10);
@@ -48,7 +48,7 @@ export const SelectCliente = ({codigoCliente, setCodigoCliente}:props ) =>{
               setPesquisa('');
             }
         }, [pesquisa]);
-  
+  */
 
         useEffect(() => {
             const busca = async () => {
@@ -111,47 +111,38 @@ return(
                                 <Text style={{ fontWeight: "bold",fontSize:25, color: defaultColors.gray }}numberOfLines={2} >Cliente</Text>
                             )
                         }
-                        <AntDesign name="caretdown" size={24} color={ defaultColors.darkBlue} />
+                        <AntDesign name="caret-down" size={24} color={ defaultColors.darkBlue} />
                 </TouchableOpacity>
 
-      <Modal visible={visible}  animationType="slide"  transparent={true} >
-                  <View style={{ backgroundColor: "rgba(0, 0, 0, 0.7)", flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 15 }}>
-                                  <View
-                                      style={{
-                                          margin: 20,backgroundColor: 'white',borderRadius: 20,width: '90%',height: '90%',shadowColor: '#000',
-                                          shadowOffset: {
-                                              width: 0,
-                                              height: 2,
-                                          },shadowOpacity: 0.25,shadowRadius: 4,elevation: 5,
-                                      }} >
-                  
-                          <View style={{padding:5}}>
-                           <TouchableOpacity  onPress={()=>setVisible(false)}  style={ { width:'15%'  ,padding: 16, borderRadius: 12    }}>
-                              <Ionicons name="close" size={28} color={ '#6C757D' } />
-                           </TouchableOpacity>
-                          </View>
-
-                          <View style={{marginBottom:20, margin:5, flexDirection:'row',justifyContent:'space-between', elevation:5}}>
-                              <TextInput
-                                  style={{  backgroundColor: '#FFF', borderRadius: 4 ,width:'90%',  padding: 10, margin:2,  elevation: 5, fontWeight:"bold", fontSize: 15, color: defaultColors.gray }}
-                                  placeholder='Pesquisar'
-                                  value={pesquisa}
-                                  onChangeText={setPesquisa}
-                                  placeholderTextColor={ defaultColors.gray} 
-                              />
-                                 
-                          </View>
-
-                          <View style={{backgroundColor:'#dcdcdd'}}>
-                              <FlatList
-                                  data={data}
-                                  renderItem={renderItem}
-                                  keyExtractor={(item) => item.codigo.toString()}
-                              />
-                          </View>
-
-                          </View>
-                  </View>
+      <Modal visible={visible} animationType="slide" transparent={true}>
+        <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: "#FFF", borderTopLeftRadius: 20, borderTopRightRadius: 20, width: "100%", height: "90%", elevation: 10, shadowColor: "#000", shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.25, shadowRadius: 5 }}>
+            <View style={{ backgroundColor: '#185FED', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={{ color: '#FFF', fontSize: 18, fontWeight: 'bold' }}>Selecionar Cliente</Text>
+              <TouchableOpacity onPress={() => setVisible(false)} style={{ padding: 4 }}>
+                <Ionicons name="close" size={24} color="#FFF" />
+              </TouchableOpacity>
+            </View>
+            <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F7FA', borderRadius: 10, borderWidth: 1, borderColor: '#E0E0E0', paddingHorizontal: 12, height: 45 }}>
+                <Ionicons name="search" size={20} color="#185FED" style={{ marginRight: 8 }} />
+                <TextInput
+                  style={{ flex: 1, color: '#333', fontSize: 15, fontWeight: 'normal' }}
+                  placeholder='Pesquisar cliente...'
+                  placeholderTextColor="#999"
+                  value={pesquisa}
+                  onChangeText={setPesquisa}
+                />
+              </View>
+            </View>
+            <FlatList
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.codigo.toString()}
+              contentContainerStyle={{ paddingHorizontal: 12, paddingBottom: 20 }}
+            />
+          </View>
+        </View>
       </Modal>
     </View>
  )
@@ -163,11 +154,15 @@ const styles = StyleSheet.create({
      
   },
   item: {
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderRadius: 5,
-    elevation: 5
+    padding: 16,
+    marginVertical: 6,
+    marginHorizontal: 4,
+    borderRadius: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   input: {
     backgroundColor: '#FFF',

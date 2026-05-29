@@ -1,12 +1,11 @@
-import { Alert, Button, Image, Text, TouchableOpacity, View } from "react-native"
-import { TextInput } from "react-native-gesture-handler"
- 
+import { Alert, Text, TouchableOpacity, View, TextInput, ScrollView } from "react-native"
 import useApi from "../../services/api"
 import { useContext, useEffect, useState } from "react"
 import { useCategoria } from "../../database/queryCategorias/queryCategorias"
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading"
+import { CustomHeader } from "../../components/custom-header"
 
 export const Cadastro_Categorias = ({navigation}:any) => {
 
@@ -73,48 +72,36 @@ export const Cadastro_Categorias = ({navigation}:any) => {
  
 
     return (
-        <View style={{ flex: 1 }}>
-            <LodingComponent isLoading={loading} />
-
-            <View style={{ width: '100%', height: '100%', backgroundColor: '#EAF4FE' }} >
-                <View style={{ margin: 10, gap: 15, flexDirection: "row" }}>
-                    <Image
-                        style={{ width: 70, height: 70 }}
-                        source={{
-                            uri: 'https://reactnative.dev/img/tiny_logo.png'
-                        }}
-                    />
-                </View>
-                <Text style={{ fontWeight:"bold", fontSize:20, color:'#185FED'}} > categoria </Text>
-
-                <View style={{ margin: 7, backgroundColor: '#FFF', padding: 2, borderRadius: 5, elevation: 5 }}>
-                    <TextInput
-                        style={{ padding: 5, backgroundColor: '#FFF' }}
-                        placeholder="descrição"
-                        onChangeText={(v:any)=> setInput(v)}
-                        //value={input}
-                    />
-              
-                </View>
-                   <View style={{ alignItems:"center"}}>  
-                     {   categoriaApi && 
-                            <Text style={{ color:'red' }}>
-                                Já existe uma categoria cadastrada com esta descricao! 
-                            </Text>
-                      }
-                   </View>   
-
-                <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center", marginTop: 10 }} >
-                    <TouchableOpacity 
-                    style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius: 15, padding: 5 }}
-                        onPress={ ()=> gravar()}
-                    >
-                        <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
-                    </TouchableOpacity>
-                </View>
+        <View style={{ flex: 1, backgroundColor: '#F0F4F8' }}>
+          <LodingComponent isLoading={loading} />
+          <CustomHeader
+            title="Nova Categoria"
+            showSearch={false}
+            onBack={() => navigation.goBack()}
+          />
+          <ScrollView contentContainerStyle={{ padding: 16 }}>
+            <View style={{ backgroundColor: '#FFF', borderRadius: 12, padding: 16, elevation: 3, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 }}>
+              <Text style={{ fontWeight: '600', fontSize: 14, color: '#6C757D', marginBottom: 6 }}>Descrição da Categoria</Text>
+              <TextInput
+                style={{ borderWidth: 1, borderColor: '#DEE2E6', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 10, fontSize: 16, color: '#333', backgroundColor: '#F9F9F9' }}
+                placeholder="Ex: Filtros"
+                placeholderTextColor="#999"
+                onChangeText={(v) => setInput(v)}
+              />
+              {categoriaApi && (
+                <Text style={{ color: '#E53935', marginTop: 8, fontWeight: '500' }}>
+                  Já existe uma categoria cadastrada com esta descrição!
+                </Text>
+              )}
             </View>
 
-
+            <TouchableOpacity
+              style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: 24, elevation: 4, shadowColor: '#185FED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 6 }}
+              onPress={() => gravar()}
+            >
+              <Text style={{ fontWeight: 'bold', color: '#FFF', fontSize: 18 }}>Gravar Categoria</Text>
+            </TouchableOpacity>
+          </ScrollView>
         </View>
     )
 }

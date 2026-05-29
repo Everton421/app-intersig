@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 
-import { View, FlatList, Text, Alert,   TouchableOpacity,   Image, ActivityIndicator, ScrollView } from "react-native";
+import { View, FlatList, Text, TouchableOpacity, Image, ActivityIndicator, ScrollView } from "react-native";
 import { AuthContext } from "../../contexts/auth";
 import { AntDesign, FontAwesome6 } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import { restartDatabaseService } from "../../database/restart-database";
 import { queryEmpresas } from "../../database/queryEmpresas/queryEmpresas";
 import  useApi from "../../services/api";
 import { defaultColors } from "../../styles/global";
+import { CustomAlert } from "../../components/custom-alert";
 import { queryConfig_api } from "../../database/queryConfig_Api/queryConfig_api";
 import { configMoment } from "../../services/moment";
 import { useSyncProdutos } from "../../hooks/sync-produtos/useSyncProdutos";
@@ -57,6 +58,10 @@ export const Home = ({ navigation }: any) => {
  const [isLoading, setIsLoading] = useState(false);
 
   const [sair, setSair] = useState<boolean>(false)
+  const [visibleAlert, setVisibleAlert] = useState(false);
+  const [messageAlert, setMessageAlert] = useState('');
+  const [typeAlert, setTypeAlert] = useState<'success' | 'error' | 'warning' | 'info'>('warning');
+  const [titleAlert, setTitleAlert] = useState('');
   const [cadEmpresa, setCadEmpresa] = useState<cadEmpre>()
   const [loaidngEmpr, setLoadingEmpr] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -166,16 +171,10 @@ async function buscaEmpresa (){
 
 
   function alertSair() {
-    Alert.alert('Sair', 'Ao sair serão excluidos os dados do aplicativo, será necessario efetuar uma nova sincronização',
-      [
-        {
-          text: 'Cancelar',
-          onPress: () => setSair(false),
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: () => setSair(true) }
-      ]);
-
+    setTitleAlert('Sair');
+    setMessageAlert('Ao sair serão excluídos os dados do aplicativo, será necessário efetuar uma nova sincronização');
+    setTypeAlert('warning');
+    setVisibleAlert(true);
   }
 
   useEffect(() => {
@@ -231,15 +230,26 @@ async function buscaEmpresa (){
   return (
     <View style={{ flex: 1, backgroundColor: "#EAF4FE" , height:'auto'}}>
 
-   <InitialLoadingData 
-       isLoading={isLoading}
-       item={item}
-       progress={progress}  />
+      <CustomAlert
+          visible={visibleAlert}
+          message={messageAlert}
+          onConfirm={() => { setVisibleAlert(false); setSair(true); }}
+          onCancel={() => setVisibleAlert(false)}
+          title={titleAlert}
+          type={typeAlert}
+          confirmText="OK"
+          cancelText="Cancelar"
+      />
+      <InitialLoadingData 
+        isLoading={isLoading}
+        item={item}
+        progress={progress}  />
 
       <View style={{  backgroundColor:  defaultColors.darkBlue , elevation: 7, padding: 5,height:200,borderBottomEndRadius:50, borderStartEndRadius:50}}>
          <View  >
             < View style={{ width:'100%' ,alignItems: "center",    flexDirection: "row", justifyContent:"space-between"}} >
-                    <View style={{ backgroundColor: '#FFF', borderRadius: 55, padding: 3, margin: 3 }}>
+                    <TouchableOpacity style={{ backgroundColor: '#FFF', borderRadius: 55, padding: 3, margin: 3 }}
+                      onPress={()=> console.log(cadEmpresa)}>
 
                     <Image
                       style={{ width: 45, height: 45, resizeMode: 'stretch', }}
@@ -247,7 +257,7 @@ async function buscaEmpresa (){
                         require('../../imgs/intersig120x120.png')
                       }
                     />
-                  </View>
+                  </TouchableOpacity>
 
                   {
                     loaidngEmpr ? (
@@ -273,30 +283,29 @@ async function buscaEmpresa (){
 
       </View>
 
-      <ScrollView style={{ flex:1}}>
-    
+      <ScrollView style={{ flex: 1 }}>
 
-        <View style={{ alignItems: "center", width: '100%', marginTop: 15, marginBottom:60 }}>
+        <View style={{ width: '100%', alignItems: "center", justifyContent: "center" }}>
 
-          <View style={{ flexDirection: "row", width: '100%', alignItems: "center", justifyContent: "center" }}>
-            <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
-              onPress={() => { navigation.navigate('ViewTabProdutos') }} >
-              <View style={{ backgroundColor: defaultColors.ligthBlue, flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-                   <FontAwesome name="cubes" size={24} color={defaultColors.darkBlue} />
-              </View>
-              <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '80%', textAlign: 'center' }} >Produtos</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flexDirection: "row", padding: 10, marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '80%', height: 80, borderRadius: 10, elevation: 2, justifyContent: "space-around", alignItems: "center" }}
+            onPress={() => { navigation.navigate('ViewTabProdutos') }} >
+            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+              <FontAwesome name="cubes" size={24} color={defaultColors.darkBlue} />
+            </View>
+            <Text style={{ fontWeight: "bold", fontSize: 17, color: defaultColors.gray, flex: 1, textAlign: 'center' }} >Produtos</Text>
+            <AntDesign name="caret-down" size={24} color={defaultColors.darkBlue} />
+          </TouchableOpacity>
 
-            <TouchableOpacity style={{ marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '40%', padding: 15, borderRadius: 10, elevation: 2, justifyContent: "space-between", alignItems: "center" }}
-              onPress={() => { navigation.navigate('serviços') }} >
-              <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-                <Feather name="tool" size={30} color={defaultColors.darkBlue} />
-              </View>
-              <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '80%', textAlign: 'center' }} >Serviços</Text>
-            </TouchableOpacity>
-          </View>
-
-
+          <TouchableOpacity
+            style={{ flexDirection: "row", padding: 10, marginTop: 15, margin: 10, backgroundColor: '#FFF', width: '80%', height: 80, borderRadius: 10, elevation: 2, justifyContent: "space-around", alignItems: "center" }}
+            onPress={() => { navigation.navigate('serviços') }} >
+            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
+              <Feather name="tool" size={30} color={defaultColors.darkBlue} />
+            </View>
+            <Text style={{ fontWeight: "bold", fontSize: 17, color: defaultColors.gray, flex: 1, textAlign: 'center' }} >Serviços</Text>
+            <AntDesign name="caret-down" size={24} color={defaultColors.darkBlue} />
+          </TouchableOpacity>
 
           <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
             onPress={() => { navigation.navigate('clientes') }}
@@ -304,46 +313,23 @@ async function buscaEmpresa (){
             <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
               <FontAwesome6 name="users" size={25} color={defaultColors.darkBlue}/>
             </View>
-            <Text style={{ fontWeight: "bold", fontSize: 18, color:   defaultColors.gray, width: '50%', textAlign: 'center' }} >Clientes</Text>
-            <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
-          </TouchableOpacity>
-
-
-          <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-            onPress={() => { navigation.navigate('veiculos') }}
-          >
-            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-            <MaterialCommunityIcons name="car-multiple" size={30} color={defaultColors.darkBlue} />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 18, color: defaultColors.gray, width: '50%', textAlign: 'center' }} >Veículos</Text>
-            <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
-          </TouchableOpacity>
-          
-
-
-          <TouchableOpacity style={{ backgroundColor: '#FFF', marginTop: 15, width: '80%', padding: 15, borderRadius: 10, elevation: 2, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-            onPress={() => { navigation.navigate('formasPagamento') }}
-          >
-            <View style={{ backgroundColor: '#EAF4FE', flexDirection: "row", height: 50, width: 50, alignItems: "center", justifyContent: "center", borderRadius: 7, elevation: 3 }}>
-            <MaterialCommunityIcons name="credit-card-check" size={30}   color={defaultColors.darkBlue}  />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 15, color:  defaultColors.gray, width: '50%', textAlign: 'center' }} >Formas de Pagamento</Text>
-            <AntDesign name="caretdown" size={24} color={defaultColors.darkBlue} />
+            <Text style={{ fontWeight: "bold", fontSize: 18, color: defaultColors.gray, width: '50%', textAlign: 'center' }} >Clientes</Text>
+            <AntDesign name="caret-down" size={24} color={defaultColors.darkBlue} />
           </TouchableOpacity>
 
         </View>
-     </ScrollView> 
+      </ScrollView>
 
-      <View style={{  flexDirection: "row", position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor:  defaultColors.darkBlue , padding: 10, justifyContent: "space-between", }}>
+      <View style={{ flexDirection: "row", position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: defaultColors.darkBlue , padding: 10, justifyContent: "space-between", }}>
         <Text style={{ color: '#FFF', fontSize: 20, fontWeight: "bold", width: '50%' }}>
-        <FontAwesome name="user-circle-o" size={24} color={'#FFF'} /> {usuario && usuario.nome}
+          {usuario && usuario.nome}
         </Text>
 
         <TouchableOpacity onPress={() => alertSair()} style={{ flexDirection: "row" }}>
           <Text style={{ color: '#FFF', fontWeight: "bold" }} >Sair</Text>
           <MaterialCommunityIcons name="logout" size={24} color="white" />
         </TouchableOpacity>
- 
+
       </View>
  
     </View>

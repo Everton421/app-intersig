@@ -10,6 +10,9 @@ import { LodingComponent } from "../../components/loading";
 import { configMoment } from "../../services/moment";
 import { useCaracteristica } from "../../database/queryCaracteristicas/queryCaracteristicas";
 import { RenderItensCaracteristicas } from "./renderItem";
+import { CustomHeader } from "../../components/custom-header";
+import { EmptyState } from "../../components/empty-state";
+import { Fab } from "../../components/fab";
 
 type caracteristica= { codigo:number, descricao:string, unidade:string}
 
@@ -18,7 +21,7 @@ export const Caracteristicas = ({navigation}:any)=>{
     const [ dados, setDados ] = useState<caracteristica[]>();
     const [ pesquisa, setPesquisa ] = useState<string | undefined>('');
     const [ visible, setVisible ] = useState<boolean>(false);
-    const [ caracteristicaSelecionada, setCaracteristicaSelecionada ] = useState();
+    const [ caracteristicaSelecionada, setCaracteristicaSelecionada ] = useState<any>();
     const [ loading , setLoading ] = useState(false);
 
     const useQueryCaracterisca = useCaracteristica();
@@ -29,7 +32,7 @@ export const Caracteristicas = ({navigation}:any)=>{
                 ()=>{
                     
                     async function busca(){ 
-                            let data:any  = await useQueryCaracterisca.selectAll(0)
+                            let data:any  = await useQueryCaracterisca.selectAll()
                             if( data?.length > 0  ){
                                 setDados(data) 
                             }   
@@ -57,35 +60,35 @@ export const Caracteristicas = ({navigation}:any)=>{
 
 
 
-        function handleSelect(item){
+        function handleSelect(item:any){
             setVisible(true);
             setCaracteristicaSelecionada(item)
         }
 
-/*
 async function gravar(){
-  if( !marcaSelecionada?.descricao ) return Alert.alert("Erro!", "É necessario informar a descrição para poder gravar!") 
+  if( !caracteristicaSelecionada?.descricao ) return Alert.alert("Erro!", "É necessario informar a descrição para poder gravar!") 
 
     try{
         
         setLoading(true);
-        let objmarca:any = {
-                    "codigo": marcaSelecionada && marcaSelecionada.codigo,
-                    "descricao": marcaSelecionada.descricao,
-                    "data_cadastro": marcaSelecionada.data_cadastro,
+        let objCaracteristica:any = {
+                    "codigo": caracteristicaSelecionada && caracteristicaSelecionada.codigo,
+                    "descricao": caracteristicaSelecionada.descricao,
+                    "unidade": caracteristicaSelecionada.unidade,
+                    "data_cadastro": caracteristicaSelecionada?.data_cadastro,
                     "data_recadastro": dateService.dataHoraAtual(),
-                    "id": marcaSelecionada.id
+                    "id": caracteristicaSelecionada?.id
                     }
-        let result = await api.put('/marca', objmarca);
+        let result = await api.put('/caracteristica', objCaracteristica);
         
         if(result.status === 200 ){
             try{
-              let resultDb = await useQueryMarcas.update(objmarca, marcaSelecionada.codigo);
+              let resultDb = await useQueryCaracterisca.update(objCaracteristica, caracteristicaSelecionada.codigo);
                 }catch(e){
-            return Alert.alert('Erro!', 'Erro ao Tentar registrar serviço no banco local!');
+            return Alert.alert('Erro!', 'Erro ao Tentar registrar característica no banco local!');
             }
             setVisible(false)
-            return Alert.alert('', ` Marca: ${marcaSelecionada?.descricao} Alterado Com Sucesso! ` );
+            return Alert.alert('', ` Característica: ${caracteristicaSelecionada?.descricao} Alterado Com Sucesso! ` );
         }
 
 
@@ -101,109 +104,70 @@ async function gravar(){
         setLoading(false);
     }
 }
-*/
 
     return(
 
         <View style={{   flex:1,  backgroundColor:'#EAF4FE'}} >
                    <LodingComponent isLoading={loading} />
        
-         <View style={{backgroundColor:'#185FED' }}>    
-            <View style={{   padding:15, backgroundColor:'#185FED', alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-                <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                    <Ionicons name="arrow-back" size={25} color="#FFF" />
-                </TouchableOpacity>
-            
-                  
-                <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                    < TextInput 
-                        style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                        onChangeText={(value)=>setPesquisa(value)}
-                        placeholder="pesquisar"
-                    /> 
-
-                    <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
-                        >
-                            <AntDesign name="filter" size={35} color="#FFF" />
-                        </TouchableOpacity>
-                </View>
-            </View>
-
-                  <View style={{ flexDirection:"row" }}>
-                    <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Caracteristicas </Text>
-                  </View>
-      </View>
+      <CustomHeader
+        title="Características"
+        onBack={() => navigation.goBack()}
+        showSearch
+        searchValue={pesquisa}
+        onSearchChange={(v) => setPesquisa(v)}
+        showFilter
+      />
  
-            {/*        
-                 <Modal transparent={true} visible={ visible && visible}>
-                 <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
-                     <View style={{ width:'96%',height:'97%', backgroundColor:'#FFF', borderRadius:10}} >
-                             <View style={{ margin:8}}>
-                                          <TouchableOpacity
-                                                     onPress={()=>setVisible(false)}
-                                                     style={{    margin: 10,  backgroundColor:"#185FED",    padding: 7,  borderRadius: 7,    width: "20%",    elevation: 5,   }}
-                                                   >
-                                                     <Text style={{ color: "#FFF", fontWeight: "bold" }}>
-                                                       voltar
-                                                     </Text>
-                                                   </TouchableOpacity>
-                             </View>
-         
-                             <View style={{ margin:10, gap:15, flexDirection:"row"}}>
-                                 <Image
-                                     style={{ width: 70 , height: 70   }}
-                                     source={{
-                                         uri:'https://reactnative.dev/img/tiny_logo.png' 
-                                     }}
-                                     />
-                                 <View style={{ backgroundColor:'#fff', borderRadius:5, height:25,flexDirection:"row", elevation:5 }}>
-                                     <Text style={{}}> Codigo: </Text>
-                                     <Text   style={{ fontWeight:"bold"}}> { marcaSelecionada?.codigo  } </Text>
-         
-                                 </View>   
-                             </View>
-                             
-                                     <View style={{ margin:7, backgroundColor:'#FFF', borderRadius:5  , padding:5}}>
-                                             <Text style={{}} >Descrição: </Text>
-                                     <TextInput
-                                        style={{ backgroundColor:'#fff', elevation:3 , width:'100%',borderRadius:5,  alignContent:"flex-start", }}
-                                        // defaultValue={ sSelecionado?.aplicacao }
-                                       onChangeText={ (v)=> setMarcaSelecionada((prev) => { return { ...prev, descricao: v }} ) }
-                                    defaultValue={marcaSelecionada && marcaSelecionada?.descricao}
-                                        />
-                                     </View>
-                                     
-                                                 <View style={{ flexDirection: "row", marginTop:50 ,width: '100%', alignItems: "center", justifyContent: "center" }} >
-                                                         <TouchableOpacity 
-                                                         style={{ backgroundColor: '#185FED', width: '80%', alignItems: "center", justifyContent: "center", borderRadius:  10, padding: 5 }}
-                                                         onPress={()=>gravar()}
-                                                         >
-                                                             <Text style={{ fontWeight: "bold", color: "#FFF", fontSize: 20 }}>gravar</Text>
-                                                         </TouchableOpacity>
-                                                     </View> 
-                     </View>    
-         
-                 </View>
-         
-                 </Modal>
-                  */}
+            <Modal transparent={true} visible={visible} animationType="fade">
+              <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ width: '85%', backgroundColor: '#FFF', borderRadius: 16, overflow: 'hidden', elevation: 10 }}>
+                  <View style={{ backgroundColor: '#185FED', padding: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ color: '#FFF', fontSize: 16, fontWeight: 'bold' }}>Editar Característica</Text>
+                    <TouchableOpacity onPress={() => setVisible(false)}>
+                      <Ionicons name="close" size={24} color="#FFF" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ padding: 20 }}>
+                    <Text style={{ fontSize: 14, color: '#757575', marginBottom: 4 }}>Código</Text>
+                    <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 15 }}>
+                      {caracteristicaSelecionada?.codigo}
+                    </Text>
+
+                    <Text style={{ fontSize: 14, color: '#757575', marginBottom: 4 }}>Descrição</Text>
+                    <TextInput
+                      style={{ backgroundColor: '#F5F7FA', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, paddingHorizontal: 12, height: 47, fontSize: 15, color: '#333', marginBottom: 15 }}
+                      defaultValue={caracteristicaSelecionada?.descricao}
+                      onChangeText={(v) => setCaracteristicaSelecionada((prev: any) => ({ ...prev, descricao: v }))}
+                    />
+
+                    <Text style={{ fontSize: 14, color: '#757575', marginBottom: 4 }}>Unidade</Text>
+                    <TextInput
+                      style={{ backgroundColor: '#F5F7FA', borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8, paddingHorizontal: 12, height: 47, fontSize: 15, color: '#333' }}
+                      defaultValue={caracteristicaSelecionada?.unidade}
+                      onChangeText={(v) => setCaracteristicaSelecionada((prev: any) => ({ ...prev, unidade: v }))}
+                    />
+
+                    <TouchableOpacity
+                      style={{ backgroundColor: '#185FED', borderRadius: 10, paddingVertical: 14, alignItems: 'center', justifyContent: 'center', marginTop: 25, elevation: 3 }}
+                      onPress={() => gravar()}
+                    >
+                      <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 16 }}>Gravar</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            </Modal>
            <View style={{ marginTop:10}}> 
-                <FlatList
-                    data={ dados }
+                 <FlatList
+                     data={ dados || [] }
                      renderItem = {( { item } )=>  <RenderItensCaracteristicas item={item} handleSelect={handleSelect} />  }
-                    keyExtractor={(i)=> i.codigo.toString()}
-                />
+                     keyExtractor={(i)=> i.codigo.toString()}
+                     ListEmptyComponent={() => <EmptyState icon="list-alt" message="Nenhuma característica encontrada" />}
+                 />
             </View>
         {/**  */}
-            <TouchableOpacity
-                style={{ backgroundColor: '#185FED',  width: 50, height: 50, borderRadius: 25,  position: "absolute", bottom: 150,   right: 30,  elevation: 10,  alignItems: "center", justifyContent: "center", zIndex: 999,             // Garante que o botão fique sobre os outros itens
-                }}
-                onPress={() => {
-                    navigation.navigate('cadastro_caracteristicas')
-                }}
-            >
-                <MaterialIcons name="add-circle" size={45} color="#FFF" />
-            </TouchableOpacity>
+            <Fab onPress={() => navigation.navigate('cadastro_caracteristicas')} />
 
         </View>
     )

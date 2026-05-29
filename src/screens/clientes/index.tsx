@@ -6,6 +6,9 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { RenderItensClients } from "./components/renderItemsClients/RenderItensClients";
 import { defaultColors } from "../../styles/global";
+import { CustomHeader } from "../../components/custom-header";
+import { EmptyState } from "../../components/empty-state";
+import { Fab } from "../../components/fab";
 
 export type client = 
 {
@@ -60,28 +63,14 @@ export function Clientes({navigation}:any){
             }       
              
             return(
-              <View style={{ flex:1 ,    backgroundColor:'#EAF4FE', width:"100%"  }}>
-                <View style={{ backgroundColor:'#185FED', }}> 
-                   <View style={{   padding:15,  alignItems:"center", flexDirection:"row", justifyContent:"space-between" }}>
-                      <TouchableOpacity onPress={  ()=> navigation.goBack()  } style={{ margin:5 }}>
-                          <Ionicons name="arrow-back" size={25} color="#FFF" />
-                      </TouchableOpacity>
-                        
-                      <View style={{ flexDirection:"row", marginLeft:10 , gap:2, width:'100%', alignItems:"center"}}>
-                          < TextInput 
-                              style={{  width:'70%', fontWeight:"bold" ,padding:5, margin:5, textAlign:'center', borderRadius:5, elevation:5, backgroundColor:'#FFF'}}
-                              onChangeText={(value)=>setPesquisa(value)}
-                              placeholder="pesquisar"
-                          /> 
-      
-                          <TouchableOpacity  //onPress={()=> setShowPesquisa(true)}
-                              >
-                                  <AntDesign name="filter" size={35} color="#FFF" />
-                              </TouchableOpacity>
-                          </View>
-                   </View>
-                       <Text style={{   left:5, bottom:5, color:'#FFF' ,fontWeight:"bold" , fontSize:20}}> Clientes </Text>
-                 </View>
+              <View style={{ flex:1, backgroundColor:'#EAF4FE', width:"100%" }}>
+                  <CustomHeader
+                      title="Clientes"
+                      onBack={() => navigation.goBack()}
+                      showSearch
+                      searchValue={pesquisa}
+                      onSearchChange={(v) => setPesquisa(v)}
+                  />
                        
                         <Modal transparent={true} visible={ visible }>
                             <View style={{ width:'100%',height:'100%', alignItems:"center", justifyContent:"center", backgroundColor: 'rgba(50,50,50, 0.5)'}} >
@@ -144,21 +133,13 @@ export function Clientes({navigation}:any){
                         </Modal>
                    
                      <FlatList
-                         data={dados}
-                         renderItem={({item})=> RenderItensClients({item, handleSelect})}
-                         keyExtractor={(i)=> i.codigo.toString() }
+                          data={dados}
+                          renderItem={({item})=> RenderItensClients({item, handleSelect})}
+                          keyExtractor={(i)=> i.codigo.toString() }
+                          ListEmptyComponent={() => <EmptyState icon="people-outline" message="Nenhum cliente encontrado" />}
                      />
 
-             <TouchableOpacity
-                style={{
-                    backgroundColor: '#185FED', width: 50, height: 50,   borderRadius: 25,  position: "absolute", bottom: 150, right: 30, elevation: 10, alignItems: "center", justifyContent: "center",zIndex: 999,             // Garante que o botão fique sobre os outros itens
-                }}
-                    onPress={() => {
-                        navigation.navigate('cadastro_cliente')
-                    }}
-                   >
-                <MaterialIcons name="add-circle" size={45} color="#FFF" />
-            </TouchableOpacity>
+             <Fab onPress={() => navigation.navigate('cadastro_cliente')} />
         
                 </View>
             )

@@ -52,7 +52,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
                    (<MaterialIcons name="no-photography" size={50} color={  defaultColors.gray} />)
                }
               </View>
-            {!isSelected && <AntDesign name="caretdown" size={24} color={defaultColors.gray} />}
+            {!isSelected && <AntDesign name="caret-down" size={24} color={defaultColors.gray} />}
 
         </View>
         <Text style={[styles.txtDescricao, ]} numberOfLines={2}> 

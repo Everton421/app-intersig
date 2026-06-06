@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalSelectedProduct } from "../modal-selected-product";
-import { useFunctionsProducts } from "../../utils/functions";
+import { useFunctionsProducts } from "../../../../../../screens/_pedido_novo/utils/functions";
     type item = {
         codigo:number,
         preco:number,

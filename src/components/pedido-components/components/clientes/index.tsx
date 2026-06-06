@@ -27,7 +27,6 @@ export const ListaClientes = ( {  codigo_orcamento }:any ) => {
  
 
     const {  orcamento , setOrcamento } = useContext(OrcamentoContext);
-    const { usuario } = useContext(AuthContext);
 
 
   ////////////////////

@@ -2,7 +2,7 @@ import { Button, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, Vi
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { defaultColors } from "../../../../../../styles/global";
 import React, { cloneElement, useCallback, useContext, useEffect, useState } from "react";
-import { useFunctionsProducts } from "../../utils/functions";
+import { useFunctionsProducts } from "../../../../../../screens/_pedido_novo/utils/functions";
 import { Ionicons } from "@expo/vector-icons";
 
 type props = {

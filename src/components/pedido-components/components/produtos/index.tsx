@@ -9,7 +9,7 @@ import { useItemsPedido } from "../../../../database/queryPedido/queryItems";
 import { useFotosProdutos } from "../../../../database/queryFotosProdutos/queryFotosProdutos";
 import { Ionicons } from "@expo/vector-icons";
 import { RenderSearchItem } from "./components/render-search-item";
-import { useFunctionsProducts } from "./utils/functions";
+import { useFunctionsProducts } from "../../../../screens/_pedido_novo/utils/functions";
 import { RenderSelectedItem } from "./components/render-item-selected";
 import { defaultColors } from "../../../../styles/global";
 

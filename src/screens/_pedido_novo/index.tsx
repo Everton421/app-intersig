@@ -1,46 +1,14 @@
 import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { CustomHeader } from "../../components/custom-header"
 import { useReducer, useState } from "react"
-import { ProductList } from "./_components/product-list"
+import { ProductList } from "./_components/product-list/product-list"
+import { RenderSelectedItem } from "./_components/render-itens-selected"
+import { actionOrderReducer, cliente, objOrderReducer, orderItem, type orderProduct } from "./types/order"
+import { CustomerList } from "./_components/customer/customer-list"
 
 
-type product = {
-    codigo: number,
-    quantidade: number
-    preco:number
-    desconto:number
-    descontos:number
-    total:number
-    quantidade_separada:number 
-    quantidade_faturada:number
-}
-
-type actionOrderReducer =   
-    { type: 'ADD_PRODUCT' , payload: product, quantity:number}  
-   | { type: 'RM_PRODUCT' , payload: number}  
-   | { type: 'FREIGHT' , payload: number}  
-    | { type: 'ADD_DISCOUNT' , discount: number , codeProduct:number }
-
-    | { type: 'ADD_CLIENT', payload: number}
 
 
-type orderItem =  product & { quantidade:number};
-
-type cliente ={ 
-    codigo:number
-}
-
-
-type objOrderReducer = {
-    codigo:string
-    products: orderItem[],
-    cliente: cliente
-    frete:number
-    total_geral:number
-    total_produtos:number
-    descontos:number
-
-}
 
  
 
@@ -57,7 +25,7 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                     if(productExists){
                             newProducts = state.products.map( ( item ) =>{ 
                                     if(item.codigo === productToadd.codigo){
-                                        const newQuantity = item.quantidade + quantity;
+                                        const newQuantity = item.quantidade = quantity;
                                         const newDesconto = newQuantity * item.desconto; 
                                          const newTotal = (newQuantity * item.preco) - newDesconto;  
                                         return { ...item, quantidade: newQuantity, descontos:newDesconto,desconto: item.desconto, total:newTotal }
@@ -88,9 +56,10 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
             }
 
         case 'RM_PRODUCT' : {
+            const { quantity } = action;
                 const newProducts = state.products.map((item) =>{
-                   if(item.codigo === action.payload  ){    
-                    let newQuantity = item.quantidade - 1
+                   if(item.codigo === action.payload  && item.quantidade >= quantity){    
+                    let newQuantity = item.quantidade - quantity
                     return { ...item, quantidade: newQuantity, total: (newQuantity * item.preco) - item.desconto }
                    }else{
                     return item
@@ -162,12 +131,15 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                  products: newProducts
             };
         }
-        case 'ADD_CLIENT':{
+        case 'ADD_CUSTOMER':{
             const { payload } = action;
+                const { cep, cnpj, codigo, endereco, numero } = payload;
 
             return {
                 ...state,
-                cliente:{ codigo: payload}
+                cliente:{   
+                     cep, cnpj, codigo, endereco, numero 
+                     }
             }
         }
 
@@ -176,72 +148,50 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
 
 
 export const PedidoComponent = ({ navigation }: any)=>{
-     
-    const [ state, dispatch ] = useReducer(orderReducer, {codigo: '1', cliente: { codigo:0},total_geral:12, total_produtos:4, descontos:1, frete:0, products:[
-        {
-            codigo: 1 ,
-             preco:1,
-            quantidade:1,
-            desconto:0,
-            descontos:0,
-            quantidade_faturada:0,
-            quantidade_separada:0,
-            total:1,
-        },
-        {
-            codigo: 2 ,
-             preco:10,
-            quantidade:1,
-            desconto:1,
-            descontos:1,
-            quantidade_faturada:0,
-            quantidade_separada:0,
-            total:9
-        },
-        {
-            codigo: 4 ,
-            preco:1,
-            quantidade:1,
-            desconto:0,
-            descontos:0,
-            quantidade_faturada:0,
-            quantidade_separada:0,
-            total:1
-        },
-        {
-            codigo: 6 ,
-            preco:1,
-            quantidade:1,
-            desconto:0,
-            descontos:0,
-            quantidade_faturada:0,
-            quantidade_separada:0,
-            total:1
+        const initalValuecustomer:cliente = {
+            cep:'',
+            cnpj:'',
+            codigo:0,
+            endereco:'',
+            numero:0
         }
+    const [ state, dispatch ] = useReducer(orderReducer, {codigo: '1', cliente:  initalValuecustomer,total_geral:12, total_produtos:4, descontos:1, frete:0, products:[
+        
 
     ]} )
 
-    const handleAddProduct = (product:product, quantity:number )=>{
+    const handleAddProduct = (product:orderProduct, quantity:number )=>{
         dispatch({
             type: "ADD_PRODUCT",
             payload: { 
                 codigo: product.codigo,
                 preco: product.preco,
+                descricao: product.descricao,
+                estoque: product.estoque,
+                unidade_medida: product.unidade_medida,
                 quantidade: product.quantidade,
                 desconto: product.desconto,
                 descontos: product.descontos,
                 quantidade_faturada:0,
                 quantidade_separada:0,
-                total: product.total
+                total: product.total,
+                fotos:product.fotos
             },
             quantity
         })
     }
 
-    const handleRmProduct = (product:product )=>{
+    const handleRmProduct = (product:orderProduct, quantity: number )=>{
         dispatch({
             type: 'RM_PRODUCT',
-            payload: product.codigo
+            payload: product.codigo,
+            quantity:quantity
+        })
+    }
+    const handleNewCustomer = (customer: cliente)=>{
+        dispatch({
+            type: "ADD_CUSTOMER",
+            payload: customer
         })
     }
     const handleAddFreight = (freight:number)=>{
@@ -260,7 +210,7 @@ const handleDiscount = ( discount:number, codeProduct:number )=>{
      })
 }
 
-    const RenderItemProduct = (  { item }: {item: product} )=>{
+    const RenderItemProduct = (  { item }: {item: orderProduct} )=>{
 
         return(
                <View style={{flex:1, width:'90%', borderWidth:1,margin:1 }}>
@@ -273,7 +223,7 @@ const handleDiscount = ( discount:number, codeProduct:number )=>{
                                 < Text> + </Text>
                             </TouchableOpacity> 
                             <TouchableOpacity style={{width:50, height:50, backgroundColor:'#CCC', alignItems:'center',justifyContent:'center'}}
-                                     onPress={ ()=> handleRmProduct(item)}>
+                                     onPress={ ()=> handleRmProduct(item, 1)}>
                                 < Text> -  </Text>
                                 
                             </TouchableOpacity> 
@@ -318,28 +268,41 @@ const handleDiscount = ( discount:number, codeProduct:number )=>{
                 <Text style={{ fontSize:15, fontWeight:"bold"}}>
                     Total Descontos: {state.descontos}
                </Text>
-               
-             
              </View>
-             <View>
-                <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                    Frete:
-               </Text>
 
-                    <TextInput
-                        style={{ backgroundColor:'#CCC', borderWidth:0.5, borderColor:'red'}}
-                        onChangeText={(frete)=>{handleAddFreight(Number(frete))}}
-                        keyboardType="number-pad"
-                    />
-               </View>
+
+
             
-            { 
+         <CustomerList
+         handleNewCustomer={handleNewCustomer}
+         />
+                 { state.cliente .codigo > 0 &&  
+           <View style={{ backgroundColor:'#CCC', justifyContent:'space-between' , flexDirection:'row',marginBottom:10}} >
+               <Text style={{ fontSize:15, fontWeight:"bold"}}>
+                  cliente {state.cliente.nome }
+               </Text>
+             </View>
+}
+
+            <ProductList 
+                     handleAddProduct={handleAddProduct}
+                     handleDiscount={handleDiscount}
+            />
+            
                 <FlatList
-                data={state.products}
-                renderItem={ ( {item}  )=>  <RenderItemProduct item={item}/>
-                   }            
-             />
-                  }
+                  data={state.products}
+                  horizontal={true}
+                  renderItem={ ( {item}  )=>  
+                    <RenderSelectedItem  item={item}  
+                     removeItem={handleRmProduct }    
+                     handleAddProduct={handleAddProduct}
+                     handleDiscount={handleDiscount}
+                     />
+                    
+                    }            
+                />
+                
+                
                 
                 { /** <ProductList  products={state.products}/> */}
 

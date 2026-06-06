@@ -1,5 +1,5 @@
 import { useCallback, useContext, useMemo } from "react";
-import { OrcamentoContext } from "../../../../../contexts/orcamentoContext";
+import { OrcamentoContext } from "../../../contexts/orcamentoContext";
 
  export const useFunctionsProducts= ()=>{
     const { orcamento, setOrcamento } = useContext(OrcamentoContext);
@@ -7,7 +7,7 @@ import { OrcamentoContext } from "../../../../../contexts/orcamentoContext";
   const selectedProductsMap = useMemo(() => {
     const map = {};
     for (const product of orcamento.produtos) {
-      map[product.codigo] = product;
+      map[product.codigo]  = product ;
     }
     return map;
   }, [orcamento.produtos]);

@@ -1,6 +1,6 @@
-import { Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Image, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { orderProduct } from "../../types/order";
 
@@ -31,31 +31,38 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
       const [ desconto, setDesconto ] = useState(0);
       const [ total, setTotal ] = useState(0);
       const [ preco, setPreco  ] = useState(0);
+      const discountRef = useRef<TextInput>(null);
 
 
-            useEffect(()=>{
-                let auxQuant= 1;
-                let auxDesc= 0 ;
-                let auxPrice= 0;
+             useEffect(()=>{
+                 let auxQuant= 1;
+                 let auxDesc= 0 ;
+                 let auxPrice= 0;
                     
 
-                     if(isSelected.quantidade && isSelected.quantidade > 0){
-                         setQuantidade(isSelected.quantidade)
-                         auxQuant = isSelected.quantidade
-                     }
-                     if(isSelected.desconto && isSelected.desconto > 0){
-                         auxDesc = isSelected.desconto;
-                         setDesconto(isSelected.desconto)
-                     }
-                     if(isSelected.preco && isSelected.preco > 0){
-                         setPreco(isSelected.preco);
-                         auxPrice = isSelected.preco;
-                     }
-                     if(auxDesc > auxPrice){
-                         auxDesc = 0
-                     }
-                     setTotal((auxPrice - auxDesc) * auxQuant)
+                      if(isSelected.quantidade && isSelected.quantidade > 0){
+                          setQuantidade(isSelected.quantidade)
+                          auxQuant = isSelected.quantidade
+                      }
+                      if(isSelected.desconto && isSelected.desconto > 0){
+                          auxDesc = isSelected.desconto;
+                          setDesconto(isSelected.desconto)
+                      }
+                      if(isSelected.preco && isSelected.preco > 0){
+                          setPreco(isSelected.preco);
+                          auxPrice = isSelected.preco;
+                      }
+                      if(auxDesc > auxPrice){
+                          auxDesc = 0
+                      }
+                      setTotal((auxPrice - auxDesc) * auxQuant)
             },[])
+
+            useEffect(() => {
+              if (visible) {
+                setTimeout(() => discountRef.current?.focus(), 300);
+              }
+            }, [visible])
 
         
                  function handleSave(item: orderProduct){
@@ -84,103 +91,112 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
         const hasImage = isSelected?.fotos && isSelected?.fotos[0]?.link;
 
         return (
-          <Modal visible={visible} style={{ flex: 1 }} transparent={true}>
-            <View style={styles.overlay}>
+          <Modal visible={visible} transparent={true}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+              style={styles.overlay}
+            >
               <View style={styles.modalContainer}>
-
-                <View style={styles.modalHeader}>
-                  <View style={styles.codeBadge}>
-                    <Text style={styles.codeText}>{isSelected.codigo}</Text>
-                  </View>
-                  <TouchableOpacity onPress={() => setVisible(false)} style={styles.closeButton}>
-                    <Ionicons name="close" size={24} color="#6C757D" />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.productInfoRow}>
-                  <View style={styles.imageContainer}>
-                    {hasImage ? (
-                      <Image source={{ uri: isSelected.fotos[0].link }} style={styles.productImage} resizeMode="cover" />
-                    ) : (
-                      <View style={styles.imagePlaceholder}>
-                        <MaterialIcons name="image-not-supported" size={36} color="#BDBDBD" />
-                      </View>
-                    )}
-                  </View>
-
-                  <View style={styles.priceStockColumn}>
-                    <Text style={styles.priceValue}>R$ {Number(isSelected.preco).toFixed(2)}</Text>
-                    <View style={styles.stockBadge}>
-                      <MaterialIcons name="inventory-2" size={14} color="#6C757D" />
-                      <Text style={styles.stockText}>Estoque: {isSelected.estoque}</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <Text style={styles.descriptionText} numberOfLines={2}>
-                  {isSelected.descricao}
-                </Text>
-
-                <View style={styles.totalRow}>
-                  <MaterialIcons name="receipt" size={18} color="#185FED" />
-                  <Text style={styles.totalLabel}>Total:</Text>
-                  <Text style={styles.totalValue}>R$ {Number((preco - desconto) * quantidade).toFixed(2)}</Text>
-                </View>
-
-                <View style={styles.quantitySection}>
-                  <Text style={styles.sectionLabel}>Quantidade</Text>
-                  <View style={styles.quantityControls}>
-                    <TouchableOpacity
-                      onPress={() => setQuantidade(Math.max(1, quantidade - 1))}
-                      style={styles.qtyButton}
-                    >
-                      <Ionicons name="remove" size={22} color="#FFF" />
-                    </TouchableOpacity>
-                    <View style={styles.qtyValueContainer}>
-                      <Text style={styles.qtyValue}>{quantidade}</Text>
-                    </View>
-                    <TouchableOpacity
-                      onPress={() => setQuantidade(quantidade + 1)}
-                      style={styles.qtyButton}
-                    >
-                      <Ionicons name="add" size={22} color="#FFF" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.discountSection}>
-                  <View style={styles.discountLabelRow}>
-                    <MaterialIcons name="monetization-on" size={18} color="#6C757D" />
-                    <Text style={styles.discountLabel}>Desconto Unitário</Text>
-                  </View>
-                  <View style={styles.discountInputRow}>
-                    <Text style={styles.discountCurrency}>R$</Text>
-                    <TextInput
-                      style={styles.discountInput}
-                      keyboardType="numeric"
-                      defaultValue={isSelected.desconto ? String(isSelected.desconto) : "0.00"}
-                      onChangeText={(e) => setDesconto(Number(e))}
-                    />
-                    <Text style={styles.discountPreview}>R$ {Number(desconto).toFixed(2)}</Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.saveButton}
-                  onPress={() => handleSave(isSelected)}
+                <ScrollView
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
                 >
-                  <Ionicons name="checkmark-circle" size={22} color="#FFF" style={{ marginRight: 6 }} />
-                  <Text style={styles.saveButtonText}>Incluir no Pedido</Text>
-                </TouchableOpacity>
 
+                  <View style={styles.modalHeader}>
+                    <View style={styles.codeBadge}>
+                      <Text style={styles.codeText}>{isSelected.codigo}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => setVisible(false)} style={styles.closeButton}>
+                      <Ionicons name="close" size={24} color="#6C757D" />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.productInfoRow}>
+                    <View style={styles.imageContainer}>
+                      {hasImage ? (
+                        <Image source={{ uri: isSelected.fotos[0].link }} style={styles.productImage} resizeMode="cover" />
+                      ) : (
+                        <View style={styles.imagePlaceholder}>
+                          <MaterialIcons name="image-not-supported" size={36} color="#BDBDBD" />
+                        </View>
+                      )}
+                    </View>
+
+                    <View style={styles.priceStockColumn}>
+                      <Text style={styles.priceValue}>R$ {Number(isSelected.preco).toFixed(2)}</Text>
+                      <View style={styles.stockBadge}>
+                        <MaterialIcons name="inventory-2" size={14} color="#6C757D" />
+                        <Text style={styles.stockText}>Estoque: {isSelected.estoque}</Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  <Text style={styles.descriptionText} numberOfLines={2}>
+                    {isSelected.descricao}
+                  </Text>
+
+                  <View style={styles.totalRow}>
+                    <MaterialIcons name="receipt" size={18} color="#185FED" />
+                    <Text style={styles.totalLabel}>Total:</Text>
+                    <Text style={styles.totalValue}>R$ {Number((preco - desconto) * quantidade).toFixed(2)}</Text>
+                  </View>
+
+                  <View style={styles.quantitySection}>
+                    <Text style={styles.sectionLabel}>Quantidade</Text>
+                    <View style={styles.quantityControls}>
+                      <TouchableOpacity
+                        onPress={() => setQuantidade(Math.max(1, quantidade - 1))}
+                        style={styles.qtyButton}
+                      >
+                        <Ionicons name="remove" size={22} color="#FFF" />
+                      </TouchableOpacity>
+                      <View style={styles.qtyValueContainer}>
+                        <Text style={styles.qtyValue}>{quantidade}</Text>
+                      </View>
+                      <TouchableOpacity
+                        onPress={() => setQuantidade(quantidade + 1)}
+                        style={styles.qtyButton}
+                      >
+                        <Ionicons name="add" size={22} color="#FFF" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+
+                  <View style={styles.discountSection}>
+                    <View style={styles.discountLabelRow}>
+                      <MaterialIcons name="monetization-on" size={18} color="#6C757D" />
+                      <Text style={styles.discountLabel}>Desconto Unitário</Text>
+                    </View>
+                    <View style={styles.discountInputRow}>
+                      <Text style={styles.discountCurrency}>R$</Text>
+                      <TextInput
+                        ref={discountRef}
+                        style={styles.discountInput}
+                        keyboardType="numeric"
+                        defaultValue={isSelected.desconto ? String(isSelected.desconto) : "0.00"}
+                        onChangeText={(e) => setDesconto(Number(e))}
+                      />
+                      <Text style={styles.discountPreview}>R$ {Number(desconto).toFixed(2)}</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={() => handleSave(isSelected)}
+                  >
+                    <Ionicons name="checkmark-circle" size={22} color="#FFF" style={{ marginRight: 6 }} />
+                    <Text style={styles.saveButtonText}>Incluir no Pedido</Text>
+                  </TouchableOpacity>
+
+                </ScrollView>
               </View>
-            </View>
+            </KeyboardAvoidingView>
           </Modal>
           )
         } 
       
 
-       const styles = StyleSheet.create({
+        const styles = StyleSheet.create({
          overlay: {
             backgroundColor: 'rgba(0,0,0,0.5)',
             flex: 1,

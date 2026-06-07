@@ -17,6 +17,22 @@ type photoOrdeProduct = {
     link:string
 }
 
+export type payloadCalculateInstallments = {
+    intervalo_parcelas : number
+    total_geral: number
+    quantidade_parcelas:number
+}
+
+export type orderPaymentMethod = {
+    codigo:number   
+     intervalo_parcelas : number
+    quantidade_parcelas:number
+}
+
+export type payloadEditDueInstallment = {
+    parcela:number // sequencia da parcela
+    vencimento:string
+}
 
 export  type actionOrderReducer =   
     { type: 'ADD_PRODUCT' , payload: orderProduct, quantity:number}  
@@ -24,7 +40,12 @@ export  type actionOrderReducer =
    | { type: 'FREIGHT' , payload: number}  
    | { type: 'ADD_DISCOUNT' , discount: number , codeProduct:number }
    | { type: 'ADD_CUSTOMER', payload: cliente}
-
+    | { type: 'CALCULATE_INSTALLMENTS', payload :  payloadCalculateInstallments}
+    | { type: 'ADD_PAYMENT_METHOD', payload :  orderPaymentMethod}
+    | { type: 'EDIT_DUE_INSTALLMENTS', payload:payloadEditDueInstallment }
+    | { type: 'EDIT_OBSERVATIONS', payload: string}
+    | { type: 'EDIT_SITUATION', payload: orderSituation}
+    | { type: 'EDIT_CONTACT', payload: string}
 
 export type orderItem =  orderProduct & { quantidade:number};
 
@@ -34,15 +55,29 @@ export type cliente ={
     cnpj:string
     endereco:string
     numero:number
+    nome:string
 }
 
+export type parcela = {
+    valor: number
+    vencimento:string
+    parcela:number
+}
+export type orderSituation =  
+    'EA' | 'AI' | 'FI' | 'RE' | 'FP' 
+ 
 
 export type objOrderReducer = {
     codigo:string
     products: orderItem[],
+    parcelas: parcela[],
     cliente: cliente
+    forma_pagamento: number
     frete:number
     total_geral:number
     total_produtos:number
     descontos:number
+    observacoes:string
+    situacao: orderSituation
+    contato:string
 }

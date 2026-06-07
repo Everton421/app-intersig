@@ -10,7 +10,7 @@ import {
     Image,
 } from "react-native";
 
-import { Ionicons, MaterialIcons, FontAwesome } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useProducts } from "../../../../database/queryProdutos/queryProdutos";
 import { useFotosProdutos } from "../../../../database/queryFotosProdutos/queryFotosProdutos";
 import { ModalEditSelectedProduct } from "./modal-edit-selected-product";
@@ -102,45 +102,54 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                         <Text style={{ fontSize: 12, color: '#185FED', fontWeight: 'bold' }}>Id: {item.id}</Text>
                         <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#4CAF50' }}>R$ {item.preco ? item.preco.toFixed(2) : '0.00'}</Text>
                     </View>
-                    
+
                     <Text numberOfLines={2} style={{ fontSize: 14, fontWeight: '600', color: '#333', marginVertical: 2 }}>
                         {item.descricao}
                     </Text>
-                    
+
                     <Text style={{ fontSize: 12, color: '#757575' }}>Estoque: {item.estoque}</Text>
                 </View>
             </TouchableOpacity>
         );
     };
 
+
     return (
-        <View style={{ flex: 1 }}>
-            {/* Botão de abrir modal estilizado como Input Search */}
+       <View style={{ marginHorizontal: 15, marginBottom: 10 }}>
+            {/* BOTÃO PRINCIPAL DE ADICIONAR PRODUTOS (Transformado em Card Interativo) */}
             <TouchableOpacity
                 onPress={() => setVisibleProdutos(true)}
                 style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    backgroundColor: "#FFF",
-                    borderRadius: 8,
-                    borderWidth: 1,
-                    borderColor: '#E0E0E0',
-                    paddingHorizontal: 15,
-                    height: 47,
-                    elevation: 2
+                    backgroundColor: '#FFF',
+                    borderRadius: 12,
+                    padding: 15,
+                    elevation: 3,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 3,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                 }}
             >
-                <FontAwesome name="search" size={18} color="#185FED" style={{ marginRight: 10 }} />
-                <Text style={{ color: "#757575", fontSize: 16 }}>
-                    {   "Pesquisar produto..."}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <View style={{ width: 45, height: 45, borderRadius: 25, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center' }}>
+                        <MaterialCommunityIcons name="package-variant-closed-plus" size={24} color="#185FED" />
+                    </View>
+                    <View>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333' }}>Adicionar Produtos</Text>
+                        <Text style={{ fontSize: 13, color: '#666' }}>Toque para pesquisar itens</Text>
+                    </View>
+                </View>
+                <MaterialIcons name="search" size={24} color="#185FED" />
             </TouchableOpacity>
 
             <Modal visible={visibleProdutos} animationType="fade" transparent={true} onRequestClose={() => setVisibleProdutos(false)}>
                 <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'center', alignItems: 'center' }}>
                     <View style={{
-                        width: "90%",
-                        height: "80%",
+                        width: "100%",
+                        height: "90%",
                         backgroundColor: "#F5F7FA",
                         borderRadius: 16,
                         overflow: 'hidden',
@@ -180,26 +189,27 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                                 <FlatList
                                     data={data}
                                     renderItem={renderItem}
-                                    keyExtractor={(item:any) => item.codigo.toString()}
+                                    keyExtractor={(item: any) => item.codigo.toString()}
                                     contentContainerStyle={{ paddingBottom: 20 }}
                                     ListEmptyComponent={() => (
                                         <View style={{ alignItems: 'center', marginTop: 50 }}>
-                                            <Text style={{ color: '#999' }}>Nenhum produto encontrado.</Text>
+                                            <MaterialIcons name="search-off" size={50} color="#BDBDBD" />
+                                            <Text style={{ color: '#999', marginTop: 10 }}>Nenhum produto encontrado.</Text>
                                         </View>
                                     )}
                                 />
                             )}
                         </View>
 
-                    { productIsSelected && 
-                     <ModalEditSelectedProduct 
-                        handleDiscount={handleDiscount}
-                        isSelected={productIsSelected}
-                        handleAddProduct={handleAddProduct}
-                        setVisible={setIsVisibleModalSelectedProduct}
-                        visible={isVisibleModalSelectedProduct}
-                    />
-                    }
+                        {productIsSelected &&
+                            <ModalEditSelectedProduct
+                                handleDiscount={handleDiscount}
+                                isSelected={productIsSelected}
+                                handleAddProduct={handleAddProduct}
+                                setVisible={setIsVisibleModalSelectedProduct}
+                                visible={isVisibleModalSelectedProduct}
+                            />
+                        }
 
                     </View>
                 </View>

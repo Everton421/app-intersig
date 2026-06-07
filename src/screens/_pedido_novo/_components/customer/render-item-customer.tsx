@@ -4,20 +4,9 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 import { defaultColors } from "../../../../styles/global";
 import { cliente } from "../../types/order";
-
-type IClient = {
-  codigo: number;
-  cnpj: string;
-  nome: string;
-  ie: string;
-  cep: string;
-  cidade: string;
-  endereco: string;
-  numero: string;
-};
-
+ 
 interface Props {
-  item: IClient;
+  item: cliente;
   handleSelect:  (customer: cliente)=>void;
 }
 

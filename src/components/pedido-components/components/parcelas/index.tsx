@@ -177,7 +177,7 @@ export const Parcelas = ( {orcamentoEditavel, codigo_orcamento} :any) => {
         const handleEvent = (event, selectedDate) => {
             const currentDate = selectedDate || date;
             const dia = String(currentDate.getDate()).padStart(2,'0');
-            const mes = String( currentDate.getMonth()).padStart(2,'0');
+            const mes = String( currentDate.getMonth() + 1).padStart(2,'0');
             const ano = currentDate.getFullYear();
             const vencimento = `${ano}-${mes}-${dia}`;
 

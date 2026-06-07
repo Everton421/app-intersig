@@ -1,27 +1,27 @@
-import { FlatList, Text, TextInput, TouchableOpacity, View } from "react-native"
-import { CustomHeader } from "../../components/custom-header"
-import { useReducer, useState } from "react"
+import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native"
+import { Ionicons, FontAwesome } from "@expo/vector-icons"
+import { CustomHeader } from "../../components/custom-header" // Cuidado com esse caminho
+import { useEffect, useReducer, useState } from "react"
 import { ProductList } from "./_components/product-list/product-list"
 import { RenderSelectedItem } from "./_components/render-itens-selected"
-import { actionOrderReducer, cliente, objOrderReducer, orderItem, type orderProduct } from "./types/order"
+import { actionOrderReducer, cliente, objOrderReducer, orderItem, orderPaymentMethod, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, type orderProduct } from "./types/order"
 import { CustomerList } from "./_components/customer/customer-list"
+import { CustomHeaderOrderComponent } from "./_components/header"
+import { Installments } from "./_components/installments"
+import { configMoment } from "../../services/moment"
+import { addDays, format } from "date-fns"
+import { RenderSimpleItenInstallment } from "./_components/render-itens-installments"
+import { OrderDetails } from "./_components/details"
+import { TextInput } from "react-native-gesture-handler"
 
-
-
-
-
- 
-
-function orderReducer(state:objOrderReducer, action:actionOrderReducer){
+function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
+    // ... MANTER TODO O SEU CÓDIGO DO REDUCER INTACTO AQUI ...
     switch(action.type){
         case 'ADD_PRODUCT':{ 
                 const productToadd = action.payload
                 const { quantity } = action;
-
               const productExists = state.products.find( product  =>   product.codigo === productToadd.codigo   )
-
                 let newProducts: orderItem[];
-
                     if(productExists){
                             newProducts = state.products.map( ( item ) =>{ 
                                     if(item.codigo === productToadd.codigo){
@@ -45,17 +45,9 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                             newTotalDescountsOrder+=item.desconto
                             newTotalProductsOrder+=(item.quantidade * item.preco)
                         } 
-
-              return {
-                ...state,
-                 total_geral: newTotalGeralProductsOrder,
-                 total_produtos: newTotalProductsOrder,
-                 descontos: newTotalDescountsOrder,
-                 products: newProducts
-            };
+              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
             }
-
-        case 'RM_PRODUCT' : {
+        case 'RM_PRODUCT': {
             const { quantity } = action;
                 const newProducts = state.products.map((item) =>{
                    if(item.codigo === action.payload  && item.quantidade >= quantity){    
@@ -64,9 +56,7 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                    }else{
                     return item
                    }
-               }
-                ).filter((item) =>  item.quantidade > 0)
-
+               }).filter((item) =>  item.quantidade > 0)
                     let newTotalGeralProductsOrder = 0;
                     let newTotalDescountsOrder = 0;   
                     let newTotalProductsOrder=0;
@@ -75,45 +65,22 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                             newTotalDescountsOrder+=item.descontos
                             newTotalProductsOrder+=(item.quantidade * item.preco)
                         } 
-
-              return {
-                ...state,
-                 total_geral: newTotalGeralProductsOrder,
-                 total_produtos: newTotalProductsOrder,
-                 descontos: newTotalDescountsOrder  ,
-                 products: newProducts
-            };
+              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
             }
-        case 'FREIGHT':{
-              return {
-                ...state,
-                  frete: action.payload,
-                 total_geral: state.total_geral + action.payload,
-            
-            };
-        }    
+        case 'FREIGHT':{ return { ...state, frete: action.payload, total_geral: state.total_geral + action.payload }; }    
         case 'ADD_DISCOUNT':{
             const { codeProduct, discount } = action
-
                              const newProducts  = state.products.map( ( item ) =>{ 
                                         if(item.codigo === codeProduct ){
-
                                             const newDiscounts = item.quantidade * discount; 
                                              let newTotal = (item.quantidade * item.preco) - newDiscounts;  
-
-                                             if(newTotal <  0 ){
-                                                newTotal = 0
-                                             }
-
-                                                
-                                         return { ...item,   descontos:newDiscounts, desconto:discount , total:newTotal }          
+                                             if(newTotal <  0 ){ newTotal = 0 }
+                                         return { ...item, descontos:newDiscounts, desconto:discount , total:newTotal }          
                                         }else{
                                             return item;
                                         }
-                                        
                                 }
                              )
-                   
                     let newTotalGeralProductsOrder = 0;
                     let newTotalDescountsOrder = 0;   
                     let newTotalProductsOrder=0;
@@ -122,190 +89,257 @@ function orderReducer(state:objOrderReducer, action:actionOrderReducer){
                             newTotalDescountsOrder+=item.descontos
                             newTotalProductsOrder+=(item.quantidade * item.preco)
                         } 
-
-              return {
-                ...state,
-                 total_geral: newTotalGeralProductsOrder,
-                 total_produtos: newTotalProductsOrder,
-                 descontos: newTotalDescountsOrder,
-                 products: newProducts
-            };
+              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
         }
         case 'ADD_CUSTOMER':{
             const { payload } = action;
-                const { cep, cnpj, codigo, endereco, numero } = payload;
-
-            return {
-                ...state,
-                cliente:{   
-                     cep, cnpj, codigo, endereco, numero 
-                     }
-            }
+            const { cep, cnpj, codigo, endereco, numero, nome} = payload;
+            return { ...state, cliente:{ cep, cnpj, codigo, endereco, numero,nome } }
         }
-
+        case 'CALCULATE_INSTALLMENTS': {
+            const { payload } = action;
+            const { intervalo_parcelas,quantidade_parcelas, total_geral } = payload;
+            let novas_parcelas:parcela[] = [];
+            let valorParcelas =   total_geral / quantidade_parcelas;
+            for (let i = 1; i <=  quantidade_parcelas; i++) {
+                const vencimento = addDays(new Date(), intervalo_parcelas * i);
+                novas_parcelas.push({ parcela: i ,valor: valorParcelas, vencimento: format(vencimento, 'yyyy-MM-dd') });
+            }
+            return { ...state, parcelas: novas_parcelas }
+        }   
+        case 'ADD_PAYMENT_METHOD':{
+            const { payload } = action;
+            const { codigo, intervalo_parcelas, quantidade_parcelas   } = payload
+            return { ...state, forma_pagamento: codigo }
+        }
+        case 'EDIT_DUE_INSTALLMENTS':{
+                const { payload }= action
+                const { parcela, vencimento} = payload           
+                const newInstallments = state.parcelas.map( (i)=>{
+                    if( i.parcela === parcela){ i.vencimento = vencimento }
+                    return i
+                })
+                return { ...state, parcelas: newInstallments }
+        }
+        case 'EDIT_OBSERVATIONS':{ return { ...state, observacoes: action.payload } }
+        case 'EDIT_SITUATION':{ return { ...state, situacao: action.payload } }
+        case "EDIT_CONTACT":{
+            return {
+                ...state, 
+                contato:action.payload
+            }
+        } 
     }   
 }
 
+export const PedidoComponent = ({ navigation }: any) => {
 
-export const PedidoComponent = ({ navigation }: any)=>{
-        const initalValuecustomer:cliente = {
-            cep:'',
-            cnpj:'',
-            codigo:0,
-            endereco:'',
-            numero:0
-        }
-    const [ state, dispatch ] = useReducer(orderReducer, {codigo: '1', cliente:  initalValuecustomer,total_geral:12, total_produtos:4, descontos:1, frete:0, products:[
-        
+    const moment = configMoment();
 
-    ]} )
+    const initalValuecustomer: cliente = { cep: '', cnpj: '', codigo: 0, endereco: '', numero: 0, nome: '' }
+    const initialInstallments: parcela = { parcela: 0, valor: 0, vencimento: moment.dataHoraAtual() }
 
-    const handleAddProduct = (product:orderProduct, quantity:number )=>{
+    const [state, dispatch] = useReducer(orderReducer, { codigo: '1', contato:'',forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 0, total_produtos: 0, descontos: 0, frete: 0, products: [], parcelas: [initialInstallments] })
+
+    const [isLoadingSaveOrder, setIsLoadingSaveOrder] = useState(false)
+    const [paymentMothod, setPaymentMethod] = useState<orderPaymentMethod>({ quantidade_parcelas: 1, intervalo_parcelas: 0, codigo: 0 });
+
+    const handleAddProduct = (product: orderProduct, quantity: number) => {
         dispatch({
             type: "ADD_PRODUCT",
-            payload: { 
-                codigo: product.codigo,
-                preco: product.preco,
-                descricao: product.descricao,
-                estoque: product.estoque,
-                unidade_medida: product.unidade_medida,
-                quantidade: product.quantidade,
-                desconto: product.desconto,
-                descontos: product.descontos,
-                quantidade_faturada:0,
-                quantidade_separada:0,
-                total: product.total,
-                fotos:product.fotos
+            payload: {
+                codigo: product.codigo, preco: product.preco, descricao: product.descricao, estoque: product.estoque, unidade_medida: product.unidade_medida, quantidade: product.quantidade, desconto: product.desconto, descontos: product.descontos, quantidade_faturada: 0, quantidade_separada: 0, total: product.total, fotos: product.fotos
             },
             quantity
         })
     }
 
-    const handleRmProduct = (product:orderProduct, quantity: number )=>{
-        dispatch({
-            type: 'RM_PRODUCT',
-            payload: product.codigo,
-            quantity:quantity
+    const handleRmProduct = (product: orderProduct, quantity: number) => { dispatch({ type: 'RM_PRODUCT', payload: product.codigo, quantity: quantity }) }
+    const handleNewCustomer = (customer: cliente) => { dispatch({ type: "ADD_CUSTOMER", payload: customer }) }
+    const handleAddFreight = (freight: number) => { dispatch({ type: "FREIGHT", payload: freight }) }
+    const handleAddObservations = (observations: string) => { dispatch({ type: "EDIT_OBSERVATIONS", payload: observations }) }
+    const handleDiscount = (discount: number, codeProduct: number) => { dispatch({ type: 'ADD_DISCOUNT', codeProduct, discount }) }
+    
+    const handleCalculateInstallments = (payload: payloadCalculateInstallments) => { dispatch({ type: 'CALCULATE_INSTALLMENTS', payload }) }
+    const handleAddPaymentMethod = (payload: orderPaymentMethod) => {
+        setPaymentMethod(payload)
+        dispatch({ type: "ADD_PAYMENT_METHOD", payload })
+    }
+    const handleEditDueInstallment = (payload: payloadEditDueInstallment) => { dispatch({ type: "EDIT_DUE_INSTALLMENTS", payload }) }
+    const handleEditSituation = (payload: orderSituation) => { dispatch({ type: 'EDIT_SITUATION', payload: payload }) }
+
+    useEffect(() => {
+        handleCalculateInstallments({
+            intervalo_parcelas: paymentMothod.intervalo_parcelas,
+            quantidade_parcelas: paymentMothod.quantidade_parcelas,
+            total_geral: state.total_geral
         })
-    }
-    const handleNewCustomer = (customer: cliente)=>{
-        dispatch({
-            type: "ADD_CUSTOMER",
-            payload: customer
-        })
-    }
-    const handleAddFreight = (freight:number)=>{
-        dispatch({
-            type:"FREIGHT",
-            payload: freight
-        })
-    }
-
-const handleDiscount = ( discount:number, codeProduct:number )=>{
-    console.log(discount, codeProduct)
-     dispatch({
-         type: 'ADD_DISCOUNT',
-         codeProduct,
-         discount 
-     })
-}
-
-    const RenderItemProduct = (  { item }: {item: orderProduct} )=>{
-
-        return(
-               <View style={{flex:1, width:'90%', borderWidth:1,margin:1 }}>
-                        <Text> Cód: {item.codigo }</Text>
-                        <Text>   Price: $ {item.preco }</Text>
-                        <Text>   Qtd: {item.quantidade }</Text>
-                       <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-around'}} >
-                            <TouchableOpacity style={{width:50, height:50, backgroundColor:'#CCC', alignItems:'center', justifyContent:'center'}}
-                             onPress={ ()=> handleAddProduct(item, 1)}>
-                                < Text> + </Text>
-                            </TouchableOpacity> 
-                            <TouchableOpacity style={{width:50, height:50, backgroundColor:'#CCC', alignItems:'center',justifyContent:'center'}}
-                                     onPress={ ()=> handleRmProduct(item, 1)}>
-                                < Text> -  </Text>
-                                
-                            </TouchableOpacity> 
-                        </View>
-                       <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-around'}} >
-                                < Text> Total: ${item.total} </Text>
-                                < Text> Descontos: ${item.descontos} </Text>
-                                < Text> Desconto Un: ${item.desconto} </Text>
-                        </View>
-
-                            <Text>
-                                desconto
-                            </Text>
-                             <TextInput
-                                style={{ backgroundColor:'#CCC', borderWidth:0.5, borderColor:'red', width:'80%'}}
-                               // onChangeText={(value)=>{ setDiscount(value) }}
-                                keyboardType="decimal-pad"
-                                 // value={  String(discount.toFixed(2)) || '0'  }  
-
-                            />
-
-
-                         
-
-                    </View>
-            )    
-    }
-
+    }, [state.total_geral, paymentMothod])
 
     return (
-            <View style={{ flex: 1, backgroundColor: '#EAF4FE' }}>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{ flex: 1, backgroundColor: '#EAF4FE' }}
+        >
 
-             <CustomHeader
-                    title="novo componente pedido "
-                    onBack={() => navigation.goBack()}
-                  />
-
-            <View style={{ backgroundColor:'#CCC', justifyContent:'space-between' , flexDirection:'row',marginBottom:10}} >
-               <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                    Total Pedido: {state.total_geral}
-               </Text>
-                <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                    Total Descontos: {state.descontos}
-               </Text>
-             </View>
-
-
-
-            
-         <CustomerList
-         handleNewCustomer={handleNewCustomer}
-         />
-                 { state.cliente .codigo > 0 &&  
-           <View style={{ backgroundColor:'#CCC', justifyContent:'space-between' , flexDirection:'row',marginBottom:10}} >
-               <Text style={{ fontSize:15, fontWeight:"bold"}}>
-                  cliente {state.cliente.nome }
-               </Text>
-             </View>
-}
-
-            <ProductList 
-                     handleAddProduct={handleAddProduct}
-                     handleDiscount={handleDiscount}
+            <CustomHeaderOrderComponent
+                title="Novo Pedido"
+                onBack={() => navigation.goBack()}
             />
-            
-                <FlatList
-                  data={state.products}
-                  horizontal={true}
-                  renderItem={ ( {item}  )=>  
-                    <RenderSelectedItem  item={item}  
-                     removeItem={handleRmProduct }    
-                     handleAddProduct={handleAddProduct}
-                     handleDiscount={handleDiscount}
-                     />
-                    
-                    }            
-                />
-                
-                
-                
-                { /** <ProductList  products={state.products}/> */}
 
-        </View>
+            <ScrollView
+                style={{ flex: 1 }}
+                keyboardShouldPersistTaps="always"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} 
+            >
+                { /* LISTA CLIENTES*/}
+                <CustomerList handleNewCustomer={handleNewCustomer} />
+
+                {state.cliente.codigo > 0 &&
+                    <View style={{
+                        backgroundColor: '#FFF',
+                        borderRadius: 12,
+                        marginHorizontal: 15,
+                        marginBottom: 10,
+                        padding: 15,
+                        elevation: 3,
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 3,
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                    }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                            <View style={{ width: 45, height: 45, borderRadius: 25, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center', marginRight: 15 }}>
+                                <Ionicons name="person" size={24} color="#185FED" />
+                            </View>
+                            <View>
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333' }}>
+                                    {state.cliente.nome}
+                                </Text>
+                                <Text style={{ fontSize: 13, color: '#666' }}>
+                                    Cód: {state.cliente.codigo}{state.cliente.cnpj ? ` | ${state.cliente.cnpj}` : ''}
+                                </Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity style={{ padding: 8, backgroundColor: '#F5F7FA', borderRadius: 8 }}>
+                            <FontAwesome name="pencil" size={16} color="#185FED" />
+                        </TouchableOpacity>
+                    </View>
+                }
+ 
+
+    {/* LISTA DE PRODUTOS*/}
+                <ProductList
+                    handleAddProduct={handleAddProduct}
+                    handleDiscount={handleDiscount}
+                />
+
+                {state.products.length > 0 && (
+                    <View style={{ paddingBottom: 10 }}>
+                        <FlatList
+                            data={state.products}
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            renderItem={({ item }) =>
+                                <RenderSelectedItem item={item}
+                                    removeItem={handleRmProduct}
+                                    handleAddProduct={handleAddProduct}
+                                    handleDiscount={handleDiscount}
+                                />
+                            }
+                        />
+                    </View>
+                )}
+
+                <View style={{ paddingBottom: 10 }}>
+                    <Installments
+                        parcelas={state.parcelas}
+                        paymentMothod={paymentMothod}
+                        handleAddPaymentMethod={handleAddPaymentMethod}
+                        handleEditDueInstallment={handleEditDueInstallment}
+                    />
+
+                    <FlatList
+                        data={state.parcelas}
+                        horizontal={true}
+                        showsHorizontalScrollIndicator={false}
+                        renderItem={({ item }) =>
+                            <RenderSimpleItenInstallment item={item} />
+                        }
+                    />
+                </View>
+
+                {/* --- DETALHES --- */}
+                <OrderDetails
+                    handleAddObservations={handleAddObservations}
+                    observations={state.observacoes}
+                    handleEditSituation={handleEditSituation}
+                    situation={state.situacao}
+                />
+
+            </ScrollView>
+
+            {/* Footer */}
+            <View style={styles.bottomBar}>
+                <View>
+                    <Text style={{ fontWeight: 'bold', fontSize: 14, color: '#333' }}>
+                        Total: <Text style={{ color: '#185FED', fontSize: 18 }}>R$ {state.total_geral?.toFixed(2)}</Text>
+                    </Text>
+                    <Text style={{ fontSize: 12, color: '#999', marginTop: 2 }}>
+                        Descontos: R$ {state.descontos.toFixed(2)}
+                    </Text>
+                </View>
+
+                <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={() => console.log(state)}
+                >
+                    {isLoadingSaveOrder ? (
+                        <ActivityIndicator size="small" color="#FFF" />
+                    ) : (
+                        <Text style={{ fontWeight: 'bold', fontSize: 16, color: '#FFF' }}>Salvar</Text>
+                    )}
+                </TouchableOpacity>
+            </View>
+
+            {isLoadingSaveOrder && (
+                <View style={{ position: 'absolute', backgroundColor: 'rgba(0,0,0,0.5)', flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                    <View style={{ backgroundColor: '#FFF', borderRadius: 16, padding: 30, alignItems: 'center', elevation: 10 }}>
+                        <ActivityIndicator size={50} color="#185FED" />
+                        <Text style={{ marginTop: 15, color: '#333', fontWeight: '600' }}>Salvando...</Text>
+                    </View>
+                </View>
+            )}
+
+        </KeyboardAvoidingView>
     )
 }
+
+const styles = StyleSheet.create({
+    bottomBar: {
+        backgroundColor: '#FFF',
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+        paddingVertical: 15,
+        paddingHorizontal: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+    },
+    saveButton: {
+        backgroundColor: '#185FED',
+        paddingVertical: 14,
+        paddingHorizontal: 30,
+        borderRadius: 12,
+        elevation: 4,
+    }
+})

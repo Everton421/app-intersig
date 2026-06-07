@@ -1,3 +1,13 @@
+export function parseDateSafe(dateStr: string): Date {
+  const [ano, mes, dia] = dateStr.split('-').map(Number);
+  return new Date(ano, mes - 1, dia);
+}
+
+export function formatDateToDisplay(dateStr: string): string {
+  const [ano, mes, dia] = dateStr.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
 export const formatItem = () => {
 
 

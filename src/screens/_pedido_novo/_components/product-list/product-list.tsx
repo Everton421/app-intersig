@@ -146,7 +146,10 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
             </TouchableOpacity>
 
             <Modal visible={visibleProdutos} animationType="fade" transparent={true} onRequestClose={() => setVisibleProdutos(false)}>
+
+                
                 <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'center', alignItems: 'center' }}>
+                
                     <View style={{
                         width: "100%",
                         height: "90%",

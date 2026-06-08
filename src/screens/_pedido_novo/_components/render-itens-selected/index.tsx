@@ -103,5 +103,6 @@ import { orderProduct } from "../../types/order";
         marginHorizontal: 6,
         padding: 12,
         width: 280,
+        marginBottom:10
     },
   })

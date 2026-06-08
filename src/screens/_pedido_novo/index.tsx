@@ -4,7 +4,7 @@ import { CustomHeader } from "../../components/custom-header" // Cuidado com ess
 import { useEffect, useReducer, useState } from "react"
 import { ProductList } from "./_components/product-list/product-list"
 import { RenderSelectedItem } from "./_components/render-itens-selected"
-import { actionOrderReducer, cliente, objOrderReducer, orderItem, orderPaymentMethod, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, type orderProduct } from "./types/order"
+import { actionOrderReducer, cliente, objOrderReducer, orderItem, orderPaymentMethod, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, serviceItem, type orderProduct } from "./types/order"
 import { CustomerList } from "./_components/customer/customer-list"
 import { CustomHeaderOrderComponent } from "./_components/header"
 import { Installments } from "./_components/installments"
@@ -13,10 +13,88 @@ import { addDays, format } from "date-fns"
 import { RenderSimpleItenInstallment } from "./_components/render-itens-installments"
 import { OrderDetails } from "./_components/details"
 import { TextInput } from "react-native-gesture-handler"
+import { ServicesList } from "./_components/services-list/services-list"
 
 function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
     // ... MANTER TODO O SEU CÓDIGO DO REDUCER INTACTO AQUI ...
     switch(action.type){
+        case 'ADD_SERVICE':{ 
+                const serviceToadd = action.payload
+                const { quantity } = action;
+              const serviceExists = state.services.find( service  =>   service.codigo === serviceToadd.codigo   )
+                let newServices: serviceItem[];
+                    if(serviceExists){
+                            newServices = state.services.map( ( item ) =>{ 
+                                    if(item.codigo === serviceToadd.codigo){
+                                        const newQuantity = item.quantidade = quantity;
+                                        const newDesconto = newQuantity * item.desconto; 
+                                         const newTotal = (newQuantity * item.valor) - newDesconto;  
+                                        return { ...item, quantidade: newQuantity, descontos:newDesconto,desconto: item.desconto, total:newTotal }
+                                    }else{
+                                        return item;
+                                    }   
+                                }
+                             )
+                    }else{
+                          newServices = [ ...state.services,{ ...serviceToadd, quantidade:quantity}];
+                    }
+                    let newTotalGeralservicesOrder = 0;
+                    let newTotalDescountsOrder = 0;   
+                    let newTotalProductsOrder=0;
+                    let newTotalGeral = 0;
+
+                    for( const item of newServices){
+                            newTotalGeralservicesOrder+= item.total;
+                            newTotalDescountsOrder+=item.desconto
+                            newTotalProductsOrder+=(item.quantidade * item.preco)
+                            newTotalGeral+= item.total;
+                        }
+                        for(const item of state.products){
+                            newTotalGeral+= item.total;
+                            newTotalDescountsOrder+= item.desconto;
+                        }
+                        newTotalGeral+= state.frete;
+              return { 
+                ...state,
+                  total_geral: newTotalGeral, 
+                  total_servicos: newTotalGeralservicesOrder,
+                  descontos: newTotalDescountsOrder,
+                  servicos:  newServices
+                };
+            }
+    case 'RM_SERVICE': {
+            const { quantity } = action;
+                const newServices = state.services.map((item) =>{
+                   if(item.codigo === action.payload  && item.quantidade >= quantity){    
+                    let newQuantity = item.quantidade - quantity
+                    return { ...item, quantidade: newQuantity, total: (newQuantity * item.valor) - item.desconto }
+                   }else{
+                    return item
+                   }
+               }).filter((item) =>  item.quantidade > 0)
+                    let newTotalGeral = 0;
+                    let newTotalDescountsOrder = 0;   
+                    let newTotalServicesOrder = 0;
+                    for( const item of newServices){
+                            newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.descontos
+                            newTotalServicesOrder+=(item.quantidade * item.valor)
+                        } 
+
+                    for(const item of state.products){
+                          newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.descontos
+                    }
+                            newTotalGeral+=state.frete;
+                        
+              return { 
+                ...state,
+                  total_geral: newTotalGeral,
+                  total_serviceos: newTotalServicesOrder,
+                  descontos: newTotalDescountsOrder,
+                  servicos: newServices
+                 };
+            }
         case 'ADD_PRODUCT':{ 
                 const productToadd = action.payload
                 const { quantity } = action;
@@ -37,16 +115,30 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                     }else{
                           newProducts = [ ...state.products,{ ...productToadd, quantidade:quantity}];
                     }
-                    let newTotalGeralProductsOrder = 0;
+                    let newTotalGeral = 0;
                     let newTotalDescountsOrder = 0;   
                     let newTotalProductsOrder=0;
                     for( const item of newProducts){
-                            newTotalGeralProductsOrder+= item.total;
+                            newTotalGeral+= item.total;
                             newTotalDescountsOrder+=item.desconto
                             newTotalProductsOrder+=(item.quantidade * item.preco)
                         } 
-              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
+                        for(const item of state.services){
+                            newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.desconto
+                        }
+                      newTotalGeral+= state.frete;
+
+              return {
+                 ...state,
+                   total_geral: newTotalGeral,
+                    total_produtos: newTotalProductsOrder,
+                    descontos: newTotalDescountsOrder,
+                    products: newProducts
+                 };
             }
+
+
         case 'RM_PRODUCT': {
             const { quantity } = action;
                 const newProducts = state.products.map((item) =>{
@@ -57,23 +149,36 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                     return item
                    }
                }).filter((item) =>  item.quantidade > 0)
-                    let newTotalGeralProductsOrder = 0;
+                    let newTotalGeral = 0;
                     let newTotalDescountsOrder = 0;   
                     let newTotalProductsOrder=0;
                     for( const item of newProducts){
-                            newTotalGeralProductsOrder+= item.total;
+                            newTotalGeral+= item.total;
                             newTotalDescountsOrder+=item.descontos
                             newTotalProductsOrder+=(item.quantidade * item.preco)
                         } 
-              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
+
+                        for(const item of state.services){
+                            newTotalGeral+=item.total;
+                            newTotalDescountsOrder+=item.descontos
+                        }
+                            newTotalGeral+=state.frete;
+                        
+              return { 
+                ...state,
+                  total_geral: newTotalGeral,
+                  total_produtos: newTotalProductsOrder,
+                  descontos: newTotalDescountsOrder,
+                  products: newProducts
+                 };
             }
         case 'FREIGHT':{ return { ...state, frete: action.payload, total_geral: state.total_geral + action.payload }; }    
-        case 'ADD_DISCOUNT':{
-            const { codeProduct, discount } = action
-                             const newProducts  = state.products.map( ( item ) =>{ 
-                                        if(item.codigo === codeProduct ){
+        case 'ADD_DISCOUNT_SERVICE':{
+            const {   codeService, discount } = action
+                             const newServices = state.services.map( ( item ) =>{ 
+                                        if(item.codigo === codeService ){
                                             const newDiscounts = item.quantidade * discount; 
-                                             let newTotal = (item.quantidade * item.preco) - newDiscounts;  
+                                             let newTotal = (item.quantidade * item.valor) - newDiscounts;  
                                              if(newTotal <  0 ){ newTotal = 0 }
                                          return { ...item, descontos:newDiscounts, desconto:discount , total:newTotal }          
                                         }else{
@@ -81,16 +186,23 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                                         }
                                 }
                              )
-                    let newTotalGeralProductsOrder = 0;
+                    let newTotalGeral = 0;
                     let newTotalDescountsOrder = 0;   
-                    let newTotalProductsOrder=0;
-                    for( const item of newProducts){
-                            newTotalGeralProductsOrder+= item.total;
+                    let newTotalservicesOrder=0;
+                    for( const item of newServices){
+                            newTotalGeral+= item.total;
                             newTotalDescountsOrder+=item.descontos
-                            newTotalProductsOrder+=(item.quantidade * item.preco)
+                            newTotalservicesOrder+=(item.quantidade * item.valor)
                         } 
-              return { ...state, total_geral: newTotalGeralProductsOrder, total_produtos: newTotalProductsOrder, descontos: newTotalDescountsOrder, products: newProducts };
+
+                        for(const item of state.products){
+                             newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.descontos
+                        }
+
+              return { ...state, total_geral: newTotalGeral, total_services: newTotalservicesOrder, descontos: newTotalDescountsOrder, services: newServices };
         }
+
         case 'ADD_CUSTOMER':{
             const { payload } = action;
             const { cep, cnpj, codigo, endereco, numero, nome} = payload;
@@ -136,10 +248,19 @@ export const PedidoComponent = ({ navigation }: any) => {
 
     const moment = configMoment();
 
-    const initalValuecustomer: cliente = { cep: '', cnpj: '', codigo: 0, endereco: '', numero: 0, nome: '' }
+    const initalValuecustomer: cliente = { cep: '', cnpj: '', codigo: 0, endereco: '', numero: 0, nome: ''}
     const initialInstallments: parcela = { parcela: 0, valor: 0, vencimento: moment.dataHoraAtual() }
+    const initialBodyOrder:objOrderReducer ={ 
+        codigo: '1',
+         contato:'', forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 0, total_produtos: 0, descontos: 0, frete: 0, 
+        descontos_produtos:0,
+        descontos_servicos:0,
+        services:[
+        ],
+         products: [ ], parcelas: [initialInstallments],
 
-    const [state, dispatch] = useReducer(orderReducer, { codigo: '1', contato:'',forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 0, total_produtos: 0, descontos: 0, frete: 0, products: [], parcelas: [initialInstallments] })
+        }
+    const [state, dispatch] = useReducer(orderReducer, initialBodyOrder)
 
     const [isLoadingSaveOrder, setIsLoadingSaveOrder] = useState(false)
     const [paymentMothod, setPaymentMethod] = useState<orderPaymentMethod>({ quantidade_parcelas: 1, intervalo_parcelas: 0, codigo: 0 });
@@ -158,7 +279,7 @@ export const PedidoComponent = ({ navigation }: any) => {
     const handleNewCustomer = (customer: cliente) => { dispatch({ type: "ADD_CUSTOMER", payload: customer }) }
     const handleAddFreight = (freight: number) => { dispatch({ type: "FREIGHT", payload: freight }) }
     const handleAddObservations = (observations: string) => { dispatch({ type: "EDIT_OBSERVATIONS", payload: observations }) }
-    const handleDiscount = (discount: number, codeProduct: number) => { dispatch({ type: 'ADD_DISCOUNT', codeProduct, discount }) }
+    const handleDiscount = (discount: number, codeProduct: number) => { dispatch({ type: 'ADD_DISCOUNT_PRODUCT', codeProduct, discount }) }
     
     const handleCalculateInstallments = (payload: payloadCalculateInstallments) => { dispatch({ type: 'CALCULATE_INSTALLMENTS', payload }) }
     const handleAddPaymentMethod = (payload: orderPaymentMethod) => {
@@ -168,6 +289,12 @@ export const PedidoComponent = ({ navigation }: any) => {
     const handleEditDueInstallment = (payload: payloadEditDueInstallment) => { dispatch({ type: "EDIT_DUE_INSTALLMENTS", payload }) }
     const handleEditSituation = (payload: orderSituation) => { dispatch({ type: 'EDIT_SITUATION', payload: payload }) }
 
+const handleEditContact = ( payload:string ) =>{
+    dispatch({
+        type:'EDIT_CONTACT',
+        payload
+    })
+}
     useEffect(() => {
         handleCalculateInstallments({
             intervalo_parcelas: paymentMothod.intervalo_parcelas,
@@ -194,83 +321,117 @@ export const PedidoComponent = ({ navigation }: any) => {
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }} 
             >
                 { /* LISTA CLIENTES*/}
-                <CustomerList handleNewCustomer={handleNewCustomer} />
+                <CustomerList handleNewCustomer={handleNewCustomer} customer={state.cliente}/>
+ 
+ 
 
-                {state.cliente.codigo > 0 &&
-                    <View style={{
+        {/* LISTA DE PRODUTOS*/}
+            <View style={{
+                    backgroundColor: '#FFF',
+                    borderRadius: 12,
+                    marginHorizontal: 10,
+                    marginBottom: 20,
+                    padding: 10,
+                    elevation: 3,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 3
+                }}>
+
+            <ProductList
+                        handleAddProduct={handleAddProduct}
+                        handleDiscount={handleDiscount}
+                    />
+
+                
+
+                    {state.products.length > 0 && (
+                        <View style={{ paddingBottom: 10 , marginBottom:5}}>
+                            <FlatList
+                                data={state.products}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={({ item }) =>
+                                    <RenderSelectedItem item={item}
+                                        removeItem={handleRmProduct}
+                                        handleAddProduct={handleAddProduct}
+                                        handleDiscount={handleDiscount}
+                                    />
+                                }
+                            />
+                            <View style={{ flexDirection:"row", justifyContent:'space-between', marginTop:5}}>
+                          <View style={{ width: 'auto', height: 20,padding:3, borderRadius: 18, backgroundColor: '#EAF4FE', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: '#185FED', fontSize: 12, fontWeight:"bold"}}> R$ {state.total_produtos?.toFixed(2)}</Text>
+                         </View>
+                            
+                          <View style={{ width: 'auto', height: 20,padding:3, borderRadius: 18, backgroundColor: '#feeaea', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: 'red', fontSize: 12, fontWeight:"bold"}}> - R$ {state.descontos?.toFixed(2)}</Text>
+                         </View>
+                        </View>
+
+                        </View>
+                    )}
+            </View>
+             
+        {/* LISTA DE SERVICOS*/}
+             
+                 <View style={{
+                    backgroundColor: '#FFF',
+                    borderRadius: 12,
+                    marginHorizontal: 10,
+                    marginBottom: 20,
+                    padding: 10,
+                    elevation: 3,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 3
+                }}>
+
+
+             <ServicesList
+                    />
+                </View>
+             
+                {/** --- PARCELAS --- */}
+          <View style={{
                         backgroundColor: '#FFF',
                         borderRadius: 12,
-                        marginHorizontal: 15,
-                        marginBottom: 10,
-                        padding: 15,
+                        marginHorizontal: 10,
+                        marginBottom: 20,
+                        padding: 10,
                         elevation: 3,
                         shadowColor: '#000',
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
-                        shadowRadius: 3,
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'space-between'
+                        shadowRadius: 3
                     }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                            <View style={{ width: 45, height: 45, borderRadius: 25, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center', marginRight: 15 }}>
-                                <Ionicons name="person" size={24} color="#185FED" />
-                            </View>
-                            <View>
-                                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333' }}>
-                                    {state.cliente.nome}
-                                </Text>
-                                <Text style={{ fontSize: 13, color: '#666' }}>
-                                    Cód: {state.cliente.codigo}{state.cliente.cnpj ? ` | ${state.cliente.cnpj}` : ''}
-                                </Text>
-                            </View>
-                        </View>
-                        <TouchableOpacity style={{ padding: 8, backgroundColor: '#F5F7FA', borderRadius: 8 }}>
-                            <FontAwesome name="pencil" size={16} color="#185FED" />
-                        </TouchableOpacity>
-                    </View>
-                }
- 
 
-    {/* LISTA DE PRODUTOS*/}
-                <ProductList
-                    handleAddProduct={handleAddProduct}
-                    handleDiscount={handleDiscount}
-                />
-
-                {state.products.length > 0 && (
                     <View style={{ paddingBottom: 10 }}>
+                        <Installments
+                            parcelas={state.parcelas}
+                            paymentMothod={paymentMothod}
+                            handleAddPaymentMethod={handleAddPaymentMethod}
+                            handleEditDueInstallment={handleEditDueInstallment}
+                        />
+
                         <FlatList
-                            data={state.products}
+                            data={state.parcelas}
                             horizontal={true}
                             showsHorizontalScrollIndicator={false}
                             renderItem={({ item }) =>
-                                <RenderSelectedItem item={item}
-                                    removeItem={handleRmProduct}
-                                    handleAddProduct={handleAddProduct}
-                                    handleDiscount={handleDiscount}
-                                />
+                                <RenderSimpleItenInstallment item={item} />
                             }
                         />
                     </View>
-                )}
+                    <View style={{ flexDirection:"row" }}>
+                         <Text style={{ color: '#185FED', fontWeight: 'bold' }}> parcelas </Text>  
 
-                <View style={{ paddingBottom: 10 }}>
-                    <Installments
-                        parcelas={state.parcelas}
-                        paymentMothod={paymentMothod}
-                        handleAddPaymentMethod={handleAddPaymentMethod}
-                        handleEditDueInstallment={handleEditDueInstallment}
-                    />
-
-                    <FlatList
-                        data={state.parcelas}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        renderItem={({ item }) =>
-                            <RenderSimpleItenInstallment item={item} />
-                        }
-                    />
+                          <View style={{ width: 'auto', height: 'auto', padding:2, borderRadius: 18, backgroundColor: '#EAF4FE', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: '#185FED', fontWeight: 'bold' }}>{state.parcelas.length } </Text>  
+                          </View>
+                     </View>
                 </View>
 
                 {/* --- DETALHES --- */}
@@ -279,6 +440,8 @@ export const PedidoComponent = ({ navigation }: any) => {
                     observations={state.observacoes}
                     handleEditSituation={handleEditSituation}
                     situation={state.situacao}
+                    contact={state.contato}
+                    handleEditContact={handleEditContact}
                 />
 
             </ScrollView>

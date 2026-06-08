@@ -9,16 +9,17 @@ import {
     ActivityIndicator
 } from "react-native";
 
-import { Ionicons, MaterialIcons, FontAwesome6 } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, FontAwesome6, FontAwesome } from "@expo/vector-icons";
 import { RenderItemCustomer } from "./render-item-customer";
 import { useClients } from "../../../../database/queryClientes/queryCliente";
 import { cliente } from "../../types/order";
 
 type props = { 
     handleNewCustomer: (customer: cliente) => void
+    customer: cliente
 }
 
-export const CustomerList = ({ handleNewCustomer }: props) => {
+export const CustomerList = ({ handleNewCustomer, customer }: props) => {
 
     const [pesquisa, setPesquisa] = useState<string>(""); 
     const [data, setData] = useState([]);
@@ -67,7 +68,31 @@ export const CustomerList = ({ handleNewCustomer }: props) => {
                     justifyContent: 'space-between'
                 }}
             >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                {
+                    customer.codigo > 0 ? 
+                    (
+                        <>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                            <View style={{ width: 45, height: 45, borderRadius: 25, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center', marginRight: 15 }}>
+                                <Ionicons name="person" size={24} color="#185FED" />
+                            </View>
+                            <View>
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#333' }}>
+                                    {customer.nome}
+                                </Text>
+                                <Text style={{ fontSize: 13, color: '#666' }}>
+                                    Cód: {customer.codigo}{customer.cnpj ? ` | ${customer.cnpj}` : ''}
+                                </Text>
+                            </View>
+                        </View>
+                            <FontAwesome name="pencil" size={16} color="#185FED" />
+
+                        </>
+
+                    ):
+                    (
+                    <>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                     <View style={{ width: 45, height: 45, borderRadius: 25, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center' }}>
                         <FontAwesome6 name="user-tag" size={20} color="#185FED" />
                     </View>
@@ -77,6 +102,12 @@ export const CustomerList = ({ handleNewCustomer }: props) => {
                     </View>
                 </View>
                 <MaterialIcons name="search" size={24} color="#185FED" />
+                    </>
+                    )
+                }
+                     
+
+             
             </TouchableOpacity>
 
             {/* --- MODAL DE PESQUISA DE CLIENTES --- */}

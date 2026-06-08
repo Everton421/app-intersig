@@ -13,6 +13,21 @@ export type orderProduct = {
     fotos:[] | photoOrdeProduct[]
 }
 
+
+ 
+export type orderService = {
+    codigo:number
+    valor:number
+    aplicacao:string
+    data_cadastro:string
+    data_recadastro:string
+    tipo_serv:number
+      desconto:number
+    descontos:number
+    quantidade:number
+    total:number
+}
+
 type photoOrdeProduct = { 
     link:string
 }
@@ -35,10 +50,16 @@ export type payloadEditDueInstallment = {
 }
 
 export  type actionOrderReducer =   
+    { type: 'ADD_SERVICE' , payload: orderService, quantity:number} 
+      
+   | { type: 'RM_SERVICE' , payload: number, quantity:number }  
+   | { type: 'ADD_DISCOUNT_SERVICE' , discount: number , codeService:number }
+   |
     { type: 'ADD_PRODUCT' , payload: orderProduct, quantity:number}  
    | { type: 'RM_PRODUCT' , payload: number, quantity:number }  
    | { type: 'FREIGHT' , payload: number}  
-   | { type: 'ADD_DISCOUNT' , discount: number , codeProduct:number }
+   
+   | { type: 'ADD_DISCOUNT_PRODUCT' , discount: number , codeProduct:number }
    | { type: 'ADD_CUSTOMER', payload: cliente}
     | { type: 'CALCULATE_INSTALLMENTS', payload :  payloadCalculateInstallments}
     | { type: 'ADD_PAYMENT_METHOD', payload :  orderPaymentMethod}
@@ -48,7 +69,6 @@ export  type actionOrderReducer =
     | { type: 'EDIT_CONTACT', payload: string}
 
 export type orderItem =  orderProduct & { quantidade:number};
-
 export type cliente ={ 
     codigo:number
     cep:string
@@ -69,7 +89,8 @@ export type orderSituation =
 
 export type objOrderReducer = {
     codigo:string
-    products: orderItem[],
+    products: orderItem[]  ,
+    services:orderService[]  ,
     parcelas: parcela[],
     cliente: cliente
     forma_pagamento: number
@@ -77,6 +98,8 @@ export type objOrderReducer = {
     total_geral:number
     total_produtos:number
     descontos:number
+    descontos_servicos:number
+    descontos_produtos:number
     observacoes:string
     situacao: orderSituation
     contato:string

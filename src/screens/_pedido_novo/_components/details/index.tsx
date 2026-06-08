@@ -10,9 +10,11 @@ type props = {
     observations: string;
     handleEditSituation: (situation: orderSituation) => void;
     situation: orderSituation;
+    contact:string,
+    handleEditContact: ( payload:string )=>void
 }
 
-export const OrderDetails = ({ handleAddObservations, observations, situation, handleEditSituation }: props) => {
+export const OrderDetails = ({ handleAddObservations, observations, situation, handleEditSituation ,contact ,handleEditContact }: props) => {
     
     const [date, setDate] = useState(new Date());
     const [showPicker, setShowPicker] = useState(false);
@@ -103,6 +105,22 @@ export const OrderDetails = ({ handleAddObservations, observations, situation, h
                         <Text style={{ color: situation === 'AI' ? '#FFF' : '#666', fontWeight: 'bold', fontSize: 15 }}>Pedido</Text>
                     </TouchableOpacity>
                 </View>
+            </View>
+
+              <View style={{marginBottom:10}}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#666', marginBottom: 8 }}>Contato</Text>
+                <TextInput
+                    style={{ 
+                        backgroundColor: '#F5F7FA', borderWidth: 1, borderColor: '#E0E0E0', 
+                        borderRadius: 8, padding: 12,  textAlignVertical: 'top', 
+                        color: '#333', fontSize: 15
+                    }}
+                    scrollEnabled={false} // Crucial para o ScrollView da tela principal fazer o scroll automático!
+                    placeholder="Contato..."
+                    placeholderTextColor="#999"
+                    value={contact}
+                    onChangeText={handleEditContact}
+                />
             </View>
 
             <View>

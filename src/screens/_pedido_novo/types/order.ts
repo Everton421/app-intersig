@@ -69,6 +69,7 @@ export  type actionOrderReducer =
     | { type: 'EDIT_CONTACT', payload: string}
 
 export type orderItem =  orderProduct & { quantidade:number};
+export type serviceItem = orderService & { quantidade: number };
 export type cliente ={ 
     codigo:number
     cep:string

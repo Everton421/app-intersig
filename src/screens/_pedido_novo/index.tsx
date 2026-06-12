@@ -26,7 +26,7 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                     if(serviceExists){
                             newServices = state.services.map( ( item ) =>{ 
                                     if(item.codigo === serviceToadd.codigo){
-                                        const newQuantity = item.quantidade = quantity;
+                                        const newQuantity  = quantity;
                                         const newDesconto = newQuantity * item.desconto; 
                                          const newTotal = (newQuantity * item.valor) - newDesconto;  
                                         return { ...item, quantidade: newQuantity, descontos:newDesconto,desconto: item.desconto, total:newTotal }
@@ -59,7 +59,7 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                   total_geral: newTotalGeral, 
                   total_servicos: newTotalGeralservicesOrder,
                   descontos: newTotalDescountsOrder,
-                  servicos:  newServices
+                  services:  newServices
                 };
             }
     case 'RM_SERVICE': {
@@ -90,9 +90,9 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
               return { 
                 ...state,
                   total_geral: newTotalGeral,
-                  total_serviceos: newTotalServicesOrder,
+                  total_servicos: newTotalServicesOrder,
                   descontos: newTotalDescountsOrder,
-                  servicos: newServices
+                  services: newServices
                  };
             }
         case 'ADD_PRODUCT':{ 
@@ -103,10 +103,10 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                     if(productExists){
                             newProducts = state.products.map( ( item ) =>{ 
                                     if(item.codigo === productToadd.codigo){
-                                        const newQuantity = item.quantidade = quantity;
-                                        const newDesconto = newQuantity * item.desconto; 
+                                        const newQuantity =  quantity;
+                                        const newDesconto = newQuantity * productToadd.desconto; 
                                          const newTotal = (newQuantity * item.preco) - newDesconto;  
-                                        return { ...item, quantidade: newQuantity, descontos:newDesconto,desconto: item.desconto, total:newTotal }
+                                        return { ...item, quantidade: newQuantity, descontos:newDesconto, desconto: productToadd.desconto, total:newTotal }
                                     }else{
                                         return item;
                                     }   
@@ -138,7 +138,35 @@ function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
                  };
             }
 
+        case 'ADD_DISCOUNT_PRODUCT':{
+            const {   codeProduct, discount } = action
+                             const newProducts = state.products.map( ( item ) =>{ 
+                                        if(item.codigo === codeProduct ){
+                                            const newDiscounts = item.quantidade * discount; 
+                                             let newTotal = (item.quantidade * item.preco) - newDiscounts;  
+                                             if(newTotal <  0 ){ newTotal = 0 }
+                                         return { ...item, descontos:newDiscounts, desconto:discount , total:newTotal }          
+                                        }else{
+                                            return item;
+                                        }
+                                }
+                             )
+                    let newTotalGeral = 0;
+                    let newTotalDescountsOrder = 0;   
+                    let newTotalservicesOrder=0;
+                    for( const item of newProducts){
+                            newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.descontos
+                            newTotalservicesOrder+=(item.quantidade * item.preco)
+                        } 
 
+                        for(const item of state.services){
+                             newTotalGeral+= item.total;
+                            newTotalDescountsOrder+=item.descontos
+                        }
+
+              return { ...state, total_geral: newTotalGeral, total_services: newTotalservicesOrder, descontos: newTotalDescountsOrder, products: newProducts };
+        }
         case 'RM_PRODUCT': {
             const { quantity } = action;
                 const newProducts = state.products.map((item) =>{
@@ -250,26 +278,39 @@ export const PedidoComponent = ({ navigation }: any) => {
 
     const initalValuecustomer: cliente = { cep: '', cnpj: '', codigo: 0, endereco: '', numero: 0, nome: ''}
     const initialInstallments: parcela = { parcela: 0, valor: 0, vencimento: moment.dataHoraAtual() }
-    const initialBodyOrder:objOrderReducer ={ 
+    const [state, dispatch] = useReducer(orderReducer, { 
         codigo: '1',
-         contato:'', forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 0, total_produtos: 0, descontos: 0, frete: 0, 
+         contato:'', forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 1, total_produtos: 0, descontos: 0, frete: 0, 
         descontos_produtos:0,
         descontos_servicos:0,
         services:[
         ],
          products: [ ], parcelas: [initialInstallments],
-
-        }
-    const [state, dispatch] = useReducer(orderReducer, initialBodyOrder)
+        })
 
     const [isLoadingSaveOrder, setIsLoadingSaveOrder] = useState(false)
     const [paymentMothod, setPaymentMethod] = useState<orderPaymentMethod>({ quantidade_parcelas: 1, intervalo_parcelas: 0, codigo: 0 });
 
     const handleAddProduct = (product: orderProduct, quantity: number) => {
+        const preco = product.preco || 0;
+        const descUnit = product.desconto || 0;
+        const descTotal = descUnit * quantity;
+        const total = (preco * quantity) - descTotal;
         dispatch({
             type: "ADD_PRODUCT",
             payload: {
-                codigo: product.codigo, preco: product.preco, descricao: product.descricao, estoque: product.estoque, unidade_medida: product.unidade_medida, quantidade: product.quantidade, desconto: product.desconto, descontos: product.descontos, quantidade_faturada: 0, quantidade_separada: 0, total: product.total, fotos: product.fotos
+                codigo: product.codigo,
+                preco,
+                descricao: product.descricao,
+                estoque: product.estoque,
+                unidade_medida: product.unidade_medida,
+                quantidade: quantity,
+                desconto: descUnit,
+                descontos: descTotal,
+                quantidade_faturada: 0,
+                quantidade_separada: 0,
+                total,
+                fotos: product.fotos || []
             },
             quantity
         })

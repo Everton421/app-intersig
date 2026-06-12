@@ -85,7 +85,7 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
 
                     useEffect(()=>{
                        setTotal( calcTotal( ) ) 
-                    },[desconto,quantidade, total])
+                    },[desconto, quantidade])
 
 
         const hasImage = isSelected?.fotos && isSelected?.fotos[0]?.link;

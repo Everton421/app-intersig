@@ -1,138 +1,36 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Image, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { useServices } from "../../../../database/queryServicos/queryServicos";
+import { orderService, serviceItem } from "../../types/order";
+import { ModalEditSelectedService } from './modal-edit-selected-service';
+import { CustomAlert } from '../../../../components/custom-alert';
+ 
+ 
 
-
-    function renderItemServico(item:any){
-
-
-      //  const isSelected = orcamento.servicos.find(i => i.codigo === item.codigo);
-        const isSelected   = {codigo: 1} ;
-
-      //  const quantidade = isSelected ? isSelected.quantidade : 0;
-        const quantidade =   0;
-
-      return ( 
-        <TouchableOpacity 
-        style={ [
-            {  backgroundColor: isSelected?.codigo  === item?.codigo  ? '#185FED' : '#FFF'} , 
-        {  margin:5, padding:7, borderRadius:5 , elevation:4} ] }
-         // onPress={ ()=> selecionaServico(item)}  
-         >
-          
-            <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between'}}>
-             <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'     }, { fontWeight:'bold'} ] } >
-              codigo:  {item.codigo}  
-             </Text>
-             
-             <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'      }, { fontWeight:'bold'} ] } >
-             valor:  {item.valor}  
-             </Text>
-
-            </View>
-          
-         <Text style={ [ {  color:   isSelected?.codigo  === item?.codigo  ? '#FFF' :'#000'  }, { fontWeight:'bold'} ] }  numberOfLines={2} >
-               {item.aplicacao}
-          </Text>
-          
-          
-          { isSelected ?
-             
-             <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 2 }}>
-        
-              <View style={{ marginTop: 3 }}>
-                <View style={{ alignItems: 'center' }}>
-                  <View style={{ backgroundColor: 'white', borderRadius: 25, elevation: 4, padding: 8, justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{ fontWeight: 'bold', textAlign: 'center' }}> {  quantidade  } </Text>
-                  </View>
-                  <View
-                   style={styles.buttonsContainer} 
-                  >
-                    <TouchableOpacity 
-                    //  onPress={() =>  handleIncrement(item)} 
-                       style={styles.button}
-                      >
-                      <Text 
-                       style={styles.buttonText}
-                       >  + </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity 
-                      //   onPress={() => handleDecrement(item)} 
-                        style={styles.button}
-                        >
-                      <Text   style={styles.buttonText}
-                      > - </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View>
-                  <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 20, elevation: 5 }}>
-                    Total R$: {item.total}
-                  </Text>
-                </View>
-              </View>
-           </View>
-
-          :null
-          }
-        </TouchableOpacity>
-      )
-    }
-
-
-    const renderItem = ({ item }: any) => {
-
-        return (
-            <TouchableOpacity
-                style={{
-                    backgroundColor: "#FFF",
-                    borderRadius: 12,
-                    marginHorizontal: 15,
-                    marginVertical: 6,
-                    padding: 10,
-                    elevation: 3,
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.1,
-                    shadowRadius: 3,
-                    flexDirection: 'row',
-                    alignItems: 'center'
-                }}
-              //  onPress={() => selecionarItem(item)}
-            >
-                <View style={{ width: 60, height: 60, borderRadius: 8, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginRight: 12, overflow: 'hidden' }}>
-                    
-                    <FontAwesome5 name="tools" size={24} color="#BDBDBD" />
-
-                </View>
-
-                {/* Dados */}
-                <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 12, color: '#185FED', fontWeight: 'bold' }}>Cód: {item.codigo}</Text>
-                        <Text style={{ fontSize: 12, color: '#185FED', fontWeight: 'bold' }}>Id: {item.id}</Text>
-                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#4CAF50' }}>R$ {item.valor ? item.valor.toFixed(2) : '0.00'}</Text>
-                    </View>
-
-                    <Text numberOfLines={2} style={{ fontSize: 14, fontWeight: '600', color: '#333', marginVertical: 2 }}>
-                        {item.aplicacao}
-                    </Text>
-
-                </View>
-            </TouchableOpacity>
-        );
-    };
-
-
-export const ServicesList = ()=>{
+type props = {
+  handleAddServices: (service: orderService, quantity: number) => void
+  handleDiscountService: (discount: number, codeService: number) => void
+    servicesIsSelected:orderService[]
+}
+export const ServicesList = ({ handleAddServices, handleDiscountService, servicesIsSelected }:props)=>{
     
     const [ isVisibleServices, setIsVisibleServices ] = useState(false);
-    const [ searchService, setSearchService] = useState<string>();
+    const [ searchService, setSearchService] = useState<string>('1');
     const [ filteredDataServices , setFilteredDataServices ] = useState();
     const [ isLoadingDataServices , setIsLoadingDataServices ] = useState(false);
-
+    const [ isVisibleModalEditService , setIsVisibleModalEditService ] = useState(false);
+    const [ serviceIsSelected, setServiceIsSelected ]= useState<serviceItem>();
+        
+        const [ isVisibleAlert, setIsVisibleAlert ] = useState(false);
+       const  [ titleAlert, setTitleAlert ] = useState<string>('');
+        const [ typeAlert, setTypeAlert] = useState< 'info' | 'success' | 'error' | 'warning'>();
+        const [ messageAlert, setMessageAlert ]= useState("");
+        const [cancelTextAlert, setCancelTextAlert] = useState();
+        const [ confirmTextAlert, setConfirmTextAlert ] = useState();
+         
+    
       const useQueryServicos  = useServices();
 
         async function register (){
@@ -168,12 +66,74 @@ export const ServicesList = ()=>{
         buscaLocal();
         },[ searchService ])
 
+        function selectServiceOrder( item  :  serviceItem ){
+
+              const isSelected = servicesIsSelected.some((service )=> item.codigo === service.codigo)
+        if(isSelected) {
+            setMessageAlert(`O Serviço ${item.aplicacao} já foi adicionado`)
+               setIsVisibleAlert(true)
+                return
+            }
+            setIsVisibleModalEditService(true);
+          setServiceIsSelected(item)
+        }
+
+        const renderItem = ({ item }: any) => {
+        const isSelected = servicesIsSelected.some((service )=> item.codigo === service.codigo)
+
+        return (
+            <TouchableOpacity
+            style={[
+                    isSelected && { 
+                         //borderBlockStartColor:'#4CAF50',
+                         borderStartColor:'#4CAF50',
+                         borderStartWidth:5
+                    },
+                    {
+                    backgroundColor: "#FFF",
+                    borderRadius: 12,
+                    marginHorizontal: 15,
+                    marginVertical: 6,
+                    padding: 10,
+                    elevation: 3,
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.1,
+                    shadowRadius: 3,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    
+                }]}
+                 onPress={() => selectServiceOrder(item)}
+            >
+                <View style={{ width: 60, height: 60, borderRadius: 8, backgroundColor: '#F5F5F5', justifyContent: 'center', alignItems: 'center', marginRight: 12, overflow: 'hidden' }}>
+                    
+                    <FontAwesome5 name="tools" size={24} color="#BDBDBD" />
+
+                </View>
+
+                {/* Dados */}
+                <View style={{ flex: 1 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={{ fontSize: 12, color: '#185FED', fontWeight: 'bold' }}>Cód: {item.codigo}</Text>
+                        <Text style={{ fontSize: 12, color: '#185FED', fontWeight: 'bold' }}>Id: {item.id}</Text>
+                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#4CAF50' }}>R$ {item.valor ? item.valor.toFixed(2) : '0.00'}</Text>
+                    </View>
+
+                    <Text numberOfLines={2} style={{ fontSize: 14, fontWeight: '600', color: '#333', marginVertical: 2 }}>
+                        {item.aplicacao}
+                    </Text>
+
+                </View>
+            </TouchableOpacity>
+        );
+    };
 
     return ( 
         <>
       
           <TouchableOpacity
-                             onPress={ ()=>    setIsVisibleServices(true) }  
+                   onPress={ ()=>    setIsVisibleServices(true) }  
 
                 style={{
                     backgroundColor: '#FFF',
@@ -203,7 +163,7 @@ export const ServicesList = ()=>{
             </TouchableOpacity>
 
                       {/****** modal servicos */}
-        <Modal visible={isVisibleServices} animationType="fade" transparent={true} onRequestClose={() => setIsVisibleServices(false)}>
+            <Modal visible={isVisibleServices} animationType="slide" transparent={true} onRequestClose={() => setIsVisibleServices(false)}>
 
                 
                 <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'center', alignItems: 'center' }}>
@@ -271,8 +231,27 @@ export const ServicesList = ()=>{
                                 visible={isVisibleModalSelectedProduct}
                             />
                         */}
+  <CustomAlert
+                        visible={isVisibleAlert}
+                        message={messageAlert}
+                        onConfirm={() => setIsVisibleAlert(false)}
+                        onCancel={() => setIsVisibleAlert(false)}
+                        title={titleAlert}
+                        type={typeAlert}
+                        cancelText={cancelTextAlert}
+                        confirmText={confirmTextAlert}
+                    />
 
-                    </View>
+                      {serviceIsSelected && 
+                          <ModalEditSelectedService
+                          handleAddService={handleAddServices}
+                          handleDiscount={handleDiscountService}
+                          isSelected={serviceIsSelected}
+                          setVisible={setIsVisibleModalEditService}
+                          visible={isVisibleModalEditService}
+                        />
+                      }      
+                        </View>
                 </View>
             </Modal>
 

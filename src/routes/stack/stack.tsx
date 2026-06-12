@@ -29,6 +29,22 @@ import { PedidoComponent } from "../../screens/_pedido_novo";
 
 const Stack = createStackNavigator();
 
+
+    const NewOrderCompoent = ({navigation}:any)=>{
+     return   <PedidoComponent navigation={navigation} isNewOrder={true}/>
+    }
+
+    const EditOrderCompoent = ({navigation, route}:any)=>{
+        const { codigo_orcamento } = route.params || {}
+        return (
+            <PedidoComponent
+                navigation={navigation}
+                isNewOrder={false}
+                orderIdEdit={codigo_orcamento}
+            />
+        )
+    }
+    
     export const  MyStack = ()=>{
 
         return(
@@ -52,11 +68,12 @@ const Stack = createStackNavigator();
 
                     <Stack.Screen name="ajustes"                   component={Configurações}  options={{ headerShown:false }} />
                     <Stack.Screen name="editarOrcamento"           component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="editarOrcamentoNovo"       component={EditOrderCompoent}  options={{ headerShown:false }} />
                     <Stack.Screen name="editarOS"                  component={EditarOS}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     
                    {/**   <Stack.Screen name="novoOrcamento"             component={Novo_Pedido}  options={{ headerShown:false }}  />
                     */}
-                    <Stack.Screen name="novoOrcamento"             component={PedidoComponent}  options={{ headerShown:false }}  />
+                    <Stack.Screen name="novoOrcamento"             component={NewOrderCompoent}  options={{ headerShown:false }}  />
                     
                     <Stack.Screen name="orçamentos"                component={Lista_pedidos}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}}  />
                     <Stack.Screen name="NovaOs"                    component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />

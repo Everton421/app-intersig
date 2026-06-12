@@ -22,40 +22,42 @@ export const ModalEditSelectedService =   ({    isSelected, visible, setVisible,
       const [ total, setTotal ] = useState(0);
       const [ preco, setPreco  ] = useState(0);
       const discountRef = useRef<TextInput>(null);
+      const [ focusDiscount, setFocusDiscount ] = useState(false);
 
 
              useEffect(()=>{
+                if(!visible) return
                  let auxQuant= 1;
                  let auxDesc= 0 ;
                  let auxPrice= 0;
                     
 
-                      if(isSelected.quantidade && isSelected.quantidade > 0){
-                          setQuantidade(isSelected.quantidade)
-                          auxQuant = isSelected.quantidade
-                      }
-                      if(isSelected.desconto && isSelected.desconto > 0){
-                          auxDesc = isSelected.desconto;
-                          setDesconto(isSelected.desconto)
-                      }
-                      if(isSelected.valor && isSelected.valor > 0){
-                          setPreco(isSelected.valor);
-                          auxPrice = isSelected.valor;
-                      }
-                      if(auxDesc > auxPrice){
-                          auxDesc = 0
-                      }
-                      setTotal((auxPrice - auxDesc) * auxQuant)
-            },[])
+                       if(isSelected.quantidade && isSelected.quantidade > 0){
+                           setQuantidade(isSelected.quantidade)
+                           auxQuant = isSelected.quantidade
+                       }
+                       if(isSelected.desconto && isSelected.desconto > 0){
+                           auxDesc = isSelected.desconto;
+                           setDesconto(isSelected.desconto)
+                       }
+                       if(isSelected.valor && isSelected.valor > 0){
+                           setPreco(isSelected.valor);
+                           auxPrice = isSelected.valor;
+                       }
+                       if(auxDesc > auxPrice){
+                           auxDesc = 0
+                       }
+                       setTotal((auxPrice - auxDesc) * auxQuant)
+             },[visible])
 
             useEffect(() => {
-              if (visible) {
+              if (focusDiscount) {
                 setTimeout(() => discountRef.current?.focus(), 300);
               }
             }, [visible])
 
         
-                 function handleSave(item: orderProduct){
+                 function handleSave(item: orderService){
                          const updatedItem = { ...item, quantidade, desconto }
                          handleAddService(updatedItem, quantidade)
                          handleDiscount(desconto, item.codigo)
@@ -152,9 +154,10 @@ export const ModalEditSelectedService =   ({    isSelected, visible, setVisible,
                       <Text style={styles.discountCurrency}>R$</Text>
                       <TextInput
                         ref={discountRef}
+                        onPress={()=>setFocusDiscount(true)}
                         style={styles.discountInput}
                         keyboardType="numeric"
-                        defaultValue={isSelected.desconto ? String(isSelected.desconto) : "0.00"}
+                        value={desconto === 0 ? "0.00" : String(desconto)}
                         onChangeText={(e) => setDesconto(Number(e))}
                       />
                       <Text style={styles.discountPreview}>R$ {Number(desconto).toFixed(2)}</Text>
@@ -163,7 +166,7 @@ export const ModalEditSelectedService =   ({    isSelected, visible, setVisible,
 
                   <TouchableOpacity
                     style={styles.saveButton}
-                    //onPress={() => handleSave(isSelected)}
+                     onPress={() => handleSave(isSelected)}
                   >
                     <Ionicons name="checkmark-circle" size={22} color="#FFF" style={{ marginRight: 6 }} />
                     <Text style={styles.saveButtonText}>Incluir no Pedido</Text>

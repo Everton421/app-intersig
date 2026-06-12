@@ -10,6 +10,7 @@ type props = {
     setVisible:React.Dispatch<React.SetStateAction<boolean>>
     handleAddProduct:  (product: orderProduct, quantity: number) => void
     handleDiscount:(discount: number, codeProduct: number) => void
+    quantity?:number
 }
    type ItemType = {
         codigo:number,
@@ -25,20 +26,27 @@ type props = {
 
 
 
-export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible, handleAddProduct , handleDiscount}:props )=>   {
+export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible, handleAddProduct , handleDiscount, quantity}:props )=>   {
 
-      const [ quantidade, setQuantidade ] = useState(1);
+      const [ quantidade, setQuantidade ] = useState(0);
       const [ desconto, setDesconto ] = useState(0);
       const [ total, setTotal ] = useState(0);
       const [ preco, setPreco  ] = useState(0);
       const discountRef = useRef<TextInput>(null);
 
+    const [ focusDiscount, setFocusDiscount ] = useState(false);
 
              useEffect(()=>{
+                if(!visible) return
                  let auxQuant= 1;
                  let auxDesc= 0 ;
                  let auxPrice= 0;
-                    
+
+                 if(quantity){
+                    setQuantidade(quantity)
+                    }else{
+                    setQuantidade(1)
+                    }
 
                       if(isSelected.quantidade && isSelected.quantidade > 0){
                           setQuantidade(isSelected.quantidade)
@@ -56,10 +64,10 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
                           auxDesc = 0
                       }
                       setTotal((auxPrice - auxDesc) * auxQuant)
-            },[])
+            },[visible])
 
             useEffect(() => {
-              if (visible) {
+              if (focusDiscount) {
                 setTimeout(() => discountRef.current?.focus(), 300);
               }
             }, [visible])
@@ -74,24 +82,32 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
                          setDesconto(0)
                          setTotal(0)
                          setPreco(0)
-                     }
+                  
+                        }
 
            function calcTotal(){
                            if(desconto > preco){
-                                setDesconto(0)
+                              console.log(`desconto: ${desconto} > preco: ${preco}`);
+                              setDesconto(0)
                            }
                   return (preco - desconto) * quantidade
                  }
 
                     useEffect(()=>{
-                       setTotal( calcTotal( ) ) 
+                       setTotal( calcTotal( ))
+                       console.log("[V] Calculando total...") 
                     },[desconto, quantidade])
 
 
         const hasImage = isSelected?.fotos && isSelected?.fotos[0]?.link;
 
+          function closeModal(){
+              setVisible(false);
+              setQuantidade(0);
+          }
+          
         return (
-          <Modal visible={visible} transparent={true}>
+          <Modal onRequestClose={ ()=>closeModal() } visible={visible} transparent={true}>
             <KeyboardAvoidingView
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}
               style={styles.overlay}
@@ -106,7 +122,7 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
                     <View style={styles.codeBadge}>
                       <Text style={styles.codeText}>{isSelected.codigo}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => setVisible(false)} style={styles.closeButton}>
+                    <TouchableOpacity onPress={() => closeModal()} style={styles.closeButton}>
                       <Ionicons name="close" size={24} color="#6C757D" />
                     </TouchableOpacity>
                   </View>
@@ -171,9 +187,10 @@ export const ModalEditSelectedProduct =   ({    isSelected, visible, setVisible,
                       <Text style={styles.discountCurrency}>R$</Text>
                       <TextInput
                         ref={discountRef}
+                        onPress={()=>  setFocusDiscount(true)}
                         style={styles.discountInput}
                         keyboardType="numeric"
-                        defaultValue={isSelected.desconto ? String(isSelected.desconto) : "0.00"}
+                        value={desconto === 0 ? "0.00" : String(desconto)}
                         onChangeText={(e) => setDesconto(Number(e))}
                       />
                       <Text style={styles.discountPreview}>R$ {Number(desconto).toFixed(2)}</Text>

@@ -230,7 +230,7 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         try{
 
           setSelecionado(item);
-          navigation.navigate('editarOrcamento',{
+          navigation.navigate('editarOrcamentoNovo',{
              codigo_orcamento: item.codigo,
              tipo: item.tipo
           });

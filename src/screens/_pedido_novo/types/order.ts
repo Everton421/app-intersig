@@ -10,6 +10,7 @@ export type orderProduct = {
     unidade_medida:string
     quantidade_separada:number 
     quantidade_faturada:number
+
     fotos:[] | photoOrdeProduct[]
 }
 
@@ -22,7 +23,7 @@ export type orderService = {
     data_cadastro:string
     data_recadastro:string
     tipo_serv:number
-      desconto:number
+    desconto:number
     descontos:number
     quantidade:number
     total:number
@@ -67,6 +68,7 @@ export  type actionOrderReducer =
     | { type: 'EDIT_OBSERVATIONS', payload: string}
     | { type: 'EDIT_SITUATION', payload: orderSituation}
     | { type: 'EDIT_CONTACT', payload: string}
+    | { type: 'LOAD_ORDER', payload: objOrderReducer }
 
 export type orderItem =  orderProduct & { quantidade:number};
 export type serviceItem = orderService & { quantidade: number };
@@ -90,18 +92,28 @@ export type orderSituation =
 
 export type objOrderReducer = {
     codigo:string
-    products: orderItem[]  ,
-    services:orderService[]  ,
+    produtos: orderItem[]  ,
+    servicos:orderService[]  ,
     parcelas: parcela[],
     cliente: cliente
     forma_pagamento: number
     frete:number
     total_geral:number
     total_produtos:number
+    total_servicos:number
     descontos:number
     descontos_servicos:number
     descontos_produtos:number
     observacoes:string
     situacao: orderSituation
     contato:string
+    id_externo:string  
+    vendedor:number 
+    enviado: 'S '| 'N' 
+    quantidade_parcelas:number,
+    data_cadastro:string,
+    data_recadastro:string,
+    veiculo:number,
+    tipo_os:number,
+    tipo:number
 }

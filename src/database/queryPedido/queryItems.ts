@@ -14,7 +14,26 @@ type produto_pedido = {
 }
         async function create(produto:produto_pedido, codeOrder:number){
             try{
- 
+                console.log(produto)
+                    console.log(  `
+                    INSERT INTO produtos_pedido 
+                   (
+                    pedido,
+                    codigo,
+                    sequencia,
+                    desconto,
+                    quantidade,
+                    preco,
+                    total 
+                    ) VALUES (
+                    ${codeOrder},
+                    ${produto.codigo},
+                    ${produto.sequencia},
+                    ${produto.desconto},
+                    ${produto.quantidade},
+                    ${produto.preco},
+                    ${produto.total} 
+                    ) `)
                 let result = await db.runAsync(
                     `
                     INSERT INTO produtos_pedido 

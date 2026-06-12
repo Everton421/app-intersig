@@ -1,294 +1,43 @@
 import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View, KeyboardAvoidingView, Platform } from "react-native"
-import { Ionicons, FontAwesome } from "@expo/vector-icons"
-import { CustomHeader } from "../../components/custom-header" // Cuidado com esse caminho
-import { useEffect, useReducer, useState } from "react"
+import { useContext, useEffect, useReducer, useRef, useState } from "react"
 import { ProductList } from "./_components/product-list/product-list"
 import { RenderSelectedItem } from "./_components/render-itens-selected"
-import { actionOrderReducer, cliente, objOrderReducer, orderItem, orderPaymentMethod, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, serviceItem, type orderProduct } from "./types/order"
+import { cliente, orderItem, orderPaymentMethod, orderService, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, serviceItem, type orderProduct } from "./types/order"
 import { CustomerList } from "./_components/customer/customer-list"
 import { CustomHeaderOrderComponent } from "./_components/header"
 import { Installments } from "./_components/installments"
-import { configMoment } from "../../services/moment"
-import { addDays, format } from "date-fns"
 import { RenderSimpleItenInstallment } from "./_components/render-itens-installments"
 import { OrderDetails } from "./_components/details"
-import { TextInput } from "react-native-gesture-handler"
 import { ServicesList } from "./_components/services-list/services-list"
+import { RenderSelectedServicesItem } from "./_components/render-itens-services-selected"
+import { usePedidos } from "../../database/queryPedido/queryPedido"
+import { AuthContext } from "../../contexts/auth"
+import { NavigationProp } from '@react-navigation/native';
+import { orderReducer } from "./reducers/orderReducer"
+import { initialOrderState } from "./reducers/orderInitalState"
 
-function orderReducer(state: objOrderReducer, action: actionOrderReducer) {
-    // ... MANTER TODO O SEU CÓDIGO DO REDUCER INTACTO AQUI ...
-    switch(action.type){
-        case 'ADD_SERVICE':{ 
-                const serviceToadd = action.payload
-                const { quantity } = action;
-              const serviceExists = state.services.find( service  =>   service.codigo === serviceToadd.codigo   )
-                let newServices: serviceItem[];
-                    if(serviceExists){
-                            newServices = state.services.map( ( item ) =>{ 
-                                    if(item.codigo === serviceToadd.codigo){
-                                        const newQuantity  = quantity;
-                                        const newDesconto = newQuantity * item.desconto; 
-                                         const newTotal = (newQuantity * item.valor) - newDesconto;  
-                                        return { ...item, quantidade: newQuantity, descontos:newDesconto,desconto: item.desconto, total:newTotal }
-                                    }else{
-                                        return item;
-                                    }   
-                                }
-                             )
-                    }else{
-                          newServices = [ ...state.services,{ ...serviceToadd, quantidade:quantity}];
-                    }
-                    let newTotalGeralservicesOrder = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalProductsOrder=0;
-                    let newTotalGeral = 0;
 
-                    for( const item of newServices){
-                            newTotalGeralservicesOrder+= item.total;
-                            newTotalDescountsOrder+=item.desconto
-                            newTotalProductsOrder+=(item.quantidade * item.preco)
-                            newTotalGeral+= item.total;
-                        }
-                        for(const item of state.products){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+= item.desconto;
-                        }
-                        newTotalGeral+= state.frete;
-              return { 
-                ...state,
-                  total_geral: newTotalGeral, 
-                  total_servicos: newTotalGeralservicesOrder,
-                  descontos: newTotalDescountsOrder,
-                  services:  newServices
-                };
-            }
-    case 'RM_SERVICE': {
-            const { quantity } = action;
-                const newServices = state.services.map((item) =>{
-                   if(item.codigo === action.payload  && item.quantidade >= quantity){    
-                    let newQuantity = item.quantidade - quantity
-                    return { ...item, quantidade: newQuantity, total: (newQuantity * item.valor) - item.desconto }
-                   }else{
-                    return item
-                   }
-               }).filter((item) =>  item.quantidade > 0)
-                    let newTotalGeral = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalServicesOrder = 0;
-                    for( const item of newServices){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                            newTotalServicesOrder+=(item.quantidade * item.valor)
-                        } 
 
-                    for(const item of state.products){
-                          newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                    }
-                            newTotalGeral+=state.frete;
-                        
-              return { 
-                ...state,
-                  total_geral: newTotalGeral,
-                  total_servicos: newTotalServicesOrder,
-                  descontos: newTotalDescountsOrder,
-                  services: newServices
-                 };
-            }
-        case 'ADD_PRODUCT':{ 
-                const productToadd = action.payload
-                const { quantity } = action;
-              const productExists = state.products.find( product  =>   product.codigo === productToadd.codigo   )
-                let newProducts: orderItem[];
-                    if(productExists){
-                            newProducts = state.products.map( ( item ) =>{ 
-                                    if(item.codigo === productToadd.codigo){
-                                        const newQuantity =  quantity;
-                                        const newDesconto = newQuantity * productToadd.desconto; 
-                                         const newTotal = (newQuantity * item.preco) - newDesconto;  
-                                        return { ...item, quantidade: newQuantity, descontos:newDesconto, desconto: productToadd.desconto, total:newTotal }
-                                    }else{
-                                        return item;
-                                    }   
-                                }
-                             )
-                    }else{
-                          newProducts = [ ...state.products,{ ...productToadd, quantidade:quantity}];
-                    }
-                    let newTotalGeral = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalProductsOrder=0;
-                    for( const item of newProducts){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.desconto
-                            newTotalProductsOrder+=(item.quantidade * item.preco)
-                        } 
-                        for(const item of state.services){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.desconto
-                        }
-                      newTotalGeral+= state.frete;
-
-              return {
-                 ...state,
-                   total_geral: newTotalGeral,
-                    total_produtos: newTotalProductsOrder,
-                    descontos: newTotalDescountsOrder,
-                    products: newProducts
-                 };
-            }
-
-        case 'ADD_DISCOUNT_PRODUCT':{
-            const {   codeProduct, discount } = action
-                             const newProducts = state.products.map( ( item ) =>{ 
-                                        if(item.codigo === codeProduct ){
-                                            const newDiscounts = item.quantidade * discount; 
-                                             let newTotal = (item.quantidade * item.preco) - newDiscounts;  
-                                             if(newTotal <  0 ){ newTotal = 0 }
-                                         return { ...item, descontos:newDiscounts, desconto:discount , total:newTotal }          
-                                        }else{
-                                            return item;
-                                        }
-                                }
-                             )
-                    let newTotalGeral = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalservicesOrder=0;
-                    for( const item of newProducts){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                            newTotalservicesOrder+=(item.quantidade * item.preco)
-                        } 
-
-                        for(const item of state.services){
-                             newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                        }
-
-              return { ...state, total_geral: newTotalGeral, total_services: newTotalservicesOrder, descontos: newTotalDescountsOrder, products: newProducts };
-        }
-        case 'RM_PRODUCT': {
-            const { quantity } = action;
-                const newProducts = state.products.map((item) =>{
-                   if(item.codigo === action.payload  && item.quantidade >= quantity){    
-                    let newQuantity = item.quantidade - quantity
-                    return { ...item, quantidade: newQuantity, total: (newQuantity * item.preco) - item.desconto }
-                   }else{
-                    return item
-                   }
-               }).filter((item) =>  item.quantidade > 0)
-                    let newTotalGeral = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalProductsOrder=0;
-                    for( const item of newProducts){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                            newTotalProductsOrder+=(item.quantidade * item.preco)
-                        } 
-
-                        for(const item of state.services){
-                            newTotalGeral+=item.total;
-                            newTotalDescountsOrder+=item.descontos
-                        }
-                            newTotalGeral+=state.frete;
-                        
-              return { 
-                ...state,
-                  total_geral: newTotalGeral,
-                  total_produtos: newTotalProductsOrder,
-                  descontos: newTotalDescountsOrder,
-                  products: newProducts
-                 };
-            }
-        case 'FREIGHT':{ return { ...state, frete: action.payload, total_geral: state.total_geral + action.payload }; }    
-        case 'ADD_DISCOUNT_SERVICE':{
-            const {   codeService, discount } = action
-                             const newServices = state.services.map( ( item ) =>{ 
-                                        if(item.codigo === codeService ){
-                                            const newDiscounts = item.quantidade * discount; 
-                                             let newTotal = (item.quantidade * item.valor) - newDiscounts;  
-                                             if(newTotal <  0 ){ newTotal = 0 }
-                                         return { ...item, descontos:newDiscounts, desconto:discount , total:newTotal }          
-                                        }else{
-                                            return item;
-                                        }
-                                }
-                             )
-                    let newTotalGeral = 0;
-                    let newTotalDescountsOrder = 0;   
-                    let newTotalservicesOrder=0;
-                    for( const item of newServices){
-                            newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                            newTotalservicesOrder+=(item.quantidade * item.valor)
-                        } 
-
-                        for(const item of state.products){
-                             newTotalGeral+= item.total;
-                            newTotalDescountsOrder+=item.descontos
-                        }
-
-              return { ...state, total_geral: newTotalGeral, total_services: newTotalservicesOrder, descontos: newTotalDescountsOrder, services: newServices };
-        }
-
-        case 'ADD_CUSTOMER':{
-            const { payload } = action;
-            const { cep, cnpj, codigo, endereco, numero, nome} = payload;
-            return { ...state, cliente:{ cep, cnpj, codigo, endereco, numero,nome } }
-        }
-        case 'CALCULATE_INSTALLMENTS': {
-            const { payload } = action;
-            const { intervalo_parcelas,quantidade_parcelas, total_geral } = payload;
-            let novas_parcelas:parcela[] = [];
-            let valorParcelas =   total_geral / quantidade_parcelas;
-            for (let i = 1; i <=  quantidade_parcelas; i++) {
-                const vencimento = addDays(new Date(), intervalo_parcelas * i);
-                novas_parcelas.push({ parcela: i ,valor: valorParcelas, vencimento: format(vencimento, 'yyyy-MM-dd') });
-            }
-            return { ...state, parcelas: novas_parcelas }
-        }   
-        case 'ADD_PAYMENT_METHOD':{
-            const { payload } = action;
-            const { codigo, intervalo_parcelas, quantidade_parcelas   } = payload
-            return { ...state, forma_pagamento: codigo }
-        }
-        case 'EDIT_DUE_INSTALLMENTS':{
-                const { payload }= action
-                const { parcela, vencimento} = payload           
-                const newInstallments = state.parcelas.map( (i)=>{
-                    if( i.parcela === parcela){ i.vencimento = vencimento }
-                    return i
-                })
-                return { ...state, parcelas: newInstallments }
-        }
-        case 'EDIT_OBSERVATIONS':{ return { ...state, observacoes: action.payload } }
-        case 'EDIT_SITUATION':{ return { ...state, situacao: action.payload } }
-        case "EDIT_CONTACT":{
-            return {
-                ...state, 
-                contato:action.payload
-            }
-        } 
-    }   
+type Props = {
+    navigation: NavigationProp<any>
+    route?: any
+  isNewOrder:boolean  
+  orderIdEdit?: number
 }
 
-export const PedidoComponent = ({ navigation }: any) => {
 
-    const moment = configMoment();
+ 
+export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) => {
 
-    const initalValuecustomer: cliente = { cep: '', cnpj: '', codigo: 0, endereco: '', numero: 0, nome: ''}
-    const initialInstallments: parcela = { parcela: 0, valor: 0, vencimento: moment.dataHoraAtual() }
-    const [state, dispatch] = useReducer(orderReducer, { 
-        codigo: '1',
-         contato:'', forma_pagamento: 0, observacoes: '', situacao: 'EA', cliente: initalValuecustomer, total_geral: 1, total_produtos: 0, descontos: 0, frete: 0, 
-        descontos_produtos:0,
-        descontos_servicos:0,
-        services:[
-        ],
-         products: [ ], parcelas: [initialInstallments],
-        })
+  const useQuerypedidos = usePedidos();
+  const { usuario }: any = useContext(AuthContext);
+
+    const [state, dispatch] = useReducer(orderReducer, initialOrderState)
 
     const [isLoadingSaveOrder, setIsLoadingSaveOrder] = useState(false)
+    const [newOrderId, setNewOrderId] = useState('0');
+    const orderCodigoRef = useRef<number | null>(null);
+
     const [paymentMothod, setPaymentMethod] = useState<orderPaymentMethod>({ quantidade_parcelas: 1, intervalo_parcelas: 0, codigo: 0 });
 
     const handleAddProduct = (product: orderProduct, quantity: number) => {
@@ -317,10 +66,13 @@ export const PedidoComponent = ({ navigation }: any) => {
     }
 
     const handleRmProduct = (product: orderProduct, quantity: number) => { dispatch({ type: 'RM_PRODUCT', payload: product.codigo, quantity: quantity }) }
+    const handleRmService = (service: orderService, quantity: number) => { dispatch({ type: 'RM_SERVICE', payload: service.codigo, quantity: quantity }) }
     const handleNewCustomer = (customer: cliente) => { dispatch({ type: "ADD_CUSTOMER", payload: customer }) }
     const handleAddFreight = (freight: number) => { dispatch({ type: "FREIGHT", payload: freight }) }
     const handleAddObservations = (observations: string) => { dispatch({ type: "EDIT_OBSERVATIONS", payload: observations }) }
     const handleDiscount = (discount: number, codeProduct: number) => { dispatch({ type: 'ADD_DISCOUNT_PRODUCT', codeProduct, discount }) }
+    
+    const handleDiscountService = (discount: number, codeService: number) => { dispatch({ type: 'ADD_DISCOUNT_SERVICE', codeService, discount }) }
     
     const handleCalculateInstallments = (payload: payloadCalculateInstallments) => { dispatch({ type: 'CALCULATE_INSTALLMENTS', payload }) }
     const handleAddPaymentMethod = (payload: orderPaymentMethod) => {
@@ -330,12 +82,28 @@ export const PedidoComponent = ({ navigation }: any) => {
     const handleEditDueInstallment = (payload: payloadEditDueInstallment) => { dispatch({ type: "EDIT_DUE_INSTALLMENTS", payload }) }
     const handleEditSituation = (payload: orderSituation) => { dispatch({ type: 'EDIT_SITUATION', payload: payload }) }
 
-const handleEditContact = ( payload:string ) =>{
-    dispatch({
-        type:'EDIT_CONTACT',
-        payload
-    })
-}
+    const handleEditContact = ( payload:string ) =>{ dispatch({ type:'EDIT_CONTACT', payload   }) }
+
+    const handleAddServices = (service: orderService, quantity:number)=>{ 
+        dispatch(
+            {
+                     type: 'ADD_SERVICE',
+                    payload: {
+                        codigo: service.codigo,
+                        aplicacao: service.aplicacao,
+                        data_cadastro: service.data_cadastro,
+                        data_recadastro: service.data_recadastro,
+                        desconto: service.desconto,
+                        descontos: service.descontos,
+                        quantidade: quantity,
+                        tipo_serv: service.tipo_serv,
+                        total: service.total,
+                        valor: service.valor 
+                    },
+                    quantity:quantity
+                    })
+    }
+
     useEffect(() => {
         handleCalculateInstallments({
             intervalo_parcelas: paymentMothod.intervalo_parcelas,
@@ -344,6 +112,131 @@ const handleEditContact = ( payload:string ) =>{
         })
     }, [state.total_geral, paymentMothod])
 
+    
+    async function generateid (){
+        let newCode =0;
+         let arrlastCode = await useQuerypedidos.selectLastCode();
+        if(arrlastCode && arrlastCode?.length > 0 ){
+                if( !arrlastCode[0].codigo ){
+                   newCode = 1; 
+                }
+                if(arrlastCode[0].codigo && arrlastCode[0].codigo > 0 ){
+                   newCode = arrlastCode[0].codigo + 1; 
+
+                }
+        }   
+
+             setNewOrderId(  String(newCode) );
+             orderCodigoRef.current = newCode;
+        return newCode
+
+    }
+
+    useEffect(()=>{
+        if(isNewOrder){
+                generateid();
+        }
+    },[])
+
+    const [isLoadingOrder, setIsLoadingOrder] = useState(false);
+    const loadedOrderRef = useRef(false);
+
+    useEffect(() => {
+        if (!isNewOrder && orderIdEdit && !loadedOrderRef.current) {
+            loadedOrderRef.current = true;
+            setIsLoadingOrder(true);
+            (async () => {
+                try {
+                    const data = await useQuerypedidos.selectCompleteOrderByCode(orderIdEdit);
+                    if (data) {
+                        const produtos: orderItem[] = (data.produtos || []).map((p: any) => ({
+                            codigo: p.codigo,
+                            preco: p.preco,
+                            descricao: p.descricao || '',
+                            estoque: p.estoque || 0,
+                            unidade_medida: p.unidade_medida || '',
+                            quantidade: p.quantidade,
+                            desconto: p.desconto || 0,
+                            descontos: (p.desconto || 0) * p.quantidade,
+                            quantidade_faturada: p.quantidade_faturada || 0,
+                            quantidade_separada: p.quantidade_separada || 0,
+                            total: p.total,
+                            fotos: p.fotos || []
+                        }));
+                        const servicos: serviceItem[] = (data.servicos || []).map((s: any) => ({
+                            codigo: s.codigo,
+                            valor: s.valor,
+                            aplicacao: s.aplicacao || '',
+                            data_cadastro: s.data_cadastro || '',
+                            data_recadastro: s.data_recadastro || '',
+                            tipo_serv: s.tipo_serv || 0,
+                            desconto: s.desconto || 0,
+                            descontos: (s.desconto || 0) * s.quantidade,
+                            quantidade: s.quantidade,
+                            total: s.total
+                        }));
+                        const parcelas: parcela[] = (data.parcelas || []).map((pa: any) => ({
+                            parcela: pa.parcela,
+                            valor: pa.valor,
+                            vencimento: pa.vencimento
+                        }));
+                        const cliente: cliente = {
+                            codigo: data.codigo_cliente || data.cliente?.codigo || 0,
+                            cep: data.cliente?.cep || '',
+                            cnpj: data.cliente?.cnpj || '',
+                            endereco: data.cliente?.endereco || '',
+                            numero: data.cliente?.numero || 0,
+                            nome: data.nome || data.cliente?.nome || ''
+                        };
+
+                        setNewOrderId(String(data.codigo || orderIdEdit));
+                        setPaymentMethod({
+                            codigo: data.forma_pagamento || 0,
+                            intervalo_parcelas: data.intervalo_parcelas || 0,
+                            quantidade_parcelas: data.quantidade_parcelas || parcelas.length || 1
+                        });
+
+                        dispatch({
+                            type: 'LOAD_ORDER',
+                            payload: {
+                                codigo: String(data.codigo || orderIdEdit),
+                                contato: data.contato || '',
+                                forma_pagamento: data.forma_pagamento || 0,
+                                observacoes: data.observacoes || '',
+                                situacao: data.situacao || 'EA',
+                                cliente,
+                                data_cadastro: data.data_cadastro,
+                                data_recadastro: data.data_recadastro,
+                                enviado: data.enviado,
+                                id_externo: data.id_externo || '',
+                                quantidade_parcelas: parcelas.length, 
+                                tipo_os: data.tipo_od || 0,
+                                veiculo: data.veiculo || 0,
+                                vendedor: data.vendedor,
+                                total_geral: data.total_geral || 0,
+                                total_produtos: data.total_produtos || 0,
+                                total_servicos: data.total_servicos || 0,
+                                descontos: data.descontos || 0,
+                                frete: data.frete || 0,
+                                tipo:1,
+                                descontos_produtos: data.descontos_produtos || 0,
+                                descontos_servicos: data.descontos_servicos || 0,
+                                servicos,
+                                produtos,
+                                parcelas,
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.log('erro ao carregar pedido para edição:', e);
+                } finally {
+                    setIsLoadingOrder(false);
+                }
+            })();
+        }
+    }, [orderIdEdit, isNewOrder])
+
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -351,7 +244,7 @@ const handleEditContact = ( payload:string ) =>{
         >
 
             <CustomHeaderOrderComponent
-                title="Novo Pedido"
+                title={ isNewOrder ? `Novo Pedido #${newOrderId}` : `Editar Pedido #${newOrderId}`}
                 onBack={() => navigation.goBack()}
             />
 
@@ -383,14 +276,15 @@ const handleEditContact = ( payload:string ) =>{
             <ProductList
                         handleAddProduct={handleAddProduct}
                         handleDiscount={handleDiscount}
+                        productsIsSelected={state.produtos}
                     />
 
                 
 
-                    {state.products.length > 0 && (
+                    {state.produtos.length > 0 && (
                         <View style={{ paddingBottom: 10 , marginBottom:5}}>
                             <FlatList
-                                data={state.products}
+                                data={state.produtos}
                                 horizontal={true}
                                 showsHorizontalScrollIndicator={false}
                                 renderItem={({ item }) =>
@@ -407,7 +301,7 @@ const handleEditContact = ( payload:string ) =>{
                          </View>
                             
                           <View style={{ width: 'auto', height: 20,padding:3, borderRadius: 18, backgroundColor: '#feeaea', justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ color: 'red', fontSize: 12, fontWeight:"bold"}}> - R$ {state.descontos?.toFixed(2)}</Text>
+                            <Text style={{ color: 'red', fontSize: 12, fontWeight:"bold"}}> - R$ {state.descontos_produtos?.toFixed(2)}</Text>
                          </View>
                         </View>
 
@@ -432,8 +326,41 @@ const handleEditContact = ( payload:string ) =>{
 
 
              <ServicesList
+             servicesIsSelected={state.servicos}
+                  handleAddServices={handleAddServices}
+                  handleDiscountService={handleDiscountService}
                     />
+
+             {state.servicos.length > 0 && (
+                        <View style={{ paddingBottom: 10 ,marginTop:10, marginBottom:5}}>
+                            <FlatList
+                                data={state.servicos}
+                                horizontal={true}
+                                showsHorizontalScrollIndicator={false}
+                                renderItem={({ item }) =>
+                                    <RenderSelectedServicesItem 
+                                        item={item}
+                                        removeItem={handleRmService}
+                                        hadleAddService={handleAddServices}
+                                         handleDiscountService={handleDiscountService}
+                                    />
+                                }
+                            />
+                            <View style={{ flexDirection:"row", justifyContent:'space-between', marginTop:5}}>
+                          <View style={{ width: 'auto', height: 20,padding:3, borderRadius: 18, backgroundColor: '#EAF4FE', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: '#185FED', fontSize: 12, fontWeight:"bold"}}> R$ {state.total_servicos?.toFixed(2)}</Text>
+                         </View>
+                            
+                          <View style={{ width: 'auto', height: 20,padding:3, borderRadius: 18, backgroundColor: '#feeaea', justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ color: 'red', fontSize: 12, fontWeight:"bold"}}> - R$ {state.descontos_servicos?.toFixed(2)}</Text>
+                         </View>
+                        </View>
+
+                        </View>
+                    )}
                 </View>
+
+                
              
                 {/** --- PARCELAS --- */}
           <View style={{
@@ -500,7 +427,75 @@ const handleEditContact = ( payload:string ) =>{
 
                 <TouchableOpacity
                     style={styles.saveButton}
-                    onPress={() => console.log(state)}
+                    onPress={
+                         async () => {
+                        setIsLoadingSaveOrder(true);
+                        try {
+                            const codigo = orderCodigoRef.current || Number(newOrderId);
+                            const pedidoData = {
+                                codigo: codigo,
+                                situacao: state.situacao,
+                                contato: state.contato,
+                                descontos: state.descontos,
+                                forma_pagamento: state.forma_pagamento,
+                                observacoes: state.observacoes,
+                                total_geral: state.total_geral,
+                                total_produtos: state.total_produtos,
+                                total_servicos: state.total_servicos,
+                                veiculo: state.veiculo,
+                                tipo_os: state.tipo_os,
+                                tipo: state.tipo,
+                                enviado: state.enviado,
+                                vendedor: usuario.codigo,
+                                quantidade_parcelas: state.quantidade_parcelas,  
+                                data_cadastro: state.data_cadastro,
+                                data_recadastro: state.data_recadastro,
+
+                                cliente: { codigo: state.cliente.codigo },
+                                produtos: state.produtos.map((p, index ) => {
+                                    ({
+                                    codigo: p.codigo,
+                                    quantidade: p.quantidade,
+                                    preco: p.preco,
+                                    desconto: p.desconto || 0,
+                                    total: p.total
+                                })
+                            }
+                            ),
+                                servicos: state.servicos.map(s => ({
+                                    codigo: s.codigo,
+                                    quantidade: s.quantidade,
+                                    valor: s.valor,
+                                    desconto: s.desconto || 0,
+                                    total: s.total
+                                })),
+                                parcelas: state.parcelas.map(pa => ({
+                                    parcela: pa.parcela,
+                                    valor: pa.valor,
+                                    vencimento: pa.vencimento
+                                }))
+                            };
+
+                            if (isNewOrder) {
+                                await useQuerypedidos.createOrderByCode(
+                                    pedidoData as any,
+                                    codigo,
+                                    String(codigo),
+                                    String(codigo)
+                                );
+                            } else {
+                                await useQuerypedidos.updateOrder(pedidoData, orderIdEdit);
+                            }
+
+                            navigation.goBack();
+                        } catch (e) {
+                            console.log('erro ao salvar pedido:', e);
+                        } finally {
+                            setIsLoadingSaveOrder(false);
+                        }
+                    }  
+                    }
+
                 >
                     {isLoadingSaveOrder ? (
                         <ActivityIndicator size="small" color="#FFF" />

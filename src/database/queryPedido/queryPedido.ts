@@ -93,7 +93,8 @@ const getCurrentDate = () => {
             if(pedido.codigo_site > 0 ) {
               pedido.enviado = 'S'
             }
-          
+            
+       
           let result = await db.runAsync(
               ` INSERT INTO pedidos 
               (
@@ -141,7 +142,7 @@ const getCurrentDate = () => {
               )` 
           );
     
-       
+         
   
            console.log(' orcamento inserido codigo : ' ,result.lastInsertRowId);
           return result.lastInsertRowId;
@@ -501,10 +502,21 @@ const getCurrentDate = () => {
                    if( codeOrder > 0 || codeOrder !== undefined  ){
        
                           if(  produtos.length > 0    ){
-                            produtos.forEach( async (prod:produto_pedido)=>{
-                              await queryItems.create( prod, code )
-                              })
-                          } 
+                                let sequencia = 1 
+                              for(  const product  of produtos ){
+                                await queryItems.create( {
+                                  codigo: product.codigo,
+                                  desconto: product.desconto,
+                                  preco:product.preco,
+                                  quantidade: product.quantidade,
+                                  sequencia: sequencia,
+                                  total: product.total
+                                    },
+                                   code
+                                  )
+                                  sequencia++
+                              }
+                            } 
 
                           if( servicos.length > 0 ){
                             servicos.forEach( async ( s:servico_pedido )=>{
@@ -534,7 +546,7 @@ const getCurrentDate = () => {
           let produtos:any = order.produtos;
           let parcelas: parcela[] = order.parcelas;
           let servicos: any = order.servicos;
-             let codeOrder:any = await createByCode(order ,code , id, id_externo);
+             let codeOrder:any = await createByCode(order ,code , id, String(id_externo));
 
                          if( codeOrder > 0 || codeOrder !== undefined  ){
              

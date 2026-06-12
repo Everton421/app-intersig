@@ -14,14 +14,29 @@ import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from "@e
 import { useProducts } from "../../../../database/queryProdutos/queryProdutos";
 import { useFotosProdutos } from "../../../../database/queryFotosProdutos/queryFotosProdutos";
 import { ModalEditSelectedProduct } from "./modal-edit-selected-product";
+import { orderProduct } from "../../types/order";
+import { CustomAlert } from "../../../../components/custom-alert";
 
-export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAddProduct: (item:any, quantity:number)=>void,  handleDiscount:(discount: number, codeProduct: number) => void}) => {
+type props = {
+    productsIsSelected: orderProduct[]
+    handleAddProduct: (item:any, quantity:number)=>void,  
+    handleDiscount:(discount: number, codeProduct: number) => void 
+}
+export const ProductList = ({   handleAddProduct , handleDiscount, productsIsSelected }:props) => {
 
     const [pesquisa, setPesquisa] = useState<any>("a"); // Inicia vazio para não buscar tudo de cara se não quiser
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [visibleProdutos, setVisibleProdutos] = useState(false);
     const [ productIsSelected, setProductIsSelected ]= useState();
+    
+        const [ isVisibleAlert, setIsVisibleAlert ] = useState(false);
+       const  [ titleAlert, setTitleAlert ] = useState<string>('');
+        const [ typeAlert, setTypeAlert] = useState< 'info' | 'success' | 'error' | 'warning'>();
+        const [ messageAlert, setMessageAlert ]= useState("");
+        const [cancelTextAlert, setCancelTextAlert] = useState();
+        const [ confirmTextAlert, setConfirmTextAlert ] = useState();
+         
 
     const useQueryProdutos = useProducts();
     const useQueryFotos = useFotosProdutos();
@@ -58,19 +73,36 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
         }
     }, [pesquisa]);
 
+
+     
+    
+
     function selecionarItem(item: any) {
+        const isSelected = productsIsSelected.some((product )=> item.codigo === product.codigo)
+        if(isSelected) {
+            setMessageAlert(`O produto ${item.descricao} já foi adicionado`)
+               setIsVisibleAlert(true)
+                return
+            }
         setIsVisibleModalSelectedProduct(true)
         setProductIsSelected(item)
         //setVisibleProdutos(false);
     }
      
 
-    const renderItem = ({ item }: any) => {
-        const hasImage = item.fotos && item.fotos.length > 0 && item.fotos[0].link;
+            const renderItem = ({ item }: any) => {
+                const hasImage = item.fotos && item.fotos.length > 0 && item.fotos[0].link;
+        const isSelected = productsIsSelected.some((product )=> item.codigo === product.codigo)
 
         return (
             <TouchableOpacity
-                style={{
+                style={[
+                    isSelected && { 
+                         //borderBlockStartColor:'#4CAF50',
+                         borderStartColor:'#4CAF50',
+                         borderStartWidth:5
+                    },
+                    {
                     backgroundColor: "#FFF",
                     borderRadius: 12,
                     marginHorizontal: 15,
@@ -82,8 +114,9 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                     shadowOpacity: 0.1,
                     shadowRadius: 3,
                     flexDirection: 'row',
-                    alignItems: 'center'
-                }}
+                    alignItems: 'center',
+                    
+                }]}
                 onPress={() => selecionarItem(item)}
             >
                 {/* Imagem */}
@@ -107,8 +140,18 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                         {item.descricao}
                     </Text>
 
-                    <Text style={{ fontSize: 12, color: '#757575' }}>Estoque: {item.estoque}</Text>
+                    <View style={[isSelected && { flexDirection:"row", justifyContent:"space-between" },{ flex:1}]}>
+                       <Text style={{ fontSize: 12, color: '#757575' }}>Estoque: {item.estoque}  </Text>
+                        {
+                            isSelected && 
+                            <FontAwesome name="check-circle" size={24} color="#4CAF50" />
+                        }
+                    </View>
+                        
+                    
                 </View>
+              
+              
             </TouchableOpacity>
         );
     };
@@ -145,7 +188,7 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                 <MaterialIcons name="search" size={24} color="#185FED" />
             </TouchableOpacity>
 
-            <Modal visible={visibleProdutos} animationType="fade" transparent={true} onRequestClose={() => setVisibleProdutos(false)}>
+            <Modal visible={visibleProdutos} animationType="slide" transparent={true} onRequestClose={() => setVisibleProdutos(false)}>
 
                 
                 <View style={{ flex: 1, backgroundColor: "rgba(0, 0, 0, 0.5)", justifyContent: 'center', alignItems: 'center' }}>
@@ -203,9 +246,20 @@ export const ProductList = ({   handleAddProduct , handleDiscount}: {  handleAdd
                                 />
                             )}
                         </View>
+  <CustomAlert
+                        visible={isVisibleAlert}
+                        message={messageAlert}
+                        onConfirm={() => setIsVisibleAlert(false)}
+                        onCancel={() => setIsVisibleAlert(false)}
+                        title={titleAlert}
+                        type={typeAlert}
+                        cancelText={cancelTextAlert}
+                        confirmText={confirmTextAlert}
+                    />
 
                         {productIsSelected &&
                             <ModalEditSelectedProduct
+                            quantity={1}
                                 handleDiscount={handleDiscount}
                                 isSelected={productIsSelected}
                                 handleAddProduct={handleAddProduct}

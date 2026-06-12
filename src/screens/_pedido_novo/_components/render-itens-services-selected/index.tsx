@@ -2,38 +2,39 @@ import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalEditSelectedProduct } from "../product-list/modal-edit-selected-product";
-import { orderProduct } from "../../types/order";
+import { orderProduct, orderService } from "../../types/order";
+import { ModalEditSelectedService } from "../services-list/modal-edit-selected-service";
 
         type props = {
-            item:orderProduct,
-            removeItem: (product: orderProduct, quantity: number) => void ,
-              handleAddProduct: (product: orderProduct, quantity: number) => void
-              handleDiscount:(discount: number, codeProduct: number) => void
+            item:orderService,
+            removeItem: (product: orderService, quantity: number) => void ,
+              hadleAddService: (product: orderService, quantity: number) => void
+                 handleDiscountService: (discount: number, codeService: number) => void
+
             };
 
-  export const RenderSelectedItem =  ({ item , removeItem, handleAddProduct, handleDiscount}: props ) => {
+  export const RenderSelectedServicesItem =  ({ item , removeItem, hadleAddService, handleDiscountService}: props ) => {
     const [ visible, setVisible] = useState(false);
 
-    const hasImage = item.fotos && item.fotos.length > 0 && item.fotos[0]?.link;
 
     return (
     <>
     <TouchableOpacity style={styles.selectedItemCard}
         onPress={()=>{setVisible(true)}}
     >
-  <ModalEditSelectedProduct
+  <ModalEditSelectedService
       isSelected={item}
       setVisible={setVisible}
       visible={visible}
-      handleAddProduct={handleAddProduct}
-      handleDiscount={handleDiscount}
-      quantity={item.quantidade}
+      handleAddService={hadleAddService}
+      handleDiscount={handleDiscountService}
       />
+
         <View style={styles.cardHeader}>
             <View style={styles.codeBadge}>
                 <Text style={styles.codeText}>{item.codigo}</Text>
             </View>
-            <Text style={styles.priceText}>R$ {item?.preco?.toFixed(2)}</Text>
+            <Text style={styles.priceText}>R$ {item?.valor?.toFixed(2)}</Text>
             <TouchableOpacity
             style={styles.closeButton}
             onPress={()=> removeItem(item, item.quantidade)}
@@ -43,22 +44,19 @@ import { orderProduct } from "../../types/order";
         </View>
 
         <View style={styles.imageContainer}>
-        {hasImage ?
-            (<Image source={{ uri: `${item.fotos[0]?.link}` }} style={styles.selectedImage} resizeMode="cover" />) :
             (<View style={styles.imagePlaceholder}>
                 <MaterialIcons name="image-not-supported" size={32} color="#BDBDBD" />
             </View>)
-        }
         </View>
-        <Text numberOfLines={2} style={styles.cardTitle}>{item.descricao}</Text>
+        <Text numberOfLines={2} style={styles.cardTitle}>{item.aplicacao}</Text>
         <View style={styles.cardFooter}>
             <View style={styles.footerItem}>
                 <MaterialIcons name="inventory-2" size={14} color="#6C757D" />
-                <Text style={[styles.cardText, { color:'#6C757D'}]}>{item.quantidade} {item.unidade_medida}</Text>
+                <Text style={[styles.cardText, { color:'#6C757D' } ]}>{item.quantidade} </Text>
             </View>
             <View style={styles.footerItem}>
                 <MaterialIcons name="monetization-on" size={14} color="red" />
-                <Text style={styles.cardText}> - {item.desconto ? `R$ ${item.desconto.toFixed(2)}` : 'R$ 0,00'}</Text>
+                <Text style={[styles.cardText]}> - {item.desconto ? `R$ ${item.desconto.toFixed(2)}` : 'R$ 0,00'}</Text>
             </View>
             <Text style={styles.totalText}>R$ {Number(item?.total).toFixed(2)}</Text>
         </View>

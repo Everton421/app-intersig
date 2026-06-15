@@ -69,6 +69,8 @@ export  type actionOrderReducer =
     | { type: 'EDIT_SITUATION', payload: orderSituation}
     | { type: 'EDIT_CONTACT', payload: string}
     | { type: 'LOAD_ORDER', payload: objOrderReducer }
+    | { type: 'EDIT_ORDER_TYPE', payload: orderType}
+    | { type : 'EDIT_TYPE_OS', payload:number } 
 
 export type orderItem =  orderProduct & { quantidade:number};
 export type serviceItem = orderService & { quantidade: number };
@@ -86,9 +88,11 @@ export type parcela = {
     vencimento:string
     parcela:number
 }
+
 export type orderSituation =  
     'EA' | 'AI' | 'FI' | 'RE' | 'FP' 
  
+export type orderType = 1 | 3 // 1 = pedido/orçamento. 3 = Ordem de serviço 
 
 export type objOrderReducer = {
     codigo:string

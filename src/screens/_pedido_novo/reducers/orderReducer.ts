@@ -193,6 +193,14 @@ export function orderReducer(state: objOrderReducer, action: actionOrderReducer)
       })
       return { ...state, parcelas: newInstallments }
     }
+    case 'EDIT_ORDER_TYPE':{
+      const { payload } = action;
+      
+        return {
+          ...state,
+          tipo: payload
+        }
+      }
 
     case 'EDIT_OBSERVATIONS': {
       return { ...state, observacoes: action.payload }
@@ -208,6 +216,11 @@ export function orderReducer(state: objOrderReducer, action: actionOrderReducer)
 
     case 'LOAD_ORDER': {
       return { ...action.payload }
+    }
+    case "EDIT_TYPE_OS": { 
+      return {
+        ...state, tipo_os: action.payload
+      }
     }
   }
 }

@@ -3,10 +3,6 @@ import { Home } from "../../screens/home";
 import { Configurações } from "../../screens/configurações";
 import { Produtos } from "../../screens/Produtos";    
 import { EditarOrcamento } from "../../screens/editar_orcamento";
-import { Novo_Pedido } from "../../screens/novo_pedido";
-import { NovaOs } from "../../screens/nova_os";
-import { Tela_os } from "../../screens/tela_os";
-import { EditarOS } from "../../screens/editar_os";
 import { Clientes } from "../../screens/clientes";
 import { Servicos } from "../../screens/servicos";
 import { Usuarios } from "../../screens/usuarios";
@@ -23,28 +19,65 @@ import Veiculos from "../../screens/veiculos";
 import Cadastro_veiculo from "../../screens/cadastroVeiculo";
 import { CadastroUsuario } from "../../screens/cadastrarUsuarios";
 import { Lista_pedidos } from "../../screens/pedidos";
-import { Tela_pedidos } from "../../screens/tela_pedidos";
 import { Cadastro_caracteristicas } from "../../screens/cadastro-caracteristicas";
 import { PedidoComponent } from "../../screens/_pedido_novo";
+import { View } from "react-native";
 
 const Stack = createStackNavigator();
 
 
+    /** componente novo pedido */
     const NewOrderCompoent = ({navigation}:any)=>{
-     return   <PedidoComponent navigation={navigation} isNewOrder={true}/>
+     return   <PedidoComponent navigation={navigation} tipo={1} isNewOrder={true}/>
     }
 
+    /** Componente edição de um pedido */
     const EditOrderCompoent = ({navigation, route}:any)=>{
         const { codigo_orcamento } = route.params || {}
         return (
             <PedidoComponent
+            tipo={1}
                 navigation={navigation}
                 isNewOrder={false}
                 orderIdEdit={codigo_orcamento}
             />
         )
     }
-    
+
+    /** Componente nova ordem de serviço */
+    const NewOsComponent = ( {navigation}:any ) =>{
+        return   <PedidoComponent navigation={navigation} tipo={3} isNewOrder={true}/>
+    }
+
+    /** componente adição de uma ordem de serviço */
+        const EditOsCompoent = ({navigation, route}:any)=>{
+        const { codigo_orcamento } = route.params || {}
+        return (
+            <PedidoComponent
+            tipo={3}
+                navigation={navigation}
+                isNewOrder={false}
+                orderIdEdit={codigo_orcamento}
+            />
+        )
+    }
+
+
+    /*** componente que exibe os pedidos  */
+    const Tela_lista_pedidos = ( {navigation,route}:any ) =>{
+            return <View style={{flex:1}}  >
+                   <Lista_pedidos tipo={1}  navigation={navigation} to={'novoOrcamento'} route={route} />
+            </View>
+    }
+
+      
+        /*** componente que exibe as os  */
+    const Tela_lista_os = ( {navigation,route}:any ) =>{
+           return <View style={{flex:1}}  >
+                   <Lista_pedidos tipo={3}  navigation={navigation} to={'NovaOs'} route={route} />
+            </View>
+    }
+
     export const  MyStack = ()=>{
 
         return(
@@ -67,24 +100,23 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="cadastro_categorias"       component={ Cadastro_Categorias } options={{ headerShown:false }}  />
 
                     <Stack.Screen name="ajustes"                   component={Configurações}  options={{ headerShown:false }} />
-                    <Stack.Screen name="editarOrcamento"           component={EditarOrcamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    
                     <Stack.Screen name="editarOrcamentoNovo"       component={EditOrderCompoent}  options={{ headerShown:false }} />
-                    <Stack.Screen name="editarOS"                  component={EditarOS}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
-                    
-                   {/**   <Stack.Screen name="novoOrcamento"             component={Novo_Pedido}  options={{ headerShown:false }}  />
-                    */}
+                    <Stack.Screen name="editarOS"                  component={EditOsCompoent}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                    <Stack.Screen name="NovaOs"                    component={NewOsComponent}  options={{ headerShown:false }} />
                     <Stack.Screen name="novoOrcamento"             component={NewOrderCompoent}  options={{ headerShown:false }}  />
-                    
                     <Stack.Screen name="orçamentos"                component={Lista_pedidos}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}}  />
-                    <Stack.Screen name="NovaOs"                    component={NovaOs}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
+                  
+                    <Stack.Screen name="vendas"                    component={Tela_lista_pedidos} options={{headerShown:false}} />
+                    <Stack.Screen name="OS"                        component={Tela_lista_os}  options={{headerShown:false}} />
+                
+                
                     <Stack.Screen name="usuarios"                  component={Usuarios}  options={{headerShown:false}} />
                     <Stack.Screen name="cadastro_usuario"          component={CadastroUsuario}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="veiculos"                  component={ Veiculos }  options={{headerShown:false}}/>
                     <Stack.Screen name="cadastro_veiculos"         component={ Cadastro_veiculo }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="Teste"                     component={ Teste }  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
                     <Stack.Screen name="ViewTabProdutos"           component={ViewTabProdutos} options={{headerShown:false}} />
-                    <Stack.Screen name="vendas"                    component={Tela_pedidos} options={{headerShown:false}} />
-                    <Stack.Screen name="OS"                        component={Tela_os}  options={{headerShown:false}} />
                     <Stack.Screen name="formasPagamento"           component={FormasPagamento }      options={{headerShown:false}} />
                     <Stack.Screen name="cadastro_formaPagamento"   component={Cadastro_FormaPagamento}  options={{ headerStyle:{ backgroundColor:'#185FED'}, headerTintColor:'#FFF', title:"voltar"}} />
               

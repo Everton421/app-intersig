@@ -6,7 +6,6 @@ import { usePedidos } from "../../database/queryPedido/queryPedido";
 import { AuthContext } from "../../contexts/auth";
 import { configMoment } from "../../services/moment";
 import Ionicons from '@expo/vector-icons/Ionicons';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { useFocusEffect } from "@react-navigation/native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { ModalFilter } from "./components/modal-filter/modal-filter"; 
@@ -49,45 +48,13 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
 
 
             const [selectedPrinter, setSelectedPrinter] = useState();
-
-            const print = async () => {
-                // On iOS/android prints the given html. On web prints the HTML from the current page.
-                await Print.printAsync({
-                html,
-                printerUrl: selectedPrinter?.url, // iOS only
-                });
-            };
-
- /*
-    const html = ` <html>
-                    <head>
-                        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-                    </head>
-                    <body style="text-align: center;">
-                        <h1 style="font-size: 50px; font-family: Helvetica Neue; font-weight: normal;">
-                        Hello Expo!
-                        </h1>
-                        <img
-                        src="https://i.ibb.co/tpDk4DD5/i5.png"
-                        style="width: 90vw;" />
-                    </body>
-                </html> `;
-
  
-
-            const printToFile = async () => {
-                // On iOS/android prints the given html. On web prints the HTML from the current page.
-                const { uri } = await Print.printToFileAsync( { html });
-                console.log('File has been saved to:', uri);
-                await shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf'} );
-            };
-            */
-
+    
              
             async function printOrder ( codigo: number ){
              let aux:any = await useQuerypedidos.selectCompleteOrderByCode(codigo);
                 
-                 const newFileName = `${FileSystem.documentDirectory}Pedido_N°-${aux.id}  - ${new Date().getTime()}.pdf`;
+                 const newFileName = `${FileSystem.documentDirectory  }Pedido_N°-${aux.id}  - ${new Date().getTime()}.pdf`;
 
                 const html =  generateOrderHTML(aux)
 
@@ -102,7 +69,7 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
             } 
 
             const selectPrinter = async () => {
-                const printer = await Print.selectPrinterAsync(); // iOS only
+                const printer:any = await Print.selectPrinterAsync(); // iOS only
                 setSelectedPrinter(printer);
             };
 
@@ -191,14 +158,14 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         ] )
     }
 
-    async function selecionaOrcamentoModal( item ){
+    async function selecionaOrcamentoModal( item :any){
         let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
         console.log(aux  )
         setOrcamentoModal( aux );
         setVisibleModal( true )
     }
 
-    async function postPedido( item ){
+    async function postPedido( item :any){
         try{
                 setVisiblePostPedido(true);
               let aux = await useQuerypedidos.selectCompleteOrderByCode(item.codigo);
@@ -225,7 +192,7 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
         }
     }
 
-    function selecionaOrcamento(item){
+    function selecionaOrcamento(item:any){
     setLoadingEditOrder(true)
         try{
 
@@ -360,7 +327,8 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                     ) : null
                   )}
                   <TouchableOpacity style={{ backgroundColor: '#E3F2FD', padding: 6, borderRadius: 8 }} onPress={() => printOrder(item.codigo)}>
-                    <AntDesign name="sharealt" size={18} color={defaultColors.darkBlue} />
+                 <MaterialIcons name="share" size={18} color={defaultColors.darkBlue} />
+
                   </TouchableOpacity>
                   <TouchableOpacity style={{ backgroundColor: '#E3F2FD', padding: 6, borderRadius: 8 }} onPress={() => postPedido(item)}>
                     <Ionicons name="sync-sharp" size={18} color={defaultColors.darkBlue} />
@@ -387,10 +355,10 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
     return (
         <View style={{ flex:1, backgroundColor:'#EAF4FE', width:'100%'}} >
               <CustomHeader
-                  title="Pedidos"
+                  title={ tipo == 1 ? 'Pedidos' : "Ordens de Serviço"}
                   onBack={() => navigation.goBack()}
                   showSearch
-                  searchValue={pesquisa}
+                  searchValue={pesquisa || ''}
                   onSearchChange={(v) => setPesquisa(v)}
                   showFilter
                   onFilterPress={() => setVisible(true)}
@@ -417,7 +385,9 @@ export const Lista_pedidos = ({navigation, tipo, to, route }:any)=>{
                         ListEmptyComponent={() => (
                           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 60 }}>
                             <MaterialIcons name="receipt-long" size={64} color="#CCC" />
-                            <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#999', marginTop: 12 }}>Nenhum pedido encontrado</Text>
+                            <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#999', marginTop: 12 }}>
+                              Nenhum{ tipo == 1 ? ' Pedido encontrado'  : "a Ordem de Serviço encontrada" } 
+                              </Text>
                           </View>
                         )}
                         />

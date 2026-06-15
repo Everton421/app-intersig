@@ -2,7 +2,7 @@ import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, TouchableOpa
 import { useContext, useEffect, useReducer, useRef, useState } from "react"
 import { ProductList } from "./_components/product-list/product-list"
 import { RenderSelectedItem } from "./_components/render-itens-selected"
-import { cliente, orderItem, orderPaymentMethod, orderService, orderSituation, parcela, payloadCalculateInstallments, payloadEditDueInstallment, serviceItem, type orderProduct } from "./types/order"
+import { cliente, orderItem, orderPaymentMethod, orderService, orderSituation, orderType, parcela, payloadCalculateInstallments, payloadEditDueInstallment, serviceItem, type orderProduct } from "./types/order"
 import { CustomerList } from "./_components/customer/customer-list"
 import { CustomHeaderOrderComponent } from "./_components/header"
 import { Installments } from "./_components/installments"
@@ -15,6 +15,9 @@ import { AuthContext } from "../../contexts/auth"
 import { NavigationProp } from '@react-navigation/native';
 import { orderReducer } from "./reducers/orderReducer"
 import { initialOrderState } from "./reducers/orderInitalState"
+import { useVeiculos } from "../../database/queryVceiculos/queryVeiculos"
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { ModalOsType } from "./_components/modal_os_type/modal_os_type"
 
 
 
@@ -22,21 +25,25 @@ type Props = {
     navigation: NavigationProp<any>
     route?: any
   isNewOrder:boolean  
+  tipo:number
   orderIdEdit?: number
 }
 
 
  
-export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) => {
+export const PedidoComponent = ({ navigation, isNewOrder,tipo , orderIdEdit }:Props) => {
 
-  const useQuerypedidos = usePedidos();
-  const { usuario }: any = useContext(AuthContext);
+    const useQuerypedidos = usePedidos();
+    const { usuario }: any = useContext(AuthContext);
+    const useQueryVeiculos    = useVeiculos();
+    const loadedOrderRef = useRef(false);
 
     const [state, dispatch] = useReducer(orderReducer, initialOrderState)
-
     const [isLoadingSaveOrder, setIsLoadingSaveOrder] = useState(false)
     const [newOrderId, setNewOrderId] = useState('0');
+    const [isLoadingOrder, setIsLoadingOrder] = useState(false);
     const orderCodigoRef = useRef<number | null>(null);
+    const [ visibleTypeosModal, setVisibleTipeOs ] = useState(false);
 
     const [paymentMothod, setPaymentMethod] = useState<orderPaymentMethod>({ quantidade_parcelas: 1, intervalo_parcelas: 0, codigo: 0 });
 
@@ -81,8 +88,10 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
     }
     const handleEditDueInstallment = (payload: payloadEditDueInstallment) => { dispatch({ type: "EDIT_DUE_INSTALLMENTS", payload }) }
     const handleEditSituation = (payload: orderSituation) => { dispatch({ type: 'EDIT_SITUATION', payload: payload }) }
-
+    const handleEditTypeOrder = ( payload: orderType )=>{ dispatch({ type: 'EDIT_ORDER_TYPE', payload: payload })}
     const handleEditContact = ( payload:string ) =>{ dispatch({ type:'EDIT_CONTACT', payload   }) }
+    
+    const handleEditTypeOs = ( payload:number ) =>{ dispatch({ type: 'EDIT_TYPE_OS', payload: payload })}
 
     const handleAddServices = (service: orderService, quantity:number)=>{ 
         dispatch(
@@ -135,11 +144,11 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
     useEffect(()=>{
         if(isNewOrder){
                 generateid();
+                handleEditTypeOrder(tipo as orderType)
         }
     },[])
 
-    const [isLoadingOrder, setIsLoadingOrder] = useState(false);
-    const loadedOrderRef = useRef(false);
+  
 
     useEffect(() => {
         if (!isNewOrder && orderIdEdit && !loadedOrderRef.current) {
@@ -237,6 +246,24 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
     }, [orderIdEdit, isNewOrder])
 
 
+
+
+    function switchOrderType(){
+        
+        if(isNewOrder && tipo == 1){
+            return  `Novo Pedido #${newOrderId}`
+        }
+        if(isNewOrder && tipo == 3){
+            return  `Nova OS #${newOrderId}`
+        }
+        if(!isNewOrder && tipo == 1 ){
+            return `Editar Pedido #${newOrderId}`
+        }
+        if(!isNewOrder && tipo == 3 ){
+         return   `Editar Pedido #${newOrderId}`
+        }
+    }
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -244,7 +271,7 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
         >
 
             <CustomHeaderOrderComponent
-                title={ isNewOrder ? `Novo Pedido #${newOrderId}` : `Editar Pedido #${newOrderId}`}
+                title={ switchOrderType() || ''}
                 onBack={() => navigation.goBack()}
             />
 
@@ -309,8 +336,14 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                     )}
             </View>
              
+          {
+             tipo  != 1 && 
+            <ModalOsType handleEditTypeOs={()=>{}} />
+            }
+
         {/* LISTA DE SERVICOS*/}
-             
+                    {
+                        tipo  != 1 &&
                  <View style={{
                     backgroundColor: '#FFF',
                     borderRadius: 12,
@@ -359,6 +392,7 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                         </View>
                     )}
                 </View>
+                    }
 
                 
              
@@ -452,7 +486,7 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                                 data_recadastro: state.data_recadastro,
 
                                 cliente: { codigo: state.cliente.codigo },
-                                produtos: state.produtos.map((p, index ) => {
+                                produtos: state.produtos.map((p, index ) => 
                                     ({
                                     codigo: p.codigo,
                                     quantidade: p.quantidade,
@@ -460,7 +494,7 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                                     desconto: p.desconto || 0,
                                     total: p.total
                                 })
-                            }
+                             
                             ),
                                 servicos: state.servicos.map(s => ({
                                     codigo: s.codigo,
@@ -476,6 +510,7 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                                 }))
                             };
 
+                          
                             if (isNewOrder) {
                                 await useQuerypedidos.createOrderByCode(
                                     pedidoData as any,
@@ -484,8 +519,10 @@ export const PedidoComponent = ({ navigation, isNewOrder, orderIdEdit }:Props) =
                                     String(codigo)
                                 );
                             } else {
-                                await useQuerypedidos.updateOrder(pedidoData, orderIdEdit);
+                                   await useQuerypedidos.updateOrder(pedidoData, orderIdEdit);
+                            
                             }
+                           
 
                             navigation.goBack();
                         } catch (e) {

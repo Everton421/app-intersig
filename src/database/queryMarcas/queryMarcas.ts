@@ -10,13 +10,16 @@ export type marca = {
      data_recadastro:string 
  }
 
+    type resultLastBrandId =  {id:string}[] 
+    type resultLastBrandCode =  {codigo:string}[] 
+
 export const useMarcas = ()=> {
 
 
 const db = useSQLiteContext();
 
  
- 
+    
   
     async function create(  marca:marca ) {
             try{
@@ -71,6 +74,21 @@ const db = useSQLiteContext();
         }catch(e){ console.log( "erro ao buscar as marcas ",e) }
     }  
 
+        async function findLastBrandId(){
+             try{
+            let result = await db.getAllAsync(`SELECT  MAX(id) as id  from marcas;`);
+          //  console.log(result);
+            return result as resultLastBrandId;
+        }catch(e){ console.log( "Erro ao buscar id da ultima marca registrada no banco de dados ",e) }
+        }
+
+    async function findLastBrandCode(){
+             try{
+            let result = await db.getAllAsync(`SELECT  MAX(codigo) as codigo  from marcas;`);
+          //  console.log(result);
+            return result as resultLastBrandCode;
+        }catch(e){ console.log( "Erro ao buscar id da ultima marca registrada no banco de dados ",e) }
+        }
     async function selectAllLimit(limit?:number){
         
         const sql = `SELECT *,
@@ -98,6 +116,6 @@ const db = useSQLiteContext();
         }catch(e){ console.log(`erro ao consultar o marca com a descricao ${descricao} `,e)}
     }
  
-    return { selectAll, selectByCode,selectAllLimit, create,update,selectByDescription  } 
+    return { selectAll, findLastBrandCode, findLastBrandId, selectByCode,selectAllLimit, create,update,selectByDescription  } 
  
 }

@@ -97,7 +97,7 @@ export const Configurações = ({ navigation }: any) => {
   async function connect() {
     try {
       setLoading(true);
-      const response = await api.get('/', {});
+      const response = await api.get('/health', {});
       if (response.status === 200 && response.data.ok) {
         setConectado(true);
         setConnected(true);
@@ -164,16 +164,16 @@ export const Configurações = ({ navigation }: any) => {
     let data = await verifyDateSinc();
     setIsLoading(true);
     try {
-      await syncProdutos.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncProdutos.syncData({ data, setIsLoading, setProgress, setItem });
       await syncMarcas.syncData({ data, setIsLoading, setProgress, setItem });
       await syncCategorias.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncFotos.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncServicos.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncClientes.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncVeiculos.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncTipoDeOs.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncFormasPagamento.syncData({ data, setIsLoading, setProgress, setItem });
-      await syncUsusarios.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncFotos.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncServicos.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncClientes.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncVeiculos.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncTipoDeOs.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncFormasPagamento.syncData({ data, setIsLoading, setProgress, setItem });
+     // await syncUsusarios.syncData({ data, setIsLoading, setProgress, setItem });
       setDataSelecionada(undefined);
     } catch (e) {
       console.log(e);

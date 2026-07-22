@@ -59,24 +59,35 @@ export const Login = ({ navigation }: any) => {
     } else {
       try {
         setLoading(true);
-        let response: any = await api.post("/login", user);
+        let response = await api.post("/login", user);
 
         if (response.status == 200) {
-          let lembrarUsuario = lembrar ? "S" : "N";
-          let userMobile = {
-            email: user.email,
-            senha: user.senha,
-            codigo: response.data.codigo,
-            nome: response.data.usuario,
-            lembrar: lembrarUsuario,
-            token: response.data.token
-          };
 
-          await useRestart.restart();
-          setUsuario(userMobile);
-          await useQueryUsuario.create(userMobile);
-          setLogado(true);
-          return;
+          const responseDateLogin = response.data as { token: string}
+            const { token } = responseDateLogin
+              const resultRequestUser = await api.get('/usuarios', {
+                  headers:{
+                    token
+                  }
+                });
+                const resultDataUser = resultRequestUser.data as { codigo: number, email:string, nome:string};
+
+
+            let lembrarUsuario = lembrar ? "S" : "N";
+            let userMobile = {
+              email: resultDataUser.email,
+              senha: user.senha,
+              codigo: resultDataUser.codigo,
+              nome: resultDataUser.nome,
+              lembrar: lembrarUsuario,
+              token: token
+            };
+
+            await useRestart.restart();
+            setUsuario(userMobile);
+            await useQueryUsuario.create(userMobile);
+            setLogado(true);
+            return;
         }
       } catch (e: any) {
         if (e.response && e.response.status === 400) {

@@ -6,6 +6,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { ConnectedContext } from "../../contexts/conectedContext"
 import { LodingComponent } from "../../components/loading";
 import { CustomHeader } from "../../components/custom-header";
+import { AlertType, CustomAlert } from "../../components/custom-alert";
 
 export const Cadastro_Marcas = ( {navigation}:any ) => {
 
@@ -16,6 +17,15 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
      
     const api = useApi();
     const useQueryMarcas = useMarcas();
+
+     const [isVisibleAlert,  setIsVisibleAlert] = useState(false);
+    const [titleAlert,      setTitleAlert ] = useState('');
+    const [messageAlert,    setMessageAlert] =useState('');
+    const [typeAlert,       setTypeAlert] = useState<AlertType>('success');
+    const [cancelText,      setCancelText] = useState<string | undefined>();
+    const [confirmText,     setConfirmText] = useState<string | undefined>();
+
+
     const {connected,  setConnected} = useContext(ConnectedContext)
 
      
@@ -35,12 +45,40 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
 
     
     async function gravar (){
-        if( connected === false ) return Alert.alert('Erro', 'É necessario estabelecer conexão com a internet para efetuar o cadastro !');
-            if(!input || input === "") return Alert.alert("é necessario informar a descricao!") 
-                
-                try{
-                    setLoading(true)
-            let resposta = await api.post('/marca', { "descricao": input});
+
+        if( connected === false ){ 
+                setIsVisibleAlert(true)
+                setTitleAlert("Atenção!")
+                setMessageAlert("É necessario estabelecer conexão com a internet para efetuar o cadastro !");
+                setTypeAlert('warning')
+                setCancelText(undefined)
+                setConfirmText('ok')
+                return 
+        } 
+        
+        if(!input || input === "") {
+                setIsVisibleAlert(true)
+                setTitleAlert("Atenção!")
+                setMessageAlert("É necessario informar com a descrição da marca")
+                setTypeAlert('warning')
+                setCancelText(undefined)
+                setConfirmText('ok')
+                return 
+            }
+ 
+       try{
+              setLoading(true)
+
+      const resultLastbrandId = await useQueryMarcas.findLastBrandCode();
+        console.log(resultLastbrandId)
+      /*
+      console.log(resultLastbrandId);
+        let lastbrandId =1;
+        //if(resultLastbrandId && Number(resultLastbrandId[0].codigo > 0 )){
+//
+        //}
+            let resposta = await api.post('/marcas', { "descricao": input, id: ''});
+            
             if(resposta.status === 200 && resposta.data.codigo > 0 ){
 
                     let valid:any = await useQueryMarcas.selectByCode(resposta.data.codigo);
@@ -51,15 +89,29 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
                         }
                     setInput('')
                     navigation.goBack()
-                    return Alert.alert('',`Marca ${input} registrada com sucesso! `)
+
+                setIsVisibleAlert(true)
+                setTitleAlert("Ok")
+                setMessageAlert(`Marca ${input} registrada com sucesso! `)
+                setTypeAlert('success')
+                setCancelText(undefined)
+                setConfirmText('ok')
+                return 
+
                 }
-            }catch(e:any){
-                if( e.status === 400 ){
-                    return Alert.alert( 'Erro!',`${e.response.data.msg}`)
-                }
-            }finally{
+          }catch(e:any){
+                
+              setIsVisibleAlert(true)
+                setTitleAlert("Erro")
+                setMessageAlert(`${e.response.data.message}`)
+                setTypeAlert('error')
+                setCancelText(undefined)
+                setConfirmText('ok')
+                return 
+          }finally{
             setLoading(false)
-            }
+          }
+          */
         } 
 
 
@@ -93,6 +145,21 @@ export const Cadastro_Marcas = ( {navigation}:any ) => {
             >
               <Text style={{ fontWeight: 'bold', color: '#FFF', fontSize: 18 }}>Gravar Marca</Text>
             </TouchableOpacity>
+
+
+  
+    
+            <CustomAlert
+                    visible={isVisibleAlert}
+                    message={messageAlert}
+                    onConfirm={() => setIsVisibleAlert(false)}
+                    onCancel={() => setIsVisibleAlert(false)}
+                    title={titleAlert}
+                    type={typeAlert}
+                    cancelText={cancelText}
+                    confirmText={confirmText}
+                  />
+
           </ScrollView>
         </View>
     )

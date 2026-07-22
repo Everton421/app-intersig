@@ -12,6 +12,7 @@ import { RenderItensMarcas } from "./renderItem";
 import { CustomHeader } from "../../components/custom-header";
 import { EmptyState } from "../../components/empty-state";
 import { Fab } from "../../components/fab";
+import { AlertType, CustomAlert } from "../../components/custom-alert";
 
 type marca= { codigo:number, descricao:string}
 
@@ -23,6 +24,14 @@ export const Marcas = ({navigation}:any)=>{
     const [ marcaSelecionada, setMarcaSelecionada ] = useState<any>();
     const [ loading , setLoading ] = useState(false);
 
+    const [isVisibleAlert,  setIsVisibleAlert] = useState(false);
+    const [titleAlert,      setTitleAlert ] = useState('');
+    const [messageAlert,    setMessageAlert] =useState('');
+    const [typeAlert,       setTypeAlert] = useState<AlertType>('success');
+    const [cancelText,      setCancelText] = useState<string | undefined>();
+    const [confirmText,     setConfirmText] = useState<string | undefined>();
+
+    
     const useQueryMarcas = useMarcas();
     const api = useApi();
          const dateService = configMoment();
@@ -66,8 +75,15 @@ export const Marcas = ({navigation}:any)=>{
 
 
 async function gravar(){
-  if( !marcaSelecionada?.descricao ) return Alert.alert("Erro!", "É necessario informar a descrição para poder gravar!") 
-
+  if( !marcaSelecionada?.descricao )   {
+            setIsVisibleAlert(true)
+            setTitleAlert("Atenção!")
+            setMessageAlert(`É necessario informar a descrição para poder gravar!`)
+            setTypeAlert('info')
+            setCancelText(undefined)
+            setConfirmText('ok')
+            return
+       }
     try{
         
         setLoading(true);
@@ -76,27 +92,50 @@ async function gravar(){
                     "descricao": marcaSelecionada.descricao,
                     "data_cadastro": marcaSelecionada.data_cadastro,
                     "data_recadastro": dateService.dataHoraAtual(),
-                    "id": marcaSelecionada.id
+                    "id": String(marcaSelecionada.id)
                     }
-        let result = await api.put('/marca', objmarca);
+        let result = await api.put('/marcas', objmarca);
         
         if(result.status === 200 ){
             try{
               let resultDb = await useQueryMarcas.update(objmarca, marcaSelecionada.codigo);
                 }catch(e){
-            return Alert.alert('Erro!', 'Erro ao Tentar registrar serviço no banco local!');
+            setIsVisibleAlert(true)
+            setTitleAlert("Erro!")
+            setMessageAlert(`Erro ao Tentar registrar Marca: ${marcaSelecionada?.descricao} !`)
+            setTypeAlert('error')
+            setCancelText(undefined)
+            setConfirmText('ok')
+            return  
             }
             setVisible(false)
-            return Alert.alert('', ` Marca: ${marcaSelecionada?.descricao} Alterado Com Sucesso! ` );
+            setIsVisibleAlert(true)
+            setTitleAlert("Sucesso!")
+            setMessageAlert(` Marca: ${marcaSelecionada?.descricao} Alterado Com Sucesso! `)
+            setTypeAlert('success')
+            setCancelText(undefined)
+            setConfirmText('ok')
         }
 
 
     }catch(e:any){
         if(e.status === 400 ){
-            return Alert.alert('Erro!', e.response.data.msg);
+            setIsVisibleAlert(true)
+            setTitleAlert("Erro!")
+            setMessageAlert(` ${e.response.data.message} `)
+            setTypeAlert('error')
+            setCancelText(undefined)
+            setConfirmText('ok')
+            return 
         } else{
-            console.log(e)
-            return Alert.alert('Erro!', 'Erro desconhecido!');
+            
+             setIsVisibleAlert(true)
+            setTitleAlert("Erro!")
+            setMessageAlert(` ${e.response.data.message} `)
+            setTypeAlert('error')
+            setCancelText(undefined)
+            setConfirmText('ok')
+            return 
 
         }  
     }finally{
@@ -150,6 +189,18 @@ async function gravar(){
                 </View>
               </View>
             </Modal>
+               <CustomAlert
+                    visible={isVisibleAlert}
+                    message={messageAlert}
+                    onConfirm={() => setIsVisibleAlert(false)}
+                    onCancel={() => setIsVisibleAlert(false)}
+                    title={titleAlert}
+                    type={typeAlert}
+                    cancelText={cancelText}
+                    confirmText={confirmText}
+                  />
+            
+
                  {/**  */}
            <View style={{ marginTop:10}}> 
                  <FlatList

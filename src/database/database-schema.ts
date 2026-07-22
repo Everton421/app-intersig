@@ -29,6 +29,7 @@ export const databaseSchema =
 
      CREATE TABLE IF NOT EXISTS produtos (
       codigo          INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       estoque         REAL DEFAULT 0,
       preco           REAL DEFAULT 0,
       grupo           INTEGER DEFAULT 0,
@@ -54,6 +55,7 @@ export const databaseSchema =
 
       CREATE TABLE IF NOT EXISTS servicos ( 
       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       valor REAL DEFAULT 0,
       aplicacao TEXT NOT NULL,
         data_cadastro TEXT NOT NULL,
@@ -64,6 +66,7 @@ export const databaseSchema =
 
     CREATE TABLE IF NOT EXISTS clientes (
       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       celular TEXT,
       nome TEXT NOT NULL,
       cep TEXT NOT NULL DEFAULT '00000-000',
@@ -81,6 +84,7 @@ export const databaseSchema =
       --
       CREATE TABLE IF NOT EXISTS forma_pagamento (
         codigo INTEGER PRIMARY KEY NOT NULL ,
+        id TEXT NOT NULL DEFAULT 0,
         descricao TEXT NOT NULL, 
         desc_maximo INTEGER DEFAULT 0,  
         parcelas INTEGER DEFAULT 0,  
@@ -149,6 +153,7 @@ export const databaseSchema =
 
       CREATE TABLE IF NOT EXISTS tipos_os (
        codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
        descricao TEXT NOT NULL,
        data_cadastro TEXT NOT NULL,
        data_recadastro TEXT NOT NULL 
@@ -156,6 +161,7 @@ export const databaseSchema =
 
       CREATE TABLE IF NOT EXISTS veiculos (
        codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
        cliente INTEGER  NOT NULL DEFAULT 0,
        placa TEXT NOT NULL,
        marca TEXT,
@@ -289,6 +295,7 @@ export const databaseSchema =
 
 CREATE TABLE IF NOT EXISTS produtos (
       codigo          INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       estoque         REAL DEFAULT 0,
       preco           REAL DEFAULT 0,
       grupo           INTEGER DEFAULT 0,
@@ -314,6 +321,7 @@ CREATE TABLE IF NOT EXISTS produtos (
 
       CREATE TABLE IF NOT EXISTS servicos ( 
       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       valor REAL DEFAULT 0,
       aplicacao TEXT NOT NULL,
         data_cadastro TEXT NOT NULL,
@@ -324,6 +332,7 @@ CREATE TABLE IF NOT EXISTS produtos (
 
     CREATE TABLE IF NOT EXISTS clientes (
       codigo INTEGER PRIMARY KEY NOT NULL,
+       id TEXT NOT NULL DEFAULT 0,
       celular TEXT,
       nome TEXT NOT NULL,
       cep TEXT NOT NULL DEFAULT '00000-000',
@@ -341,6 +350,7 @@ CREATE TABLE IF NOT EXISTS produtos (
       --
       CREATE TABLE IF NOT EXISTS forma_pagamento (
         codigo INTEGER PRIMARY KEY NOT NULL ,
+        id TEXT NOT NULL DEFAULT 0,
         descricao TEXT NOT NULL, 
         desc_maximo INTEGER DEFAULT 0,  
         parcelas INTEGER DEFAULT 0,  

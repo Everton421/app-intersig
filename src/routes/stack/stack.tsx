@@ -85,13 +85,13 @@ const Stack = createStackNavigator();
                     <Stack.Screen name="home"                      component={Home}     options={{headerShown:false}} />
 
                     <Stack.Screen name="produtos"                  component={Produtos} />
-                    <Stack.Screen name="cadastro_produto"          component={Cadastro_produto}  options={{headerShown:false}}  />
 
                     <Stack.Screen name="serviços"                  component={Servicos}  options={{headerShown:false}} />
                     <Stack.Screen name="cadastro_servico"          component={Cadastro_servico}  options={{ headerShown:false}} />
 
                     <Stack.Screen name="clientes"                  component={Clientes} options={{headerShown:false}} />
                     <Stack.Screen name="cadastro_cliente"          component={Cadastro_cliente}  options={{ headerShown:false }} />
+                    <Stack.Screen name="cadastro_produto"          component={Cadastro_produto}  options={{headerShown:false}}  />
 
                     <Stack.Screen name="cadastro_caracteristicas"   component={Cadastro_caracteristicas}  options={{ headerShown:false }} />
 
